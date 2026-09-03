@@ -1,26 +1,227 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ===========================================================================
+   Tazkarti design system
+   Neutral-first: paper and ink carry the page, one accent hue carries meaning.
+   Hairline borders instead of shadows. One 4px spacing grid. Tight display type.
+   =========================================================================== */
+@theme {
+  /* ---- Neutral ramp (the whole product is built from this) -------------- */
+  --color-n-0:   oklch(1 0 0);
+  --color-n-25:  oklch(0.992 0.001 285);
+  --color-n-50:  oklch(0.979 0.002 285);
+  --color-n-100: oklch(0.960 0.003 285);
+  --color-n-150: oklch(0.940 0.003 285);
+  --color-n-200: oklch(0.918 0.004 285);
+  --color-n-300: oklch(0.860 0.005 285);
+  --color-n-400: oklch(0.715 0.008 285);
+  --color-n-500: oklch(0.605 0.010 285);
+  --color-n-600: oklch(0.505 0.011 285);
+  --color-n-700: oklch(0.396 0.011 285);
+  --color-n-800: oklch(0.288 0.010 285);
+  --color-n-850: oklch(0.238 0.009 285);
+  --color-n-900: oklch(0.193 0.008 285);
+  --color-n-950: oklch(0.152 0.007 285);
+  --color-n-1000:oklch(0.118 0.006 285);
+
+  /* ---- Accent: used for focus, links, selection, active state ----------- */
+  --color-accent-50:  oklch(0.970 0.015 286);
+  --color-accent-100: oklch(0.936 0.032 286);
+  --color-accent-200: oklch(0.885 0.060 286);
+  --color-accent-300: oklch(0.806 0.104 286);
+  --color-accent-400: oklch(0.712 0.152 286);
+  --color-accent-500: oklch(0.628 0.188 286);
+  --color-accent-600: oklch(0.556 0.204 286);
+  --color-accent-700: oklch(0.487 0.186 286);
+  --color-accent-800: oklch(0.416 0.152 286);
+  --color-accent-900: oklch(0.352 0.120 286);
+  --color-accent-950: oklch(0.242 0.082 286);
+
+  /* ---- Status: muted, never neon --------------------------------------- */
+  --color-positive:   oklch(0.596 0.132 152);
+  --color-positive-bg:oklch(0.955 0.031 152);
+  --color-caution:    oklch(0.640 0.132 70);
+  --color-caution-bg: oklch(0.960 0.043 82);
+  --color-critical:   oklch(0.586 0.192 25);
+  --color-critical-bg:oklch(0.955 0.026 25);
+  --color-info:       oklch(0.585 0.128 245);
+  --color-info-bg:    oklch(0.955 0.028 245);
+
+  /* ---- Semantic surfaces (light) --------------------------------------- */
+  --color-paper:    oklch(0.985 0.002 285);  /* page background            */
+  --color-card:     oklch(1 0 0);            /* raised surface             */
+  --color-sunken:   oklch(0.964 0.003 285);  /* inset rows, inputs at rest */
+  --color-hairline: oklch(0.912 0.004 285);  /* 1px separators             */
+  --color-hairline-soft: oklch(0.948 0.003 285);
+
+  --color-ink:      oklch(0.205 0.008 285);  /* primary text               */
+  --color-ink-2:    oklch(0.455 0.010 285);  /* secondary text             */
+  --color-ink-3:    oklch(0.605 0.010 285);  /* tertiary / placeholder     */
+
+  /* Solid button: near-black in light, near-white in dark. */
+  --color-solid:    oklch(0.205 0.008 285);
+  --color-on-solid: oklch(1 0 0);
+
+  /* ---- Radii: one family ------------------------------------------------ */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 20px;
+  --radius-3xl: 28px;
+
+  /* ---- Elevation: barely there ----------------------------------------- */
+  --shadow-e1: 0 1px 2px oklch(0.15 0.007 285 / 0.05);
+  --shadow-e2: 0 1px 2px oklch(0.15 0.007 285 / 0.05), 0 4px 12px oklch(0.15 0.007 285 / 0.05);
+  --shadow-e3: 0 2px 6px oklch(0.15 0.007 285 / 0.07), 0 16px 40px oklch(0.15 0.007 285 / 0.10);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* ---- Motion ----------------------------------------------------------- */
+  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@layer base {
+  .dark {
+    --color-paper:    oklch(0.145 0.006 285);
+    --color-card:     oklch(0.186 0.007 285);
+    --color-sunken:   oklch(0.222 0.008 285);
+    --color-hairline: oklch(0.278 0.009 285);
+    --color-hairline-soft: oklch(0.238 0.008 285);
+
+    --color-ink:      oklch(0.972 0.002 285);
+    --color-ink-2:    oklch(0.740 0.009 285);
+    --color-ink-3:    oklch(0.585 0.010 285);
+
+    --color-solid:    oklch(0.972 0.002 285);
+    --color-on-solid: oklch(0.165 0.007 285);
+
+    --color-positive-bg: oklch(0.290 0.052 152);
+    --color-caution-bg:  oklch(0.310 0.056 78);
+    --color-critical-bg: oklch(0.300 0.070 25);
+    --color-info-bg:     oklch(0.295 0.055 245);
+
+    --shadow-e1: 0 1px 2px oklch(0 0 0 / 0.35);
+    --shadow-e2: 0 1px 2px oklch(0 0 0 / 0.30), 0 4px 12px oklch(0 0 0 / 0.30);
+    --shadow-e3: 0 2px 6px oklch(0 0 0 / 0.40), 0 16px 40px oklch(0 0 0 / 0.45);
+  }
+
+  * { border-color: var(--color-hairline); }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+    text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "cv11", "ss01";
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent-500);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  ::selection { background: var(--color-accent-200); color: var(--color-accent-950); }
+  .dark ::selection { background: var(--color-accent-800); color: var(--color-accent-50); }
+
+  /* Display type: tight, balanced, never orphaned. */
+  h1, h2, h3, h4 { letter-spacing: -0.022em; text-wrap: balance; font-weight: 600; }
+  h1 { letter-spacing: -0.032em; }
+  p { text-wrap: pretty; }
+
+  /* Numerals line up in tables and money columns. */
+  .tabular, table { font-variant-numeric: tabular-nums; }
+
+  input, textarea, select, button { font: inherit; }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer utilities {
+  /* One page gutter, used by every route so columns line up across the app. */
+  .container-page {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 76rem;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px)  { .container-page { padding-inline: 2rem; } }
+  @media (min-width: 1280px) { .container-page { padding-inline: 2.5rem; } }
+
+  .container-narrow {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 56rem;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 768px) { .container-narrow { padding-inline: 2rem; } }
+
+  .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+
+  /* Hairline that survives fractional device pixels. */
+  .hairline-t { box-shadow: inset 0 1px 0 var(--color-hairline-soft); }
+  .hairline-b { box-shadow: inset 0 -1px 0 var(--color-hairline-soft); }
+
+  .display-1 { font-size: clamp(2.5rem, 1.6rem + 3.8vw, 4.25rem); line-height: 1.02; letter-spacing: -0.036em; font-weight: 600; }
+  .display-2 { font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);      line-height: 1.06; letter-spacing: -0.032em; font-weight: 600; }
+  .display-3 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);    line-height: 1.14; letter-spacing: -0.026em; font-weight: 600; }
+
+  .eyebrow {
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-ink-3);
+  }
+
+  .animate-rise { animation: rise 0.4s var(--ease-out-quint) both; }
+  .animate-fade { animation: fade 0.25s var(--ease-out-quint) both; }
+
+  /* Perforation between a ticket's stub and body. */
+  .perforation {
+    background-image: repeating-linear-gradient(
+      to bottom, var(--color-hairline) 0 5px, transparent 5px 11px
+    );
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ---------------------------------------------------------------------------
+   Chart palette. Both modes are selected against their own surface and pass
+   scripts/validate_palette.js (lightness band, chroma floor, CVD separation,
+   normal-vision floor). Aqua sits just under 3:1 on the light surface, so the
+   charts using it always carry visible value labels.
+   --------------------------------------------------------------------------- */
+.viz {
+  --series-1: #2a78d6;
+  --series-2: #1baf7a;
+  --viz-grid: var(--color-hairline-soft);
+  --viz-axis: var(--color-ink-3);
+}
+.dark .viz {
+  --series-1: #3987e5;
+  --series-2: #199e70;
+}
+
+@keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sweep { 100% { transform: translateX(100%); } }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
