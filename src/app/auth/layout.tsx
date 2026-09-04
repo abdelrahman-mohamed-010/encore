@@ -10,7 +10,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
           <Logo />
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-[13px] text-ink-3 transition-colors hover:text-ink"
+            className="inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
           >
             <ArrowLeft className="size-3.5" />
             Back to events
@@ -23,7 +23,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </main>
 
       <footer className="border-t border-hairline">
-        <div className="container-page flex h-14 items-center justify-center gap-5 text-[12.5px] text-ink-3">
+        <div className="container-page flex h-14 items-center justify-center gap-5 text-xs text-ink-3">
           <Link href="/legal/terms" className="transition-colors hover:text-ink-2">Terms</Link>
           <Link href="/legal/privacy" className="transition-colors hover:text-ink-2">Privacy</Link>
         </div>

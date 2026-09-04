@@ -147,7 +147,7 @@ export function CheckoutClient({
     <div className="container-page py-8 md:py-10">
       <Link
         href={`/events/${event.slug}`}
-        className="mb-6 inline-flex items-center gap-1.5 text-[13px] text-ink-3 transition-colors hover:text-ink"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
       >
         <ArrowLeft className="size-3.5" />
         Back to event
@@ -157,7 +157,7 @@ export function CheckoutClient({
         <Form id="checkout-form" form={form} onSubmit={pay.run} className="min-w-0 space-y-6">
           <div>
             <h1 className="display-2 text-ink">Checkout</h1>
-            <p className="mt-2 text-[14px] text-ink-2">
+            <p className="mt-2 text-base text-ink-2">
               {ticketCount} {ticketCount === 1 ? "ticket" : "tickets"} for {event.title}
             </p>
           </div>
@@ -170,7 +170,7 @@ export function CheckoutClient({
             )}
           >
             <Timer className="size-4 shrink-0" />
-            <p className="text-[13.5px]">
+            <p className="text-sm">
               {expired ? (
                 "Your hold has expired."
               ) : (
@@ -184,8 +184,8 @@ export function CheckoutClient({
 
           <Card>
             <div className="border-b border-hairline-soft px-5 py-4">
-              <h2 className="text-[15px] font-semibold text-ink">Your details</h2>
-              <p className="mt-0.5 text-[13px] text-ink-3">Your tickets are sent to this email.</p>
+              <h2 className="text-md font-semibold text-ink">Your details</h2>
+              <p className="mt-0.5 text-sm text-ink-3">Your tickets are sent to this email.</p>
             </div>
             <div className="grid gap-4 p-5 sm:grid-cols-2">
               <FormField<BuyerValues, "buyerName"> name="buyerName" label="Full name" required className="sm:col-span-2">
@@ -203,18 +203,18 @@ export function CheckoutClient({
           {totals.totalCents > 0 && (
             <Card>
               <div className="border-b border-hairline-soft px-5 py-4">
-                <h2 className="flex items-center gap-2 text-[15px] font-semibold text-ink">
+                <h2 className="flex items-center gap-2 text-md font-semibold text-ink">
                   <CreditCard className="size-4 text-ink-3" />
                   Payment
                 </h2>
-                <p className="mt-0.5 text-[13px] text-ink-3">
+                <p className="mt-0.5 text-sm text-ink-3">
                   This organizer has not connected Stripe yet, so the order settles through the
                   built-in sandbox rail. Use 4242 4242 4242 4242 to succeed, or 4000 0000 0000 0002
                   to see a decline.
                 </p>
               </div>
               <div className="p-5">
-                <label htmlFor="card" className="text-[13px] font-medium text-ink-2">
+                <label htmlFor="card" className="text-sm font-medium text-ink-2">
                   Card number
                 </label>
                 <Input
@@ -253,23 +253,23 @@ export function CheckoutClient({
                 )}
               </div>
               <div className="min-w-0">
-                <p className="truncate text-[14px] font-semibold text-ink">{event.title}</p>
-                <p className="mt-0.5 truncate text-[12.5px] text-ink-3">
+                <p className="truncate text-base font-semibold text-ink">{event.title}</p>
+                <p className="mt-0.5 truncate text-xs text-ink-3">
                   {formatEventStamp(event.startsAt, event.timezone ?? undefined)}
                 </p>
-                <p className="truncate text-[12.5px] text-ink-3">{event.placeLabel}</p>
+                <p className="truncate text-xs text-ink-3">{event.placeLabel}</p>
               </div>
             </div>
 
             <div className="space-y-3 p-4">
               {lines.map((line) => (
-                <div key={line.id} className="flex items-start justify-between gap-3 text-[13.5px]">
+                <div key={line.id} className="flex items-start justify-between gap-3 text-sm">
                   <div className="min-w-0">
                     <p className="text-ink">
                       {line.quantity} × {line.name}
                     </p>
                     {line.seatLabel && (
-                      <p className="mt-0.5 truncate text-[12px] text-ink-3">{line.seatLabel}</p>
+                      <p className="mt-0.5 truncate text-xs text-ink-3">{line.seatLabel}</p>
                     )}
                   </div>
                   <span className="shrink-0 tabular text-ink">
@@ -282,7 +282,7 @@ export function CheckoutClient({
             <Divider />
 
             <div className="p-4">
-              <label htmlFor="promo" className="text-[13px] font-medium text-ink-2">
+              <label htmlFor="promo" className="text-sm font-medium text-ink-2">
                 Promo code
               </label>
               <div className="mt-1.5 flex gap-2">
@@ -309,7 +309,7 @@ export function CheckoutClient({
                   Apply
                 </Button>
               </div>
-              {promo.error && <p className="mt-1.5 text-[12px] text-critical">{promo.error}</p>}
+              {promo.error && <p className="mt-1.5 text-xs text-critical">{promo.error}</p>}
               {promo.applied && (
                 <Badge tone="positive" size="md" className="mt-2.5">
                   <CheckCircle2 className="size-3" />
@@ -346,7 +346,7 @@ export function CheckoutClient({
               >
                 {submitLabel}
               </Button>
-              <p className="mt-2.5 text-center text-[11.5px] leading-relaxed text-ink-3">
+              <p className="mt-2.5 text-center text-2xs leading-relaxed text-ink-3">
                 By paying you agree to the organizer&apos;s terms and our refund policy.
               </p>
             </div>

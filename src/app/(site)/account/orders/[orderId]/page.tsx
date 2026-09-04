@@ -56,7 +56,7 @@ export default async function OrderDetailPage({
 
       <Link
         href="/account/orders"
-        className="mb-6 inline-flex items-center gap-1.5 text-[13px] text-ink-3 transition-colors hover:text-ink"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
       >
         <ArrowLeft className="size-3.5" />
         All orders
@@ -65,7 +65,7 @@ export default async function OrderDetailPage({
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <h1 className="display-3 text-ink">{order.event?.title}</h1>
-          <p className="mt-1.5 font-mono text-[13px] text-ink-3">{order.order_number}</p>
+          <p className="mt-1.5 font-mono text-sm text-ink-3">{order.order_number}</p>
         </div>
         <Badge tone={TONE[order.status]} size="md">
           {order.status.replace("_", " ")}
@@ -96,17 +96,17 @@ export default async function OrderDetailPage({
 
       <Card className="mt-5 overflow-hidden">
         <div className="border-b border-hairline-soft px-4 py-3.5">
-          <h2 className="text-[14px] font-semibold text-ink">Items</h2>
+          <h2 className="text-base font-semibold text-ink">Items</h2>
         </div>
         <div className="space-y-3 p-4">
           {order.items?.map((item) => (
-            <div key={item.id} className="flex items-start justify-between gap-3 text-[13.5px]">
+            <div key={item.id} className="flex items-start justify-between gap-3 text-sm">
               <div className="min-w-0">
                 <p className="text-ink">
                   {item.quantity} × {item.ticket_type_name}
                 </p>
                 {item.seat_label && (
-                  <p className="mt-0.5 text-[12px] text-ink-3">{item.seat_label}</p>
+                  <p className="mt-0.5 text-xs text-ink-3">{item.seat_label}</p>
                 )}
               </div>
               <span className="shrink-0 tabular text-ink">
@@ -143,7 +143,7 @@ export default async function OrderDetailPage({
       {order.tickets && order.tickets.length > 0 && (
         <Card className="mt-5 overflow-hidden">
           <div className="flex items-center justify-between border-b border-hairline-soft px-4 py-3.5">
-            <h2 className="text-[14px] font-semibold text-ink">
+            <h2 className="text-base font-semibold text-ink">
               Tickets ({order.tickets.length})
             </h2>
             <Button asChild variant="outline" size="sm">
@@ -154,9 +154,9 @@ export default async function OrderDetailPage({
             {order.tickets.map((ticket) => (
               <div key={ticket.id} className="flex items-center justify-between gap-3 px-4 py-3">
                 <div className="min-w-0">
-                  <p className="font-mono text-[13px] font-medium text-ink">{ticket.ticket_code}</p>
+                  <p className="font-mono text-sm font-medium text-ink">{ticket.ticket_code}</p>
                   {ticket.seat_label && (
-                    <p className="mt-0.5 text-[12px] text-ink-3">{ticket.seat_label}</p>
+                    <p className="mt-0.5 text-xs text-ink-3">{ticket.seat_label}</p>
                   )}
                 </div>
                 <Badge tone={ticket.status === "valid" ? "positive" : "neutral"} size="xs">
@@ -171,14 +171,14 @@ export default async function OrderDetailPage({
       {order.refunds && order.refunds.length > 0 && (
         <Card className="mt-5 overflow-hidden">
           <div className="border-b border-hairline-soft px-4 py-3.5">
-            <h2 className="text-[14px] font-semibold text-ink">Refunds</h2>
+            <h2 className="text-base font-semibold text-ink">Refunds</h2>
           </div>
           <div className="divide-y divide-hairline-soft">
             {order.refunds.map((refund) => (
-              <div key={refund.id} className="flex items-center justify-between gap-3 px-4 py-3 text-[13px]">
+              <div key={refund.id} className="flex items-center justify-between gap-3 px-4 py-3 text-sm">
                 <div>
                   <p className="text-ink">{formatMoney(refund.amount_cents, order.currency)}</p>
-                  <p className="mt-0.5 text-[12px] text-ink-3">
+                  <p className="mt-0.5 text-xs text-ink-3">
                     {refund.reason ?? "No reason given"} · {formatDateTime(refund.created_at)}
                   </p>
                 </div>

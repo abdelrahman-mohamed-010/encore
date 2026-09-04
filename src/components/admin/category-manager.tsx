@@ -93,8 +93,8 @@ export function CategoryManager({ categories }: { categories: Category[] }) {
               aria-hidden
             />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[14px] font-medium text-ink">{category.name}</p>
-              <p className="truncate text-[12px] text-ink-3">/{category.slug}</p>
+              <p className="truncate text-base font-medium text-ink">{category.name}</p>
+              <p className="truncate text-xs text-ink-3">/{category.slug}</p>
             </div>
             <Switch
               checked={category.is_active}

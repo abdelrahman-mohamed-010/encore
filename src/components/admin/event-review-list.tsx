@@ -103,16 +103,16 @@ export function EventReviewList({ events }: { events: ReviewEvent[] }) {
 
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="truncate text-[14.5px] font-medium text-ink">{event.title}</p>
+                  <p className="truncate text-base font-medium text-ink">{event.title}</p>
                   <Badge tone={TONE[event.status]} size="xs">
                     {event.status.replace("_", " ")}
                   </Badge>
                 </div>
-                <p className="mt-1 truncate text-[12.5px] text-ink-3">
+                <p className="mt-1 truncate text-xs text-ink-3">
                   {event.organizerName} · {formatDate(event.startsAt, "medium")}
                   {event.venueLabel && ` · ${event.venueLabel}`}
                 </p>
-                <p className="mt-0.5 text-[12px] text-ink-3">
+                <p className="mt-0.5 text-xs text-ink-3">
                   {event.tiers} ticket {event.tiers === 1 ? "type" : "types"} ·{" "}
                   {formatNumber(event.capacity)} capacity
                 </p>

@@ -38,8 +38,8 @@ export function ForgotPasswordForm() {
         <span className="mx-auto grid size-11 place-items-center rounded-xl border border-hairline bg-sunken text-ink-2">
           <MailCheck className="size-5" />
         </span>
-        <p className="mt-4 text-[15px] font-medium text-ink">Check your inbox</p>
-        <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-2">
+        <p className="mt-4 text-md font-medium text-ink">Check your inbox</p>
+        <p className="mt-1.5 text-sm leading-relaxed text-ink-2">
           If an account exists for <span className="font-medium text-ink">{sentTo}</span>, a reset
           link is on its way.
         </p>

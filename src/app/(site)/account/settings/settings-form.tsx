@@ -67,7 +67,7 @@ export function SettingsForm({ profile }: { profile: Profile }) {
           </FormField>
 
           <div className="flex flex-col gap-1.5">
-            <span className="text-[13px] font-medium text-ink-2">Email</span>
+            <span className="text-sm font-medium text-ink-2">Email</span>
             <Input value={profile.email} disabled readOnly />
           </div>
 

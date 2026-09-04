@@ -56,7 +56,7 @@ function CategoryChip({
     <Link
       href={href}
       className={cn(
-        "inline-flex shrink-0 items-center gap-2 rounded-full border px-3.5 py-2 text-[13px] font-medium transition-colors",
+        "inline-flex shrink-0 items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors",
         active
           ? "border-transparent bg-solid text-on-solid"
           : "border-hairline bg-card text-ink-2 hover:bg-sunken hover:text-ink",

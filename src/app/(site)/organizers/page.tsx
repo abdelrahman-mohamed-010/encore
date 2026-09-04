@@ -39,15 +39,15 @@ export default async function OrganizersPage() {
                 className="rounded-xl border border-hairline bg-card p-5 transition-colors hover:bg-sunken"
               >
                 <Avatar src={organizer.logo_url} name={organizer.name} size="lg" />
-                <p className="mt-3 flex items-center gap-1.5 text-[15px] font-semibold text-ink">
+                <p className="mt-3 flex items-center gap-1.5 text-md font-semibold text-ink">
                   {organizer.name}
                   {organizer.verification_status === "verified" && (
                     <ShieldCheck className="size-3.5 text-info" />
                   )}
                 </p>
-                <p className="mt-1 text-[12.5px] text-ink-3">{pluralize(count, "event")}</p>
+                <p className="mt-1 text-xs text-ink-3">{pluralize(count, "event")}</p>
                 {organizer.description && (
-                  <p className="mt-2.5 line-clamp-2 text-[13px] leading-relaxed text-ink-2">
+                  <p className="mt-2.5 line-clamp-2 text-sm leading-relaxed text-ink-2">
                     {organizer.description}
                   </p>
                 )}

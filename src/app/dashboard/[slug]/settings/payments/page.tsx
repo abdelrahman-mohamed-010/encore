@@ -42,13 +42,13 @@ export default async function PaymentsSettingsPage({
       />
 
       {connected === "1" && (
-        <div className="flex items-start gap-2.5 rounded-xl border border-transparent bg-positive-bg px-4 py-3 text-[13.5px] text-positive">
+        <div className="flex items-start gap-2.5 rounded-xl border border-transparent bg-positive-bg px-4 py-3 text-sm text-positive">
           <CheckCircle2 className="mt-px size-4 shrink-0" />
           Stripe connected. If charges are still disabled, finish the remaining steps in Stripe.
         </div>
       )}
       {error && (
-        <div className="flex items-start gap-2.5 rounded-xl border border-transparent bg-critical-bg px-4 py-3 text-[13.5px] text-critical">
+        <div className="flex items-start gap-2.5 rounded-xl border border-transparent bg-critical-bg px-4 py-3 text-sm text-critical">
           <AlertTriangle className="mt-px size-4 shrink-0" />
           {decodeURIComponent(error)}
         </div>
@@ -76,7 +76,7 @@ export default async function PaymentsSettingsPage({
           <>
             <FieldRow
               label="Stripe account"
-              value={<span className="font-mono text-[13px]">{account.stripe_account_id ?? "—"}</span>}
+              value={<span className="font-mono text-sm">{account.stripe_account_id ?? "—"}</span>}
             />
             <FieldRow
               label="Charges"
@@ -95,7 +95,7 @@ export default async function PaymentsSettingsPage({
                 label="Stripe still needs"
                 align="start"
                 value={
-                  <ul className="mt-0.5 space-y-0.5 text-[13px] text-ink-2">
+                  <ul className="mt-0.5 space-y-0.5 text-sm text-ink-2">
                     {(account.requirements_due as string[]).slice(0, 6).map((item) => (
                       <li key={item}>· {item.replace(/_/g, " ")}</li>
                     ))}
@@ -115,7 +115,7 @@ export default async function PaymentsSettingsPage({
           </>
         ) : (
           <CardBody className="space-y-4">
-            <p className="text-[13.5px] leading-relaxed text-ink-2">
+            <p className="text-sm leading-relaxed text-ink-2">
               Until you connect Stripe, paid orders on your events settle through the built-in
               sandbox rail: the whole checkout works end to end, tickets are issued, but no real
               money moves.
@@ -129,14 +129,14 @@ export default async function PaymentsSettingsPage({
               </Button>
             ) : (
               <div className="rounded-xl border border-hairline bg-sunken p-4">
-                <p className="text-[13.5px] font-medium text-ink">
+                <p className="text-sm font-medium text-ink">
                   Stripe Connect is not configured on this deployment
                 </p>
-                <p className="mt-1.5 text-[13px] leading-relaxed text-ink-2">
-                  The operator needs to set <code className="font-mono text-[12.5px]">STRIPE_SECRET_KEY</code>{" "}
-                  and <code className="font-mono text-[12.5px]">STRIPE_CONNECT_CLIENT_ID</code>, then
+                <p className="mt-1.5 text-sm leading-relaxed text-ink-2">
+                  The operator needs to set <code className="font-mono text-xs">STRIPE_SECRET_KEY</code>{" "}
+                  and <code className="font-mono text-xs">STRIPE_CONNECT_CLIENT_ID</code>, then
                   point a Stripe webhook at{" "}
-                  <code className="font-mono text-[12.5px]">/api/webhooks/stripe</code>. Once those
+                  <code className="font-mono text-xs">/api/webhooks/stripe</code>. Once those
                   exist this button starts the OAuth flow and organizers can link their own accounts.
                 </p>
               </div>
@@ -146,10 +146,10 @@ export default async function PaymentsSettingsPage({
       </Card>
 
       <Card inset className="p-4">
-        <p className="text-[13px] font-medium text-ink">How the money splits</p>
-        <p className="mt-1.5 text-[12.5px] leading-relaxed text-ink-2">
+        <p className="text-sm font-medium text-ink">How the money splits</p>
+        <p className="mt-1.5 text-xs leading-relaxed text-ink-2">
           Each charge is created on your connected account with Tazkarti&apos;s service fee as the
-          Stripe <span className="font-mono text-[12px]">application_fee_amount</span>. You are the
+          Stripe <span className="font-mono text-xs">application_fee_amount</span>. You are the
           merchant of record, payouts follow your Stripe schedule, and refunds pull the platform fee
           back proportionally.
         </p>

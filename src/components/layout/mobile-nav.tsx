@@ -43,7 +43,7 @@ export function MobileNav({ action }: { action?: React.ReactNode }) {
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-3 rounded-lg px-3 py-3 text-[15px] font-medium text-ink transition-colors hover:bg-sunken"
+                className="flex items-center gap-3 rounded-lg px-3 py-3 text-md font-medium text-ink transition-colors hover:bg-sunken"
               >
                 {link.icon && <link.icon className="size-[18px] text-ink-3" />}
                 {link.label}

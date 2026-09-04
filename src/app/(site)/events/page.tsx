@@ -93,7 +93,7 @@ export default async function EventsPage({
         <h1 className="display-2 text-ink">
           {query ? `Results for “${query}”` : "Browse events"}
         </h1>
-        <p className="mt-2 text-[15px] text-ink-2">
+        <p className="mt-2 text-md text-ink-2">
           {total > 0
             ? `${formatNumber(total)} ${total === 1 ? "event" : "events"} on sale.`
             : "Nothing matches those filters yet."}
@@ -149,7 +149,7 @@ export default async function EventsPage({
               Previous
             </Link>
           </Button>
-          <span className="px-3 text-[13px] text-ink-3 tabular">
+          <span className="px-3 text-sm text-ink-3 tabular">
             Page {page} of {totalPages}
           </span>
           <Button asChild variant="outline" size="sm" disabled={page >= totalPages}>

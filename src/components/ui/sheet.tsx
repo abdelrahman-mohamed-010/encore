@@ -43,7 +43,7 @@ export function SheetHeader({ className, ...props }: React.HTMLAttributes<HTMLDi
 }
 
 export function SheetTitle({ className, ...props }: React.ComponentProps<typeof Drawer.Title>) {
-  return <Drawer.Title className={cn("text-[17px] font-semibold text-ink", className)} {...props} />;
+  return <Drawer.Title className={cn("text-lg font-semibold text-ink", className)} {...props} />;
 }
 
 export function SheetDescription({
@@ -52,7 +52,7 @@ export function SheetDescription({
 }: React.ComponentProps<typeof Drawer.Description>) {
   return (
     <Drawer.Description
-      className={cn("text-[13.5px] leading-relaxed text-ink-2", className)}
+      className={cn("text-sm leading-relaxed text-ink-2", className)}
       {...props}
     />
   );

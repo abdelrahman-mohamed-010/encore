@@ -34,7 +34,7 @@ export default async function EditEventPage({
     <div className="max-w-3xl space-y-6">
       <Link
         href={`/dashboard/${slug}/events/${eventId}`}
-        className="inline-flex items-center gap-1.5 text-[13px] text-ink-3 transition-colors hover:text-ink"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
       >
         <ArrowLeft className="size-3.5" />
         Back to event

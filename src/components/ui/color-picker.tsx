@@ -70,7 +70,7 @@ export function ColorPicker({
             style={{ backgroundColor: value }}
             aria-hidden
           />
-          <span className="font-mono text-[12.5px] uppercase text-ink-2">{value}</span>
+          <span className="font-mono text-xs uppercase text-ink-2">{value}</span>
         </button>
       </PopoverTrigger>
 

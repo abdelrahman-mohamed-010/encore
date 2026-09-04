@@ -8,7 +8,7 @@ export default function CheckoutLayout({ children }: { children: React.ReactNode
       <header className="border-b border-hairline bg-card">
         <div className="container-page flex h-14 items-center justify-between">
           <Logo />
-          <span className="inline-flex items-center gap-1.5 text-[12.5px] text-ink-3">
+          <span className="inline-flex items-center gap-1.5 text-xs text-ink-3">
             <Lock className="size-3.5" />
             Secure checkout
           </span>
@@ -18,7 +18,7 @@ export default function CheckoutLayout({ children }: { children: React.ReactNode
       <main className="flex-1">{children}</main>
 
       <footer className="border-t border-hairline">
-        <div className="container-page flex h-14 items-center justify-center gap-5 text-[12.5px] text-ink-3">
+        <div className="container-page flex h-14 items-center justify-center gap-5 text-xs text-ink-3">
           <Link href="/legal/terms" className="transition-colors hover:text-ink-2">Terms</Link>
           <Link href="/legal/privacy" className="transition-colors hover:text-ink-2">Privacy</Link>
         </div>

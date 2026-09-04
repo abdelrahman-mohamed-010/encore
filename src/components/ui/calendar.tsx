@@ -23,7 +23,7 @@ export function Calendar({ className, classNames, showOutsideDays = true, ...pro
 
         // The caption row: month name left, arrows right.
         month_caption: "flex h-8 items-center px-1",
-        caption_label: "text-[14px] font-semibold tracking-[-0.01em] text-ink",
+        caption_label: "text-base font-semibold tracking-[-0.01em] text-ink",
         nav: "absolute right-2 top-3 flex items-center gap-0.5",
         button_previous: cn(
           "inline-flex size-7 items-center justify-center rounded-lg text-ink-3",
@@ -36,7 +36,7 @@ export function Calendar({ className, classNames, showOutsideDays = true, ...pro
 
         month_grid: "w-full border-collapse",
         weekdays: "flex",
-        weekday: "w-9 text-[11px] font-medium uppercase tracking-wide text-ink-3",
+        weekday: "w-9 text-2xs font-medium uppercase tracking-wide text-ink-3",
         weeks: "",
         week: "mt-1 flex w-full",
 
@@ -47,7 +47,7 @@ export function Calendar({ className, classNames, showOutsideDays = true, ...pro
           "[&:has([data-range-start])]:rounded-l-lg [&:has([data-range-end])]:rounded-r-lg",
         ),
         day_button: cn(
-          "inline-flex size-9 items-center justify-center rounded-lg text-[13.5px] tnum text-ink",
+          "inline-flex size-9 items-center justify-center rounded-lg text-sm tnum text-ink",
           "transition-colors duration-100 hover:bg-sunken",
           "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1",
           "disabled:pointer-events-none disabled:text-ink-3 disabled:line-through disabled:opacity-40",
@@ -62,7 +62,7 @@ export function Calendar({ className, classNames, showOutsideDays = true, ...pro
         range_start: "[&>button]:bg-solid [&>button]:text-on-solid",
         range_end: "[&>button]:bg-solid [&>button]:text-on-solid",
 
-        footer: "px-1 pt-3 text-[12px] text-ink-3",
+        footer: "px-1 pt-3 text-xs text-ink-3",
         ...classNames,
       }}
       components={{

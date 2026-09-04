@@ -28,10 +28,10 @@ function ChartTooltip({
   if (!active || !payload?.length) return null;
   return (
     <div className="rounded-lg border border-hairline bg-card px-3 py-2 shadow-e2">
-      <p className="text-[11px] text-ink-3">
+      <p className="text-2xs text-ink-3">
         {label ? new Intl.DateTimeFormat("en-US", { weekday: "short", day: "numeric", month: "short" }).format(new Date(label)) : ""}
       </p>
-      <p className="mt-0.5 text-[13px] font-semibold tabular text-ink">
+      <p className="mt-0.5 text-sm font-semibold tabular text-ink">
         {formatter(payload[0].value)}
       </p>
     </div>
@@ -47,7 +47,7 @@ export function RevenueChart({ data, currency }: { data: SalesPoint[]; currency:
 
   return (
     <div className="viz">
-      <p className="mb-4 text-[24px] font-semibold leading-none tracking-[-0.02em] tabular text-ink">
+      <p className="mb-4 font-display text-2xl font-semibold leading-none numeral text-ink">
         {formatMoney(total, currency)}
       </p>
       <ResponsiveContainer width="100%" height={220}>
@@ -98,7 +98,7 @@ export function TicketsChart({ data }: { data: SalesPoint[] }) {
 
   return (
     <div className="viz">
-      <p className="mb-4 text-[24px] font-semibold leading-none tracking-[-0.02em] tabular text-ink">
+      <p className="mb-4 font-display text-2xl font-semibold leading-none numeral text-ink">
         {formatNumber(total)}
       </p>
       <ResponsiveContainer width="100%" height={220}>

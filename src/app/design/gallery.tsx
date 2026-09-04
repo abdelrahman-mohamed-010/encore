@@ -35,8 +35,8 @@ function Row({ title, note, children }: { title: string; note?: string; children
   return (
     <section className="space-y-3 border-t border-hairline-soft pt-6 first:border-0 first:pt-0">
       <div>
-        <h3 className="text-[15px] font-semibold text-ink">{title}</h3>
-        {note && <p className="mt-0.5 max-w-2xl text-[13px] leading-relaxed text-ink-3">{note}</p>}
+        <h3 className="text-md font-semibold text-ink">{title}</h3>
+        {note && <p className="mt-0.5 max-w-2xl text-sm leading-relaxed text-ink-3">{note}</p>}
       </div>
       <div className="flex flex-wrap items-end gap-3">{children}</div>
     </section>
@@ -47,7 +47,7 @@ function Swatch({ token, label }: { token: string; label: string }) {
   return (
     <div className="w-full space-y-1.5">
       <div className={`h-12 w-full rounded-lg border border-hairline ${token}`} />
-      <p className="truncate font-mono text-[10.5px] text-ink-3">{label}</p>
+      <p className="truncate font-mono text-2xs text-ink-3">{label}</p>
     </div>
   );
 }
@@ -75,11 +75,11 @@ export function DesignGallery() {
       <header className="space-y-2">
         <p className="eyebrow">Tazkarti</p>
         <h1 className="display-2">Design system</h1>
-        <p className="max-w-2xl text-[15px] leading-relaxed text-ink-2">
+        <p className="max-w-2xl text-md leading-relaxed text-ink-2">
           Every control below is built from Radix behaviour and our own tokens. No native{" "}
-          <code className="rounded bg-sunken px-1 py-0.5 font-mono text-[13px]">&lt;select&gt;</code>,{" "}
-          <code className="rounded bg-sunken px-1 py-0.5 font-mono text-[13px]">date</code> or{" "}
-          <code className="rounded bg-sunken px-1 py-0.5 font-mono text-[13px]">color</code> input
+          <code className="rounded bg-sunken px-1 py-0.5 font-mono text-sm">&lt;select&gt;</code>,{" "}
+          <code className="rounded bg-sunken px-1 py-0.5 font-mono text-sm">date</code> or{" "}
+          <code className="rounded bg-sunken px-1 py-0.5 font-mono text-sm">color</code> input
           appears anywhere in the app — the browser draws those popups itself, so they cannot honour
           this palette or dark mode. Toggle the theme and nothing here should break.
         </p>
@@ -90,21 +90,21 @@ export function DesignGallery() {
         <CardHeader bordered><CardTitle>Colour</CardTitle></CardHeader>
         <CardBody className="space-y-8">
           <div className="space-y-2">
-            <p className="text-[13px] font-medium text-ink-2">Neutral ramp</p>
+            <p className="text-sm font-medium text-ink-2">Neutral ramp</p>
             <div className="grid grid-cols-6 gap-2 sm:grid-cols-12">
               {NEUTRALS.map((t) => <Swatch key={t} token={t} label={t.replace("bg-n-", "")} />)}
             </div>
           </div>
 
           <div className="space-y-2">
-            <p className="text-[13px] font-medium text-ink-2">Brand ramp</p>
+            <p className="text-sm font-medium text-ink-2">Brand ramp</p>
             <div className="grid grid-cols-6 gap-2 sm:grid-cols-11">
               {BRANDS.map((t) => <Swatch key={t} token={t} label={t.replace("bg-brand-", "")} />)}
             </div>
           </div>
 
           <div className="space-y-2">
-            <p className="text-[13px] font-medium text-ink-2">
+            <p className="text-sm font-medium text-ink-2">
               Status — meaning, never decoration
             </p>
             <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -116,14 +116,14 @@ export function DesignGallery() {
           </div>
 
           <div className="space-y-2">
-            <p className="text-[13px] font-medium text-ink-2">
+            <p className="text-sm font-medium text-ink-2">
               Tints — decoration, never meaning
             </p>
             <div className="flex flex-wrap gap-3">
               {TINTS.map((tone) => (
                 <div key={tone} className="flex items-center gap-2">
                   <IconChip icon={Ticket} tone={tone} size="lg" />
-                  <span className="font-mono text-[11px] text-ink-3">{tone}</span>
+                  <span className="font-mono text-2xs text-ink-3">{tone}</span>
                 </div>
               ))}
             </div>
@@ -134,16 +134,49 @@ export function DesignGallery() {
       {/* ---- Type --------------------------------------------------------- */}
       <Card>
         <CardHeader bordered><CardTitle>Typography</CardTitle></CardHeader>
-        <CardBody className="space-y-4">
-          <p className="display-1">Display 1</p>
-          <p className="display-2">Display 2</p>
-          <p className="display-3">Display 3</p>
-          <p className="text-[15px] text-ink">Body — the default reading size.</p>
-          <p className="text-[13.5px] text-ink-2">Secondary — supporting copy and hints.</p>
-          <p className="eyebrow">Eyebrow label</p>
-          <p className="font-mono text-[13px] tnum text-ink-2">
-            Tabular numerals 1234567890 — money and times never shift width
-          </p>
+        <CardBody className="space-y-8">
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-ink-2">
+              Display — Instrument Sans. Headlines only; never UI text.
+            </p>
+            <p className="display-1">Find your next night out</p>
+            <p className="display-2">Find your next night out</p>
+            <p className="display-3">Find your next night out</p>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-ink-2">
+              UI — Inter. Every label, control and table cell.
+            </p>
+            <div className="space-y-1.5">
+              {(
+                [
+                  ["text-xl", "20 · section headings"],
+                  ["text-lg", "17 · card and sheet titles"],
+                  ["text-md", "15 · reading copy"],
+                  ["text-base", "14 · the default control size"],
+                  ["text-sm", "13 · secondary UI, dense rows"],
+                  ["text-xs", "12 · hints, meta, badges"],
+                ] as const
+              ).map(([size, note]) => (
+                <p key={size} className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                  <span className={size}>The quick brown fox</span>
+                  <span className="font-mono text-2xs text-ink-3">
+                    {size} — {note}
+                  </span>
+                </p>
+              ))}
+            </div>
+            <p className="eyebrow pt-1">Eyebrow · text-2xs</p>
+          </div>
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-ink-2">
+              Numerals — tabular throughout, so a column of prices never jitters.
+            </p>
+            <p className="numeral text-2xl font-semibold text-ink">$1,284.00</p>
+            <p className="font-mono text-sm tnum text-ink-2">0123456789 · 0123456789</p>
+          </div>
         </CardBody>
       </Card>
 
@@ -273,7 +306,7 @@ export function DesignGallery() {
             <Badge tone="caution">Low stock</Badge>
             <Badge tone="critical">Sold out</Badge>
             <Badge tone="info">Draft</Badge>
-            <Badge tone="outline" pill>Pill</Badge>
+            <Badge tone="outline">Pill</Badge>
           </Row>
           <Row title="Status dots">
             <StatusDot tone="positive">Published</StatusDot>
@@ -282,7 +315,7 @@ export function DesignGallery() {
             <StatusDot>Draft</StatusDot>
           </Row>
           <div className="space-y-3">
-            <h3 className="text-[15px] font-semibold text-ink">Callouts</h3>
+            <h3 className="text-md font-semibold text-ink">Callouts</h3>
             <Callout tone="caution" title="Location missing">
               Please enter the location of the event before it starts.
             </Callout>
@@ -324,7 +357,7 @@ export function DesignGallery() {
                 className="flex flex-1 items-center gap-3 rounded-2xl border border-hairline bg-card p-4 text-left transition-colors hover:bg-sunken"
               >
                 <IconChip icon={icon} tone={tone as "blue"} size="xl" />
-                <span className="text-[14.5px] font-medium text-ink">{label}</span>
+                <span className="text-base font-medium text-ink">{label}</span>
               </button>
             ))}
           </Row>
@@ -337,7 +370,7 @@ export function DesignGallery() {
           </Row>
 
           <div className="space-y-3">
-            <h3 className="text-[15px] font-semibold text-ink">Table</h3>
+            <h3 className="text-md font-semibold text-ink">Table</h3>
             <TableWrap className="rounded-xl border border-hairline">
               <Table>
                 <THead>
@@ -383,7 +416,7 @@ export function DesignGallery() {
             <Pagination page={4} pageCount={12} hrefFor={(p) => `?page=${p}`} />
           </Row>
           <Row title="Keyboard hints">
-            <span className="flex items-center gap-1.5 text-[13px] text-ink-2">
+            <span className="flex items-center gap-1.5 text-sm text-ink-2">
               Open search <Kbd>⌘</Kbd> <Kbd>K</Kbd>
             </span>
           </Row>

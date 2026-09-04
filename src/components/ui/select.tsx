@@ -20,9 +20,9 @@ export const SelectGroup = SelectPrimitive.Group;
 export const SelectValue = SelectPrimitive.Value;
 
 const TRIGGER_SIZES = {
-  sm: "h-(--size-field-sm) rounded-lg px-2.5 text-[13px]",
-  md: "h-(--size-field) rounded-xl px-3 text-[14px]",
-  lg: "h-(--size-field-lg) rounded-xl px-3.5 text-[15px]",
+  sm: "h-(--size-field-sm) rounded-lg px-2.5 text-sm",
+  md: "h-(--size-field) rounded-xl px-3 text-base",
+  lg: "h-(--size-field-lg) rounded-xl px-3.5 text-md",
 } as const;
 
 export const SelectTrigger = React.forwardRef<
@@ -100,7 +100,7 @@ export const SelectItem = React.forwardRef<
 >(({ className, children, hint, ...props }, ref) => (
   <SelectPrimitive.Item ref={ref} className={cn("pop-item pr-2", className)} {...props}>
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-    {hint && <span className="ml-auto shrink-0 text-[12px] tnum text-ink-3">{hint}</span>}
+    {hint && <span className="ml-auto shrink-0 text-xs tnum text-ink-3">{hint}</span>}
     <SelectPrimitive.ItemIndicator className={cn("shrink-0 text-brand-600", !hint && "ml-auto")}>
       <Check className="size-4" aria-hidden />
     </SelectPrimitive.ItemIndicator>
@@ -111,7 +111,7 @@ SelectItem.displayName = "SelectItem";
 export function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Label>) {
   return (
     <SelectPrimitive.Label
-      className={cn("px-2.5 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-wider text-ink-3", className)}
+      className={cn("px-2.5 pb-1 pt-2 text-2xs font-semibold uppercase tracking-wider text-ink-3", className)}
       {...props}
     />
   );

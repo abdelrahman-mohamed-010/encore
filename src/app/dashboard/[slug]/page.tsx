@@ -72,8 +72,8 @@ export default async function DashboardOverview({
           <div className="flex items-start gap-3">
             <CreditCard className="mt-0.5 size-4 shrink-0 text-caution" />
             <div>
-              <p className="text-[13.5px] font-medium text-ink">Connect Stripe to take card payments</p>
-              <p className="mt-0.5 text-[12.5px] text-ink-2">
+              <p className="text-sm font-medium text-ink">Connect Stripe to take card payments</p>
+              <p className="mt-0.5 text-xs text-ink-2">
                 Until then, paid orders settle through the built-in sandbox rail and no real money moves.
               </p>
             </div>
@@ -115,7 +115,7 @@ export default async function DashboardOverview({
         <Card>
           <CardHeader bordered className="flex-col items-start">
             <CardTitle>Revenue</CardTitle>
-            <p className="text-[12.5px] text-ink-3">Gross, last 30 days</p>
+            <p className="text-xs text-ink-3">Gross, last 30 days</p>
           </CardHeader>
           <CardBody>
             <RevenueChart data={points} currency={currency} />
@@ -125,7 +125,7 @@ export default async function DashboardOverview({
         <Card>
           <CardHeader bordered className="flex-col items-start">
             <CardTitle>Tickets issued</CardTitle>
-            <p className="text-[12.5px] text-ink-3">Per day, last 30 days</p>
+            <p className="text-xs text-ink-3">Per day, last 30 days</p>
           </CardHeader>
           <CardBody>
             <TicketsChart data={points} />
@@ -150,8 +150,8 @@ export default async function DashboardOverview({
                 className="flex items-center gap-4 border-b border-hairline-soft px-5 py-3.5 transition-colors last:border-b-0 hover:bg-sunken"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[14px] font-medium text-ink">{event.title}</p>
-                  <p className="mt-0.5 text-[12.5px] text-ink-3">
+                  <p className="truncate text-base font-medium text-ink">{event.title}</p>
+                  <p className="mt-0.5 text-xs text-ink-3">
                     {formatDate(event.starts_at, "medium")}
                   </p>
                 </div>

@@ -48,7 +48,7 @@ export function DisconnectStripeButton({ organizerId }: { organizerId: string })
             </DialogDescription>
           </DialogHeader>
           <DialogBody>
-            <p className="text-[13.5px] leading-relaxed text-ink-2">
+            <p className="text-sm leading-relaxed text-ink-2">
               Existing orders and payouts in Stripe are unaffected — this only removes the link
               between your Stripe account and this organization.
             </p>

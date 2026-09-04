@@ -1,11 +1,35 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist_Mono, Instrument_Sans, Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import { ThemeProvider, themeScript } from "@/contexts/theme-context";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"], display: "swap" });
-const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"], display: "swap" });
+/**
+ * Two families with distinct jobs, which is what gives the interface a voice:
+ *
+ *  - Inter runs the UI. It was drawn for screens at 12–16px, so labels, table
+ *    cells and form text stay crisp at sizes where a display face smears.
+ *  - Instrument Sans runs headlines only. It is narrower and higher-contrast
+ *    than Inter, so a title reads as a deliberate typographic act rather than
+ *    as body copy that happens to be large.
+ *
+ * Both are variable, so one file covers every weight we use.
+ */
+const sans = Inter({
+  variable: "--font-sans-family",
+  subsets: ["latin"],
+  display: "swap",
+  // Optical sizing: Inter subtly reshapes itself for small vs large text.
+  axes: ["opsz"],
+});
+
+const display = Instrument_Sans({
+  variable: "--font-display-family",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const mono = Geist_Mono({ variable: "--font-mono-family", subsets: ["latin"], display: "swap" });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
@@ -42,7 +66,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+      <body className={`${sans.variable} ${display.variable} ${mono.variable} antialiased`}>
         <ThemeProvider>
           {children}
           <Toaster

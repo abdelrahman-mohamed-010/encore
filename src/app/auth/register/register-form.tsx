@@ -54,8 +54,8 @@ export function RegisterForm({ next }: { next?: string }) {
         <span className="mx-auto grid size-11 place-items-center rounded-xl border border-hairline bg-sunken text-ink-2">
           <MailCheck className="size-5" />
         </span>
-        <p className="mt-4 text-[15px] font-medium text-ink">Confirm your email</p>
-        <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-2">
+        <p className="mt-4 text-md font-medium text-ink">Confirm your email</p>
+        <p className="mt-1.5 text-sm leading-relaxed text-ink-2">
           We sent a link to <span className="font-medium text-ink">{pendingConfirmation}</span>.
           Open it to finish creating your account.
         </p>
@@ -86,7 +86,7 @@ export function RegisterForm({ next }: { next?: string }) {
         Create account
       </Button>
 
-      <p className="text-center text-[12px] leading-relaxed text-ink-3">
+      <p className="text-center text-xs leading-relaxed text-ink-3">
         By creating an account you agree to our Terms and Privacy Policy.
       </p>
     </Form>

@@ -61,21 +61,21 @@ export default async function OrdersPage() {
           >
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <p className="truncate text-[14.5px] font-semibold text-ink">
+                <p className="truncate text-base font-semibold text-ink">
                   {order.event?.title ?? "Event"}
                 </p>
                 <Badge tone={TONE[order.status]} size="xs">
                   {order.status.replace("_", " ")}
                 </Badge>
               </div>
-              <p className="mt-1 text-[12.5px] text-ink-3">
+              <p className="mt-1 text-xs text-ink-3">
                 <span className="font-mono">{order.order_number}</span>
                 {" · "}
                 {formatDate(order.created_at, "medium")}
                 {ticketCount > 0 && ` · ${pluralize(ticketCount, "ticket")}`}
               </p>
             </div>
-            <span className="shrink-0 text-[14px] font-semibold tabular text-ink">
+            <span className="shrink-0 text-base font-semibold tabular text-ink">
               {formatMoney(order.total_cents, order.currency)}
             </span>
           </Link>

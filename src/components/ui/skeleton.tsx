@@ -149,7 +149,7 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
             <Shimmer className="h-3.5 w-2/5" />
             <Shimmer className="h-2.5 w-1/4" />
           </div>
-          <Shimmer className="h-5 w-16 rounded-full" />
+          <Shimmer className="h-5 w-16 rounded-md" />
         </div>
       ))}
     </div>

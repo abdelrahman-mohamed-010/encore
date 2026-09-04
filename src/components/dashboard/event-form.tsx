@@ -145,7 +145,7 @@ export function EventForm({
           <div className="flex items-center justify-between gap-4">
             <div>
               <Label>Online event</Label>
-              <p className="mt-0.5 text-[12.5px] text-ink-3">
+              <p className="mt-0.5 text-xs text-ink-3">
                 Attendees get a link instead of a venue address.
               </p>
             </div>

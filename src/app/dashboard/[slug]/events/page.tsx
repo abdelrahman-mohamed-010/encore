@@ -87,7 +87,7 @@ export default async function DashboardEventsPage({
 
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="truncate text-[14.5px] font-medium text-ink">{event.title}</p>
+                    <p className="truncate text-base font-medium text-ink">{event.title}</p>
                     <Badge tone={STATUS_TONE[event.status]} size="xs">
                       {event.status.replace("_", " ")}
                     </Badge>
@@ -95,13 +95,13 @@ export default async function DashboardEventsPage({
                       <Badge tone="outline" size="xs">Reserved seating</Badge>
                     )}
                   </div>
-                  <p className="mt-1 text-[12.5px] text-ink-3">
+                  <p className="mt-1 text-xs text-ink-3">
                     {formatDate(event.starts_at, "medium")}
                   </p>
                 </div>
 
                 <div className="hidden w-40 shrink-0 sm:block">
-                  <div className="flex items-baseline justify-between text-[12px]">
+                  <div className="flex items-baseline justify-between text-xs">
                     <span className="text-ink-3">Sold</span>
                     <span className="tabular text-ink">
                       {formatNumber(sold)}/{formatNumber(capacity)}
@@ -110,7 +110,7 @@ export default async function DashboardEventsPage({
                   <Meter value={sold} max={capacity || 1} className="mt-1.5" />
                 </div>
 
-                <span className="hidden w-24 shrink-0 text-right text-[14px] font-semibold tabular text-ink md:block">
+                <span className="hidden w-24 shrink-0 text-right text-base font-semibold tabular text-ink md:block">
                   {formatMoney(gross, currency)}
                 </span>
               </Link>

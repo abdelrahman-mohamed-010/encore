@@ -7,7 +7,9 @@ import { cn } from "@/lib/utils";
 const buttonVariants = cva(
   [
     "relative inline-flex select-none items-center justify-center gap-2 whitespace-nowrap",
-    "font-medium transition-[background-color,border-color,color,opacity,transform] duration-150",
+    // Slightly negative tracking: button labels are short and set in a row, so
+    // default spacing reads loose next to the tighter headings around them.
+    "font-medium tracking-[-0.011em] transition-[background-color,border-color,color,opacity,transform] duration-150",
     "disabled:pointer-events-none disabled:opacity-45",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
   ],
@@ -35,14 +37,14 @@ const buttonVariants = cva(
         link: "h-auto p-0 text-brand-600 underline-offset-4 hover:underline dark:text-brand-400",
       },
       size: {
-        xs: "h-7 rounded-lg px-2.5 text-[12px] [&_svg]:size-3.5",
-        sm: "h-8 rounded-lg px-3 text-[13px] [&_svg]:size-3.5",
-        md: "h-(--size-field) rounded-xl px-4 text-sm [&_svg]:size-4",
-        lg: "h-(--size-field-lg) rounded-xl px-5 text-[15px] [&_svg]:size-4",
-        xl: "h-13 rounded-2xl px-6 text-base [&_svg]:size-[18px]",
-        icon: "size-(--size-field) rounded-xl [&_svg]:size-4",
-        "icon-sm": "size-8 rounded-lg [&_svg]:size-4",
-        "icon-xs": "size-7 rounded-lg [&_svg]:size-3.5",
+        xs: "h-7 rounded-md px-2.5 text-xs [&_svg]:size-3.5",
+        sm: "h-8 rounded-md px-3 text-sm [&_svg]:size-3.5",
+        md: "h-(--size-field) rounded-lg px-4 text-base [&_svg]:size-4",
+        lg: "h-(--size-field-lg) rounded-lg px-5 text-md [&_svg]:size-[18px]",
+        xl: "h-13 rounded-xl px-7 text-lg [&_svg]:size-5",
+        icon: "size-(--size-field) rounded-lg [&_svg]:size-4",
+        "icon-sm": "size-8 rounded-md [&_svg]:size-4",
+        "icon-xs": "size-7 rounded-md [&_svg]:size-3.5",
       },
       block: { true: "w-full", false: "" },
     },

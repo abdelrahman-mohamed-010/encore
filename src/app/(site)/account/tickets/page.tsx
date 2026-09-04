@@ -69,7 +69,7 @@ export default async function TicketsPage() {
     <div className="space-y-10">
       {upcoming.length > 0 && (
         <section>
-          <h2 className="mb-4 text-[15px] font-semibold text-ink">Upcoming</h2>
+          <h2 className="mb-4 text-md font-semibold text-ink">Upcoming</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {upcoming.map((ticket) => (
               <TicketCard key={ticket.id} ticket={ticket} qr={qrCodes.get(ticket.id)} />
@@ -80,7 +80,7 @@ export default async function TicketsPage() {
 
       {past.length > 0 && (
         <section>
-          <h2 className="mb-4 text-[15px] font-semibold text-ink">Past</h2>
+          <h2 className="mb-4 text-md font-semibold text-ink">Past</h2>
           <div className="grid gap-4 md:grid-cols-2">
             {past.map((ticket) => (
               <TicketCard key={ticket.id} ticket={ticket} past />
@@ -143,7 +143,7 @@ function TicketCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <Link href={`/events/${event.slug}`} className="min-w-0">
-              <h3 className="truncate text-[15px] font-semibold text-ink hover:underline">
+              <h3 className="truncate text-md font-semibold text-ink hover:underline">
                 {event.title}
               </h3>
             </Link>
@@ -152,11 +152,11 @@ function TicketCard({
             </Badge>
           </div>
 
-          <p className="mt-1.5 flex items-center gap-1.5 text-[12.5px] text-ink-3">
+          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-ink-3">
             <CalendarDays className="size-3.5 shrink-0" />
             {formatEventStamp(event.starts_at, event.timezone ?? undefined)}
           </p>
-          <p className="mt-0.5 flex items-center gap-1.5 text-[12.5px] text-ink-3">
+          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-ink-3">
             <MapPin className="size-3.5 shrink-0" />
             <span className="truncate">
               {event.is_online ? "Online event" : [event.venue?.name, event.venue?.city].filter(Boolean).join(" · ")}
@@ -174,12 +174,12 @@ function TicketCard({
             <img src={qr} alt={`QR code for ticket ${ticket.ticket_code}`} className="size-24" />
           </div>
         ) : (
-          <div className="grid size-[6.75rem] shrink-0 place-items-center rounded-lg border border-dashed border-hairline text-[11px] text-ink-3">
+          <div className="grid size-[6.75rem] shrink-0 place-items-center rounded-lg border border-dashed border-hairline text-2xs text-ink-3">
             {ticket.status === "used" ? "Checked in" : "Not scannable"}
           </div>
         )}
 
-        <dl className="min-w-0 flex-1 space-y-2 text-[12.5px]">
+        <dl className="min-w-0 flex-1 space-y-2 text-xs">
           <div>
             <dt className="text-ink-3">Ticket</dt>
             <dd className="font-medium text-ink">{ticket.ticket_type?.name ?? "General"}</dd>
@@ -192,7 +192,7 @@ function TicketCard({
           )}
           <div>
             <dt className="text-ink-3">Code</dt>
-            <dd className="font-mono text-[12px] font-medium tracking-wide text-ink">
+            <dd className="font-mono text-xs font-medium tracking-wide text-ink">
               {ticket.ticket_code}
             </dd>
           </div>

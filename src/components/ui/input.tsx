@@ -23,7 +23,7 @@ export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttribute
   ({ className, ...props }, ref) => (
     <input
       ref={ref}
-      className={cn(control, "h-(--size-field) px-3 text-[14px]", className)}
+      className={cn(control, "h-(--size-field) px-3 text-base", className)}
       {...props}
     />
   ),
@@ -36,7 +36,7 @@ export const Textarea = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <textarea
     ref={ref}
-    className={cn(control, "min-h-28 resize-y px-3 py-2.5 text-[14px] leading-relaxed", className)}
+    className={cn(control, "min-h-28 resize-y px-3 py-2.5 text-base leading-relaxed", className)}
     {...props}
   />
 ));
@@ -54,7 +54,7 @@ export const SearchInput = React.forwardRef<
     <input
       ref={ref}
       type="search"
-      className={cn(control, "h-(--size-field) pl-9 pr-3 text-[14px]", className)}
+      className={cn(control, "h-(--size-field) pl-9 pr-3 text-base", className)}
       {...props}
     />
   </div>
@@ -68,7 +68,7 @@ export function Label({
   ...props
 }: React.LabelHTMLAttributes<HTMLLabelElement> & { required?: boolean }) {
   return (
-    <label className={cn("text-[13px] font-medium text-ink-2", className)} {...props}>
+    <label className={cn("text-sm font-medium text-ink-2", className)} {...props}>
       {children}
       {required && <span className="ml-0.5 text-critical">*</span>}
     </label>
@@ -102,9 +102,9 @@ export function Field({
       )}
       {children}
       {error ? (
-        <p className="text-[12px] text-critical">{error}</p>
+        <p className="text-xs text-critical">{error}</p>
       ) : hint ? (
-        <p className="text-[12px] leading-relaxed text-ink-3">{hint}</p>
+        <p className="text-xs leading-relaxed text-ink-3">{hint}</p>
       ) : null}
     </div>
   );
@@ -124,13 +124,13 @@ export const AffixInput = React.forwardRef<
       className,
     )}
   >
-    {prefix && <span className="pl-3 text-[13px] font-medium text-ink-3">{prefix}</span>}
+    {prefix && <span className="pl-3 text-sm font-medium text-ink-3">{prefix}</span>}
     <input
       ref={ref}
-      className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-[14px] text-ink placeholder:text-ink-3 focus:outline-none"
+      className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-base text-ink placeholder:text-ink-3 focus:outline-none"
       {...props}
     />
-    {suffix && <span className="pr-3 text-[13px] font-medium text-ink-3">{suffix}</span>}
+    {suffix && <span className="pr-3 text-sm font-medium text-ink-3">{suffix}</span>}
   </div>
 ));
 AffixInput.displayName = "AffixInput";

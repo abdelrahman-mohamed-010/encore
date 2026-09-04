@@ -41,9 +41,9 @@ export function FieldRow({
         </span>
       )}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-[13px] text-ink-3">{label}</p>
+        <p className="truncate text-sm text-ink-3">{label}</p>
         {value !== undefined && (
-          <div className="mt-0.5 text-[14px] font-medium leading-snug text-ink">{value}</div>
+          <div className="mt-0.5 text-base font-medium leading-snug text-ink">{value}</div>
         )}
       </div>
       {action && <div className="shrink-0">{action}</div>}
@@ -126,10 +126,10 @@ export function DateBlock({
         className,
       )}
     >
-      <span className="block bg-sunken px-2 pb-px pt-1 text-[9px] font-semibold leading-none tracking-[0.08em] text-ink-3">
+      <span className="block bg-sunken px-2 pb-px pt-1 text-2xs font-semibold leading-none tracking-[0.08em] text-ink-3">
         {month}
       </span>
-      <span className="block px-2 pb-1 pt-1 text-[17px] font-semibold leading-none tabular text-ink">
+      <span className="block px-2 pb-1 pt-1 text-lg font-semibold leading-none tabular text-ink">
         {day}
       </span>
     </div>

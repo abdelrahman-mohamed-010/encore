@@ -8,7 +8,7 @@ export default function NotFound() {
       <Logo />
       <p className="eyebrow mt-10">404</p>
       <h1 className="display-2 mt-3 text-ink">We could not find that page</h1>
-      <p className="mt-3 max-w-md text-[15px] leading-relaxed text-ink-2">
+      <p className="mt-3 max-w-md text-md leading-relaxed text-ink-2">
         The event may have been unpublished, or the link might be out of date.
       </p>
       <div className="mt-8 flex gap-3">

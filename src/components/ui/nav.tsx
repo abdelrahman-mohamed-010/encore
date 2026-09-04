@@ -47,7 +47,7 @@ export function Pagination({
       {pages.map((n, index) => (
         <React.Fragment key={n}>
           {index > 0 && n - pages[index - 1] > 1 && (
-            <span className="px-1 text-[13px] text-ink-3" aria-hidden>
+            <span className="px-1 text-sm text-ink-3" aria-hidden>
               …
             </span>
           )}
@@ -92,7 +92,7 @@ export function Breadcrumbs({
   className?: string;
 }) {
   return (
-    <nav aria-label="Breadcrumb" className={cn("flex items-center gap-1.5 text-[13px]", className)}>
+    <nav aria-label="Breadcrumb" className={cn("flex items-center gap-1.5 text-sm", className)}>
       {items.map((item, index) => (
         <React.Fragment key={item.label}>
           {index > 0 && <ChevronRight className="size-3.5 shrink-0 text-ink-3" aria-hidden />}
@@ -132,7 +132,7 @@ export function Steps({
           <li key={step} className="flex flex-1 items-center gap-2">
             <span
               className={cn(
-                "grid size-6 shrink-0 place-items-center rounded-full text-[11px] font-semibold tnum",
+                "grid size-6 shrink-0 place-items-center rounded-full text-2xs font-semibold tnum",
                 state === "done" && "bg-brand-600 text-white",
                 state === "active" && "bg-brand-600 text-white ring-4 ring-brand-500/20",
                 state === "todo" && "bg-sunken text-ink-3",
@@ -143,7 +143,7 @@ export function Steps({
             </span>
             <span
               className={cn(
-                "truncate text-[13px]",
+                "truncate text-sm",
                 state === "todo" ? "text-ink-3" : "font-medium text-ink",
               )}
               aria-current={state === "active" ? "step" : undefined}
@@ -171,7 +171,7 @@ export function Kbd({ children, className }: { children: React.ReactNode; classN
     <kbd
       className={cn(
         "inline-flex h-5 min-w-5 items-center justify-center rounded-md border border-hairline",
-        "bg-sunken px-1.5 font-mono text-[11px] font-medium text-ink-2",
+        "bg-sunken px-1.5 font-mono text-2xs font-medium text-ink-2",
         className,
       )}
     >

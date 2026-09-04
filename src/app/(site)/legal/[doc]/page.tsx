@@ -48,12 +48,12 @@ export default async function LegalPage({ params }: { params: Promise<{ doc: str
   return (
     <div className="container-narrow py-14">
       <h1 className="display-2 text-ink">{entry.title}</h1>
-      <p className="mt-3 text-[13px] text-ink-3">
+      <p className="mt-3 text-sm text-ink-3">
         Last updated {new Date().getFullYear()}. This is a demonstration document and is not legal advice.
       </p>
       <div className="mt-8 space-y-5">
         {entry.body.map((paragraph, index) => (
-          <p key={index} className="text-[15px] leading-[1.75] text-ink-2">
+          <p key={index} className="text-md leading-[1.75] text-ink-2">
             {paragraph}
           </p>
         ))}

@@ -56,11 +56,11 @@ export function SearchField({
         placeholder={placeholder}
         aria-label="Search events"
         className={cn(
-          "w-full rounded-full border border-hairline bg-card text-ink placeholder:text-ink-3",
+          "w-full rounded-lg border border-hairline bg-card text-ink placeholder:text-ink-3",
           "transition-colors hover:border-n-300 dark:hover:border-n-700",
           "focus-visible:border-accent-500 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-accent-500/18",
           "[&::-webkit-search-cancel-button]:appearance-none",
-          size === "lg" ? "h-12 pl-11 pr-4 text-[15px]" : "h-9 pl-9 pr-3.5 text-[13.5px]",
+          size === "lg" ? "h-12 pl-11 pr-4 text-md" : "h-9 pl-9 pr-3.5 text-sm",
         )}
       />
     </form>

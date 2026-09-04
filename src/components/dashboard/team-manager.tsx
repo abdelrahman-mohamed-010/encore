@@ -148,10 +148,10 @@ export function TeamManager({
           >
             <Avatar src={member.avatarUrl} name={member.fullName ?? member.email} size="md" />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-[14px] font-medium text-ink">
+              <p className="truncate text-base font-medium text-ink">
                 {member.fullName ?? "Team member"}
               </p>
-              <p className="truncate text-[12.5px] text-ink-3">{member.email}</p>
+              <p className="truncate text-xs text-ink-3">{member.email}</p>
             </div>
 
             <SelectField
@@ -179,8 +179,8 @@ export function TeamManager({
       </Card>
 
       <Card inset className="p-4">
-        <p className="mb-2 text-[13px] font-medium text-ink">What each role can do</p>
-        <dl className="space-y-1.5 text-[12.5px]">
+        <p className="mb-2 text-sm font-medium text-ink">What each role can do</p>
+        <dl className="space-y-1.5 text-xs">
           {(Object.keys(ROLE_HELP) as OrgMemberRole[]).map((r) => (
             <div key={r} className="flex gap-2">
               <dt className="w-16 shrink-0 font-medium capitalize text-ink-2">{r}</dt>

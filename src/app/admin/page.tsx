@@ -71,7 +71,7 @@ export default async function AdminOverview() {
 
         {!pending || pending.length === 0 ? (
           <CardBody>
-            <p className="text-[13.5px] text-ink-3">Nothing is waiting for approval.</p>
+            <p className="text-sm text-ink-3">Nothing is waiting for approval.</p>
           </CardBody>
         ) : (
           <div>
@@ -82,8 +82,8 @@ export default async function AdminOverview() {
                 className="flex items-center gap-4 border-b border-hairline-soft px-5 py-3.5 transition-colors last:border-b-0 hover:bg-sunken"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[14px] font-medium text-ink">{event.title}</p>
-                  <p className="mt-0.5 truncate text-[12.5px] text-ink-3">
+                  <p className="truncate text-base font-medium text-ink">{event.title}</p>
+                  <p className="mt-0.5 truncate text-xs text-ink-3">
                     {event.organizer?.name} · {formatDate(event.starts_at, "medium")}
                   </p>
                 </div>

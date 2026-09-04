@@ -67,7 +67,7 @@ export default async function OrganizerPage({ params }: { params: Promise<{ slug
             <h1 className="display-3 flex flex-wrap items-center gap-2 text-ink">
               {organizer.name}
               {organizer.verification_status === "verified" && (
-                <Badge tone="info" size="sm" pill>
+                <Badge tone="info" size="sm">
                   <ShieldCheck className="size-3" /> Verified
                 </Badge>
               )}
@@ -76,12 +76,12 @@ export default async function OrganizerPage({ params }: { params: Promise<{ slug
         </div>
 
         {organizer.description && (
-          <p className="mt-5 max-w-2xl text-[15px] leading-relaxed text-ink-2">
+          <p className="mt-5 max-w-2xl text-md leading-relaxed text-ink-2">
             {organizer.description}
           </p>
         )}
 
-        <div className="mt-4 flex flex-wrap gap-5 text-[13px] text-ink-3">
+        <div className="mt-4 flex flex-wrap gap-5 text-sm text-ink-3">
           {organizer.website && (
             <a
               href={organizer.website}

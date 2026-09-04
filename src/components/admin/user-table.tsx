@@ -61,9 +61,9 @@ export function UserTable({
         <EmptyState icon={Search} title="No users found" description="Try a different search term." />
       ) : (
         <Card className="overflow-x-auto">
-          <table className="w-full min-w-[44rem] text-left text-[13px]">
+          <table className="w-full min-w-[44rem] text-left text-sm">
             <thead>
-              <tr className="border-b border-hairline text-[11.5px] uppercase tracking-[0.06em] text-ink-3">
+              <tr className="border-b border-hairline text-2xs uppercase tracking-[0.06em] text-ink-3">
                 <th scope="col" className="px-4 py-3 font-semibold">User</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Joined</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Role</th>
@@ -79,7 +79,7 @@ export function UserTable({
                       <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="sm" />
                       <div className="min-w-0">
                         <p className="truncate text-ink">{profile.full_name ?? "—"}</p>
-                        <p className="truncate text-[12px] text-ink-3">{profile.email}</p>
+                        <p className="truncate text-xs text-ink-3">{profile.email}</p>
                       </div>
                     </div>
                   </td>

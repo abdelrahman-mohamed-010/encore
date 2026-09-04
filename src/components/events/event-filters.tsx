@@ -72,7 +72,7 @@ export function EventFilters({
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2.5">
-        <span className="mr-1 hidden items-center gap-2 text-[13px] font-medium text-ink-2 sm:flex">
+        <span className="mr-1 hidden items-center gap-2 text-sm font-medium text-ink-2 sm:flex">
           <SlidersHorizontal className="size-3.5" />
           Filter
         </span>
@@ -120,7 +120,7 @@ export function EventFilters({
         </Button>
 
         <div className="ml-auto flex items-center gap-2.5">
-          <span className="hidden text-[13px] text-ink-3 sm:inline tnum">
+          <span className="hidden text-sm text-ink-3 sm:inline tnum">
             {total} {total === 1 ? "event" : "events"}
           </span>
           <SelectField
@@ -144,7 +144,7 @@ export function EventFilters({
               className="group"
               aria-label={`Remove filter ${chip.label}`}
             >
-              <Badge tone="neutral" size="md" pill className="gap-1.5 pr-1.5 transition-colors group-hover:bg-n-150 dark:group-hover:bg-n-800">
+              <Badge tone="neutral" size="md" className="gap-1.5 pr-1.5 transition-colors group-hover:bg-n-150 dark:group-hover:bg-n-800">
                 {chip.label}
                 <X className="size-3 text-ink-3" />
               </Badge>

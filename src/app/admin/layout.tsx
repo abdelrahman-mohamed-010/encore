@@ -13,12 +13,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <header className="sticky top-0 z-30 border-b border-hairline bg-paper/85 backdrop-blur-xl">
         <div className="container-page flex h-14 items-center gap-3">
           <Logo showWordmark={false} />
-          <span className="text-[14px] font-semibold text-ink">Admin</span>
+          <span className="text-base font-semibold text-ink">Admin</span>
           <Badge tone="critical" size="xs">Platform</Badge>
           <div className="ml-auto flex items-center gap-2">
             <Link
               href="/"
-              className="text-[13px] text-ink-3 transition-colors hover:text-ink"
+              className="text-sm text-ink-3 transition-colors hover:text-ink"
             >
               Back to site
             </Link>

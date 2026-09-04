@@ -41,8 +41,8 @@ export function Callout({
         {icon ?? <Icon />}
       </span>
       <div className="min-w-0 flex-1 space-y-1">
-        {title && <p className={cn("text-[14px] font-semibold", iconTone)}>{title}</p>}
-        {children && <div className="text-[13.5px] leading-relaxed text-ink-2">{children}</div>}
+        {title && <p className={cn("text-base font-semibold", iconTone)}>{title}</p>}
+        {children && <div className="text-sm leading-relaxed text-ink-2">{children}</div>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>
@@ -66,7 +66,7 @@ export function Banner({
     <div className={cn("border-b border-hairline-soft", wrap, className)}>
       <div className="container-page flex items-center gap-3 py-2.5">
         <Icon className={cn("size-4 shrink-0", iconTone)} aria-hidden />
-        <p className="min-w-0 flex-1 text-[13px] text-ink-2">{children}</p>
+        <p className="min-w-0 flex-1 text-sm text-ink-2">{children}</p>
         {action}
       </div>
     </div>

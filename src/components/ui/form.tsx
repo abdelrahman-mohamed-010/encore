@@ -91,11 +91,11 @@ export function FormField<T extends FieldValues, N extends FieldPath<T>>({
             } as ControllerRenderProps<T, N> & { id: string; "aria-invalid": boolean })}
 
             {fieldState.error ? (
-              <p id={`${id}-error`} className="text-[12px] text-critical" role="alert">
+              <p id={`${id}-error`} className="text-xs text-critical" role="alert">
                 {fieldState.error.message}
               </p>
             ) : hint ? (
-              <p id={`${id}-hint`} className="text-[12px] leading-relaxed text-ink-3">
+              <p id={`${id}-hint`} className="text-xs leading-relaxed text-ink-3">
                 {hint}
               </p>
             ) : null}
@@ -112,7 +112,7 @@ export function FormError({ message }: { message?: string | null }) {
   return (
     <div
       role="alert"
-      className="flex items-start gap-2.5 rounded-xl border border-transparent bg-critical-bg px-4 py-3 text-[13.5px] text-critical"
+      className="flex items-start gap-2.5 rounded-xl border border-transparent bg-critical-bg px-4 py-3 text-sm text-critical"
     >
       <AlertCircle className="mt-px size-4 shrink-0" />
       {message}

@@ -70,9 +70,9 @@ export function OrganizerSettingsForm({ organizer }: { organizer: Organizer }) {
           </FormField>
 
           <div className="flex flex-col gap-1.5">
-            <span className="text-[13px] font-medium text-ink-2">Web address</span>
+            <span className="text-sm font-medium text-ink-2">Web address</span>
             <Input value={organizer.slug} disabled readOnly />
-            <p className="text-[12px] text-ink-3">
+            <p className="text-xs text-ink-3">
               Fixed — changing it would break every existing link to your events.
             </p>
           </div>

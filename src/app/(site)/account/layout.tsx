@@ -19,7 +19,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
         <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="xl" />
         <div className="min-w-0">
           <h1 className="display-3 truncate text-ink">{profile.full_name ?? "Your account"}</h1>
-          <p className="mt-1 truncate text-[14px] text-ink-3">{profile.email}</p>
+          <p className="mt-1 truncate text-base text-ink-3">{profile.email}</p>
         </div>
       </header>
 
@@ -28,7 +28,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
           <Link
             key={tab.href}
             href={tab.href}
-            className="-mb-px flex items-center gap-2 whitespace-nowrap border-b-2 border-transparent pb-2.5 text-[14px] font-medium text-ink-3 transition-colors hover:text-ink-2"
+            className="-mb-px flex items-center gap-2 whitespace-nowrap border-b-2 border-transparent pb-2.5 text-base font-medium text-ink-3 transition-colors hover:text-ink-2"
           >
             <tab.icon className="size-4" />
             {tab.label}

@@ -23,7 +23,7 @@ export async function SiteHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="rounded-lg px-2.5 py-1.5 text-[13.5px] font-medium text-ink-2 transition-colors hover:bg-sunken hover:text-ink"
+                  className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-ink-2 transition-colors hover:bg-sunken hover:text-ink"
                 >
                   {link.label}
                 </Link>
@@ -32,7 +32,7 @@ export async function SiteHeader() {
           </div>
 
           <div className="mx-auto hidden w-full max-w-sm lg:block">
-            <Suspense fallback={<div className="h-9 rounded-full bg-sunken" />}>
+            <Suspense fallback={<div className="h-9 rounded-lg bg-sunken" />}>
               <SearchField />
             </Suspense>
           </div>

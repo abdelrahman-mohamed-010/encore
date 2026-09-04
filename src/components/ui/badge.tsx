@@ -17,9 +17,9 @@ const badgeVariants = cva(
         outline:  "border-hairline bg-transparent text-ink-2",
       },
       size: {
-        xs: "rounded-md px-1.5 py-0.5 text-[11px]",
-        sm: "rounded-md px-2 py-[3px] text-[11.5px]",
-        md: "rounded-lg px-2.5 py-1 text-[12.5px]",
+        xs: "rounded-md px-1.5 py-0.5 text-2xs",
+        sm: "rounded-md px-2 py-[3px] text-2xs",
+        md: "rounded-lg px-2.5 py-1 text-xs",
       },
       pill: { true: "rounded-full", false: "" },
     },
@@ -56,7 +56,7 @@ export function StatusDot({
     accent: "bg-accent-500",
   } as const;
   return (
-    <span className={cn("inline-flex items-center gap-2 text-[13px] text-ink-2", className)}>
+    <span className={cn("inline-flex items-center gap-2 text-sm text-ink-2", className)}>
       <span className={cn("size-1.5 shrink-0 rounded-full", dots[tone])} />
       {children}
     </span>

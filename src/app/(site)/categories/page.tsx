@@ -51,10 +51,10 @@ export default async function CategoriesPage() {
               >
                 <Icon className="size-5" />
               </span>
-              <p className="mt-3.5 text-[15px] font-semibold text-ink">{category.name}</p>
-              <p className="mt-1 text-[12.5px] text-ink-3">{pluralize(count, "event")}</p>
+              <p className="mt-3.5 text-md font-semibold text-ink">{category.name}</p>
+              <p className="mt-1 text-xs text-ink-3">{pluralize(count, "event")}</p>
               {category.description && (
-                <p className="mt-2 line-clamp-2 text-[13px] leading-relaxed text-ink-2">
+                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-ink-2">
                   {category.description}
                 </p>
               )}

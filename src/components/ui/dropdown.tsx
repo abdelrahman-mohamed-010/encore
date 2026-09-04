@@ -36,7 +36,7 @@ export function DropdownItem({
   return (
     <Primitive.Item
       className={cn(
-        "flex cursor-pointer select-none items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13.5px] text-ink-2 outline-none",
+        "flex cursor-pointer select-none items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-ink-2 outline-none",
         "transition-colors focus:bg-sunken focus:text-ink",
         "data-[disabled]:pointer-events-none data-[disabled]:opacity-45",
         "[&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-ink-3",
@@ -64,7 +64,7 @@ export function DropdownCheckItem({
 export function DropdownLabel({ className, ...props }: React.ComponentProps<typeof Primitive.Label>) {
   return (
     <Primitive.Label
-      className={cn("px-2.5 pb-1 pt-2 text-[11px] font-semibold uppercase tracking-[0.07em] text-ink-3", className)}
+      className={cn("px-2.5 pb-1 pt-2 text-2xs font-semibold uppercase tracking-[0.07em] text-ink-3", className)}
       {...props}
     />
   );

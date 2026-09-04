@@ -75,7 +75,7 @@ export function AuthDivider({ label = "or" }: { label?: string }) {
   return (
     <div className="my-5 flex items-center gap-3">
       <span className="h-px flex-1 bg-hairline-soft" />
-      <span className="text-[12px] text-ink-3">{label}</span>
+      <span className="text-xs text-ink-3">{label}</span>
       <span className="h-px flex-1 bg-hairline-soft" />
     </div>
   );

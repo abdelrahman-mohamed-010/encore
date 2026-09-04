@@ -6,7 +6,7 @@ export default function SiteLoading() {
       <PageHeaderSkeleton withAction={false} />
       <div className="mt-6 flex gap-2">
         {Array.from({ length: 6 }).map((_, i) => (
-          <Shimmer key={i} className="h-9 w-24 rounded-full" />
+          <Shimmer key={i} className="h-9 w-24 rounded-lg" />
         ))}
       </div>
       <EventGridSkeleton className="mt-8" />

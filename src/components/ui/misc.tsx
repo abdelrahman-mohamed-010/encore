@@ -22,10 +22,10 @@ export function Avatar({
   className?: string;
 }) {
   const sizes = {
-    xs: "size-6 text-[10px]",
-    sm: "size-8 text-[11px]",
-    md: "size-9 text-[12px]",
-    lg: "size-11 text-[13px]",
+    xs: "size-6 text-2xs",
+    sm: "size-8 text-2xs",
+    md: "size-9 text-xs",
+    lg: "size-11 text-sm",
     xl: "size-16 text-lg",
   } as const;
 
@@ -113,9 +113,9 @@ export function EmptyState({
         </span>
       )}
       <div className="space-y-1.5">
-        <p className="text-[15px] font-medium text-ink">{title}</p>
+        <p className="text-md font-medium text-ink">{title}</p>
         {description && (
-          <p className="mx-auto max-w-sm text-[13.5px] leading-relaxed text-ink-3">{description}</p>
+          <p className="mx-auto max-w-sm text-sm leading-relaxed text-ink-3">{description}</p>
         )}
       </div>
       {action}
@@ -145,21 +145,21 @@ export function StatTile({
   return (
     <div className={cn("flex flex-col justify-between rounded-xl border border-hairline bg-card p-4", className)}>
       <div className="flex items-center justify-between gap-3">
-        <p className="text-[13px] text-ink-3">{label}</p>
+        <p className="text-sm text-ink-3">{label}</p>
         {Icon && (
           <span className="grid size-7 place-items-center rounded-md bg-sunken text-ink-3">
             <Icon className="size-3.5" />
           </span>
         )}
       </div>
-      <p className="mt-3 text-[26px] font-semibold leading-none tracking-[-0.02em] tabular text-ink">
+      <p className="mt-3 font-display text-[1.625rem] font-semibold leading-none numeral text-ink">
         {value}
       </p>
       <div className="mt-2 flex min-h-[18px] items-center gap-2">
         {delta != null && (
           <span
             className={cn(
-              "text-[12px] font-medium tabular",
+              "text-xs font-medium tabular",
               delta.value >= 0 ? "text-positive" : "text-critical",
             )}
           >
@@ -168,7 +168,7 @@ export function StatTile({
             {delta.suffix ?? "%"}
           </span>
         )}
-        {sub && <span className="truncate text-[12px] text-ink-3">{sub}</span>}
+        {sub && <span className="truncate text-xs text-ink-3">{sub}</span>}
       </div>
     </div>
   );
@@ -187,9 +187,9 @@ export function SummaryLine({
   className?: string;
 }) {
   return (
-    <div className={cn("flex items-baseline justify-between gap-4 text-[14px]", className)}>
+    <div className={cn("flex items-baseline justify-between gap-4 text-base", className)}>
       <span className={cn(strong ? "font-medium text-ink" : "text-ink-2")}>{label}</span>
-      <span className={cn("tabular", strong ? "text-[15px] font-semibold text-ink" : "text-ink")}>
+      <span className={cn("tabular", strong ? "text-md font-semibold text-ink" : "text-ink")}>
         {value}
       </span>
     </div>

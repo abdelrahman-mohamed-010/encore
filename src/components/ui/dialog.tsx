@@ -58,7 +58,7 @@ export function DialogHeader({
 }
 
 export function DialogTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
-  return <DialogPrimitive.Title className={cn("text-[16px] font-semibold text-ink", className)} {...props} />;
+  return <DialogPrimitive.Title className={cn("text-md font-semibold text-ink", className)} {...props} />;
 }
 
 export function DialogDescription({
@@ -66,7 +66,7 @@ export function DialogDescription({
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Description>) {
   return (
-    <DialogPrimitive.Description className={cn("text-[13px] leading-relaxed text-ink-3", className)} {...props} />
+    <DialogPrimitive.Description className={cn("text-sm leading-relaxed text-ink-3", className)} {...props} />
   );
 }
 

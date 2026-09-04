@@ -44,10 +44,10 @@ export function UserMenu({
         <div className="flex items-center gap-3 px-2.5 py-2.5">
           <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="md" />
           <div className="min-w-0">
-            <p className="truncate text-[13.5px] font-medium text-ink">
+            <p className="truncate text-sm font-medium text-ink">
               {profile.full_name ?? "Your account"}
             </p>
-            <p className="truncate text-[12px] text-ink-3">{profile.email}</p>
+            <p className="truncate text-xs text-ink-3">{profile.email}</p>
           </div>
         </div>
         <DropdownSeparator />
@@ -74,7 +74,7 @@ export function UserMenu({
                 <Link href={`/dashboard/${organizer.slug}`}>
                   <Building2 />
                   <span className="min-w-0 flex-1 truncate">{organizer.name}</span>
-                  <span className="shrink-0 text-[10.5px] font-semibold uppercase tracking-[0.06em] text-ink-3">
+                  <span className="shrink-0 text-2xs font-semibold uppercase tracking-[0.06em] text-ink-3">
                     {role}
                   </span>
                 </Link>

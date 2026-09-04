@@ -134,13 +134,13 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
               >
                 <Avatar src={event.organizer?.logo_url} name={event.organizer?.name} size="md" />
                 <div className="min-w-0">
-                  <p className="flex items-center gap-1.5 truncate text-[14px] font-medium text-ink">
+                  <p className="flex items-center gap-1.5 truncate text-base font-medium text-ink">
                     {event.organizer?.name}
                     {event.organizer?.verification_status === "verified" && (
                       <ShieldCheck className="size-3.5 shrink-0 text-info" />
                     )}
                   </p>
-                  <p className="truncate text-[12.5px] text-ink-3">View all events</p>
+                  <p className="truncate text-xs text-ink-3">View all events</p>
                 </div>
               </Link>
             </div>
@@ -150,8 +150,8 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                 <Divider />
                 <div>
                   <p className="eyebrow mb-2.5">Venue</p>
-                  <p className="text-[14px] font-medium text-ink">{event.venue.name}</p>
-                  <p className="mt-1 text-[13px] leading-relaxed text-ink-3">
+                  <p className="text-base font-medium text-ink">{event.venue.name}</p>
+                  <p className="mt-1 text-sm leading-relaxed text-ink-3">
                     {[event.venue.address_line1, event.venue.city, event.venue.country]
                       .filter(Boolean)
                       .join(", ")}
@@ -161,7 +161,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                       href={`https://www.google.com/maps/search/?api=1&query=${event.venue.latitude},${event.venue.longitude}`}
                       target="_blank"
                       rel="noreferrer noopener"
-                      className="mt-2 inline-block text-[13px] font-medium text-accent-600 hover:underline dark:text-accent-400"
+                      className="mt-2 inline-block text-sm font-medium text-accent-600 hover:underline dark:text-accent-400"
                     >
                       Open in Maps
                     </a>
@@ -186,20 +186,20 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             {event.category && (
-              <Badge tone="neutral" size="md" pill>
+              <Badge tone="neutral" size="md">
                 <Tag className="size-3" />
                 {event.category.name}
               </Badge>
             )}
-            {event.is_featured && <Badge tone="solid" size="md" pill>Featured</Badge>}
-            {isCancelled && <Badge tone="critical" size="md" pill>Cancelled</Badge>}
-            {!isCancelled && soldOut && <Badge tone="critical" size="md" pill>Sold out</Badge>}
-            {event.min_age ? <Badge tone="outline" size="md" pill>{event.min_age}+</Badge> : null}
+            {event.is_featured && <Badge tone="solid" size="md">Featured</Badge>}
+            {isCancelled && <Badge tone="critical" size="md">Cancelled</Badge>}
+            {!isCancelled && soldOut && <Badge tone="critical" size="md">Sold out</Badge>}
+            {event.min_age ? <Badge tone="outline" size="md">{event.min_age}+</Badge> : null}
           </div>
 
           <h1 className="display-1 mt-4 text-ink">{event.title}</h1>
           {event.subtitle && (
-            <p className="mt-3 text-[17px] leading-relaxed text-ink-2">{event.subtitle}</p>
+            <p className="mt-3 text-lg leading-relaxed text-ink-2">{event.subtitle}</p>
           )}
 
           <Card className="mt-7 overflow-hidden">
@@ -241,7 +241,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             <div className="mb-4 flex items-baseline justify-between gap-4">
               <h2 className="display-3 text-ink">Tickets</h2>
               {!soldOut && !isPast && !isCancelled && (
-                <span className="text-[13px] text-ink-3 tabular">
+                <span className="text-sm text-ink-3 tabular">
                   {pluralize(totalLeft, "ticket")} left
                 </span>
               )}
@@ -249,15 +249,15 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
 
             {isCancelled ? (
               <Card inset className="p-5 text-center">
-                <p className="text-[14px] font-medium text-ink">This event was cancelled</p>
+                <p className="text-base font-medium text-ink">This event was cancelled</p>
                 {event.cancellation_reason && (
-                  <p className="mt-1 text-[13px] text-ink-3">{event.cancellation_reason}</p>
+                  <p className="mt-1 text-sm text-ink-3">{event.cancellation_reason}</p>
                 )}
               </Card>
             ) : isPast ? (
               <Card inset className="p-5 text-center">
-                <p className="text-[14px] font-medium text-ink">This event has finished</p>
-                <p className="mt-1 text-[13px] text-ink-3">
+                <p className="text-base font-medium text-ink">This event has finished</p>
+                <p className="mt-1 text-sm text-ink-3">
                   Follow {event.organizer?.name} to hear about the next one.
                 </p>
               </Card>
@@ -281,7 +281,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
           {event.description && (
             <section className="mt-12">
               <h2 className="display-3 mb-4 text-ink">About this event</h2>
-              <div className="space-y-4 text-[15px] leading-[1.75] text-ink-2">
+              <div className="space-y-4 text-md leading-[1.75] text-ink-2">
                 {event.description.split("\n").filter(Boolean).map((paragraph, i) => (
                   <p key={i}>{paragraph}</p>
                 ))}
@@ -293,7 +293,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             <div className="mt-8 flex flex-wrap gap-2">
               {event.tags.map((tag) => (
                 <Link key={tag} href={`/events?q=${encodeURIComponent(tag)}`}>
-                  <Badge tone="neutral" size="md" pill className="transition-colors hover:bg-n-150 dark:hover:bg-n-800">
+                  <Badge tone="neutral" size="md" className="transition-colors hover:bg-n-150 dark:hover:bg-n-800">
                     #{tag}
                   </Badge>
                 </Link>

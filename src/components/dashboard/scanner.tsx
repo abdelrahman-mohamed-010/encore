@@ -112,7 +112,7 @@ export function Scanner({ events }: { events: { id: string; title: string }[] })
                 <div className="absolute inset-0 grid place-items-center text-center">
                   <div>
                     <CameraOff className="mx-auto size-6 text-n-500" />
-                    <p className="mt-2 text-[13px] text-n-400">
+                    <p className="mt-2 text-sm text-n-400">
                       {cameraError ?? "Start the camera to scan tickets"}
                     </p>
                   </div>
@@ -170,7 +170,7 @@ export function Scanner({ events }: { events: { id: string; title: string }[] })
                 Check in
               </Button>
             </form>
-            <p className="mt-2 text-[12px] leading-relaxed text-ink-3">
+            <p className="mt-2 text-xs leading-relaxed text-ink-3">
               A ticket code alone is not enough — the QR payload also carries a secret, so a code
               read off someone&apos;s screenshot will not admit anyone.
             </p>
@@ -184,7 +184,7 @@ export function Scanner({ events }: { events: { id: string; title: string }[] })
         </CardHeader>
         {history.length === 0 ? (
           <CardBody>
-            <p className="text-[13px] text-ink-3">Nothing scanned yet.</p>
+            <p className="text-sm text-ink-3">Nothing scanned yet.</p>
           </CardBody>
         ) : (
           <div className="max-h-[32rem] overflow-y-auto">
@@ -201,15 +201,15 @@ export function Scanner({ events }: { events: { id: string; title: string }[] })
                     <XCircle className="mt-0.5 size-4 shrink-0 text-critical" />
                   )}
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-medium text-ink">
+                    <p className="truncate text-sm font-medium text-ink">
                       {entry.attendee_name ?? entry.ticket_code}
                     </p>
-                    <p className="truncate text-[12px] text-ink-3">
+                    <p className="truncate text-xs text-ink-3">
                       {copy.label}
                       {entry.ticket_type ? ` · ${entry.ticket_type}` : ""}
                     </p>
                   </div>
-                  <span className="shrink-0 text-[11.5px] tabular text-ink-3">
+                  <span className="shrink-0 text-2xs tabular text-ink-3">
                     {formatTime(new Date(entry.at))}
                   </span>
                 </div>

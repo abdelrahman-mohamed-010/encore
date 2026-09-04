@@ -40,11 +40,11 @@ export function CardHeader({
 }
 
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h3 className={cn("text-[15px] font-semibold text-ink", className)} {...props} />;
+  return <h3 className={cn("text-md font-semibold text-ink", className)} {...props} />;
 }
 
 export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn("mt-0.5 text-[13px] leading-relaxed text-ink-3", className)} {...props} />;
+  return <p className={cn("mt-0.5 text-sm leading-relaxed text-ink-3", className)} {...props} />;
 }
 
 export function CardBody({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
@@ -85,7 +85,7 @@ export function SectionHeader({
         {eyebrow && <p className="eyebrow mb-1.5">{eyebrow}</p>}
         <Heading className="display-3 text-ink">{title}</Heading>
         {description && (
-          <p className="mt-1.5 max-w-prose text-[14px] leading-relaxed text-ink-2">{description}</p>
+          <p className="mt-1.5 max-w-prose text-base leading-relaxed text-ink-2">{description}</p>
         )}
       </div>
       {action && <div className="shrink-0">{action}</div>}

@@ -55,7 +55,7 @@ export default async function ManageEventPage({
     <div className="space-y-6">
       <Link
         href={`/dashboard/${slug}/events`}
-        className="inline-flex items-center gap-1.5 text-[13px] text-ink-3 transition-colors hover:text-ink"
+        className="inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
       >
         <ArrowLeft className="size-3.5" />
         Events
@@ -69,7 +69,7 @@ export default async function ManageEventPage({
               {event.status.replace("_", " ")}
             </Badge>
           </div>
-          <p className="mt-2 text-[13.5px] text-ink-3">
+          <p className="mt-2 text-sm text-ink-3">
             {formatDateTime(event.starts_at, event.timezone ?? undefined)}
             {event.venue && ` · ${event.venue.name}`}
           </p>
@@ -129,11 +129,11 @@ export default async function ManageEventPage({
         </CardHeader>
         <CardBody className="space-y-4">
           {(stats.by_ticket_type ?? []).length === 0 ? (
-            <p className="text-[13.5px] text-ink-3">No ticket types yet.</p>
+            <p className="text-sm text-ink-3">No ticket types yet.</p>
           ) : (
             (stats.by_ticket_type ?? []).map((tier) => (
               <div key={tier.name}>
-                <div className="flex items-baseline justify-between gap-4 text-[13.5px]">
+                <div className="flex items-baseline justify-between gap-4 text-sm">
                   <span className="font-medium text-ink">{tier.name}</span>
                   <span className="tabular text-ink-2">
                     {formatNumber(tier.sold)} / {formatNumber(tier.total)} ·{" "}

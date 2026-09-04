@@ -30,7 +30,7 @@ export function Logo({
         </svg>
       </span>
       {showWordmark && (
-        <span className="text-[17px] font-semibold tracking-[-0.03em] text-ink">Tazkarti</span>
+        <span className="text-lg font-semibold tracking-[-0.03em] text-ink">Tazkarti</span>
       )}
     </Link>
   );

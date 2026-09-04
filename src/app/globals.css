@@ -118,14 +118,18 @@
   --size-field-lg: 2.875rem; /* 46px — hero/auth forms          */
   --size-field-sm: 2rem;     /* 32px — toolbars, table filters  */
 
-  /* ---- Radii: one family ------------------------------------------------ */
-  --radius-xs: 6px;
-  --radius-sm: 8px;
-  --radius-md: 10px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
-  --radius-2xl: 20px;
-  --radius-3xl: 28px;
+  /* ---- Radii ------------------------------------------------------------
+     Deliberately tight. Large radii read as soft and consumer; a small,
+     consistent corner reads as precise, and lets edges line up across a
+     dense screen instead of each control bulging on its own. Anything that
+     must read as a token — badge pill, avatar, switch — stays fully round. */
+  --radius-xs: 3px;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 7px;
+  --radius-xl: 9px;
+  --radius-2xl: 12px;
+  --radius-3xl: 16px;
 
   /* ---- Elevation: barely there, then decisive for popovers -------------- */
   --shadow-e1: 0 1px 2px oklch(0.15 0.010 286 / 0.05);
@@ -134,8 +138,51 @@
   --shadow-pop: 0 0 0 1px oklch(0.15 0.010 286 / 0.06), 0 8px 24px oklch(0.15 0.010 286 / 0.10),
                 0 2px 6px oklch(0.15 0.010 286 / 0.06);
 
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  /* ---- Type -------------------------------------------------------------
+     Two families, three roles. `display` is for headlines only — using it for
+     UI text is what makes an interface look like a poster instead of a tool. */
+  --font-sans: var(--font-sans-family), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: var(--font-display-family), var(--font-sans-family), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-mono-family), ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* A real scale, so no component reaches for an arbitrary `text-[13.5px]`.
+     Line-height loosens as size drops (small text needs air to stay readable)
+     and tracking tightens as size rises (large text looks loose untouched). */
+  --text-2xs: 0.6875rem;   /* 11 — eyebrows, table headers            */
+  --text-2xs--line-height: 1.36;
+  --text-2xs--letter-spacing: 0.055em;
+
+  --text-xs: 0.75rem;      /* 12 — hints, meta, badges                */
+  --text-xs--line-height: 1.45;
+  --text-xs--letter-spacing: 0.004em;
+
+  --text-sm: 0.8125rem;    /* 13 — secondary UI, dense rows           */
+  --text-sm--line-height: 1.5;
+  --text-sm--letter-spacing: 0em;
+
+  --text-base: 0.875rem;   /* 14 — the default control and label size */
+  --text-base--line-height: 1.5;
+  --text-base--letter-spacing: -0.005em;
+
+  --text-md: 0.9375rem;    /* 15 — reading copy                       */
+  --text-md--line-height: 1.62;
+  --text-md--letter-spacing: -0.008em;
+
+  --text-lg: 1.0625rem;    /* 17 — card titles, sheet titles          */
+  --text-lg--line-height: 1.38;
+  --text-lg--letter-spacing: -0.017em;
+
+  --text-xl: 1.25rem;      /* 20 — section headings                   */
+  --text-xl--line-height: 1.28;
+  --text-xl--letter-spacing: -0.022em;
+
+  --text-2xl: 1.5rem;      /* 24 — page headings                      */
+  --text-2xl--line-height: 1.2;
+  --text-2xl--letter-spacing: -0.026em;
+
+  --text-3xl: 1.875rem;    /* 30                                      */
+  --text-3xl--line-height: 1.14;
+  --text-3xl--letter-spacing: -0.03em;
 
   /* ---- Motion ----------------------------------------------------------- */
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
@@ -209,7 +256,11 @@
     background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-feature-settings: "cv11", "ss01";
+    font-size: var(--text-base);
+    /* cv05/cv11: single-storey l and straight-tailed a/g — Inter's own
+       "more geometric" alternates. ss03 tightens the ampersand. */
+    font-feature-settings: "cv05", "cv11", "ss03";
+    font-optical-sizing: auto;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -223,10 +274,22 @@
   ::selection { background: var(--color-accent-200); color: var(--color-accent-950); }
   .dark ::selection { background: var(--color-accent-800); color: var(--color-accent-50); }
 
-  /* Display type: tight, balanced, never orphaned. */
-  h1, h2, h3, h4 { letter-spacing: -0.022em; text-wrap: balance; font-weight: 600; }
+  /* Headlines use the display family and are never left to wrap into a
+     one-word last line. Tracking tightens as size rises. */
+  h1, h2, h3, h4, h5 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
   h1 { letter-spacing: -0.032em; }
+  h2 { letter-spacing: -0.026em; }
+
   p { text-wrap: pretty; }
+
+  /* Wide-tracked lowercase looks accidental; wide-tracked uppercase looks
+     intentional. Small caps labels get the space they need to read. */
+  small { font-size: var(--text-xs); }
 
   /* Numerals line up in tables and money columns. */
   .tabular, table { font-variant-numeric: tabular-nums; }
@@ -260,16 +323,49 @@
   .hairline-t { box-shadow: inset 0 1px 0 var(--color-hairline-soft); }
   .hairline-b { box-shadow: inset 0 -1px 0 var(--color-hairline-soft); }
 
-  .display-1 { font-size: clamp(2.5rem, 1.6rem + 3.8vw, 4.25rem); line-height: 1.02; letter-spacing: -0.036em; font-weight: 600; }
-  .display-2 { font-size: clamp(2rem, 1.4rem + 2.4vw, 3rem);      line-height: 1.06; letter-spacing: -0.032em; font-weight: 600; }
-  .display-3 { font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2rem);    line-height: 1.14; letter-spacing: -0.026em; font-weight: 600; }
+  /* Display sizes. Optical tracking: the bigger the type, the tighter it is
+     set, because letter-spacing that looks right at 15px looks slack at 60px. */
+  .display-1 {
+    font-family: var(--font-display);
+    font-size: clamp(2.75rem, 1.7rem + 4.2vw, 4.75rem);
+    line-height: 0.98;
+    letter-spacing: -0.042em;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+  .display-2 {
+    font-family: var(--font-display);
+    font-size: clamp(2.125rem, 1.45rem + 2.7vw, 3.25rem);
+    line-height: 1.04;
+    letter-spacing: -0.036em;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+  .display-3 {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.2rem + 1.3vw, 2.125rem);
+    line-height: 1.12;
+    letter-spacing: -0.028em;
+    font-weight: 600;
+    text-wrap: balance;
+  }
+
+  /* Opt a run of text into the display family without changing its size. */
+  .font-display { font-family: var(--font-display); }
 
   .eyebrow {
-    font-size: 0.6875rem;
+    font-size: var(--text-2xs);
     font-weight: 600;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.09em;
     text-transform: uppercase;
     color: var(--color-ink-3);
+  }
+
+  /* Money and counts that need to feel weighed rather than typed. */
+  .numeral {
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    font-feature-settings: "ss03";
   }
 
   .animate-rise { animation: rise 0.4s var(--ease-out-quint) both; }

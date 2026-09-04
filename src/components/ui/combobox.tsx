@@ -83,7 +83,7 @@ export function Combobox({
       />
       <span className="min-w-0 flex-1 truncate">{option.label}</span>
       {option.hint && (
-        <span className="shrink-0 font-mono text-[12px] text-ink-3">{option.hint}</span>
+        <span className="shrink-0 font-mono text-xs text-ink-3">{option.hint}</span>
       )}
     </CommandPrimitive.Item>
   );
@@ -113,7 +113,7 @@ export function Combobox({
           aria-describedby={describedBy}
           disabled={disabled}
           className={cn(
-            "flex h-(--size-field) w-full items-center justify-between gap-2 rounded-xl border border-hairline bg-card px-3 text-[14px] text-ink",
+            "flex h-(--size-field) w-full items-center justify-between gap-2 rounded-xl border border-hairline bg-card px-3 text-base text-ink",
             "transition-[border-color,box-shadow] duration-150 hover:border-n-300 dark:hover:border-n-700",
             "focus-visible:border-brand-500 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20",
             "data-[state=open]:border-brand-500 data-[state=open]:ring-[3px] data-[state=open]:ring-brand-500/20",
@@ -138,14 +138,14 @@ export function Combobox({
             <Search className="size-4 shrink-0 text-ink-3" aria-hidden />
             <CommandPrimitive.Input
               placeholder={searchPlaceholder}
-              className="h-11 w-full bg-transparent text-[14px] text-ink placeholder:text-ink-3 focus:outline-none"
+              className="h-11 w-full bg-transparent text-base text-ink placeholder:text-ink-3 focus:outline-none"
             />
           </div>
           <CommandPrimitive.List
             id={listId}
             className="max-h-64 overflow-y-auto overscroll-contain p-1.5"
           >
-            <CommandPrimitive.Empty className="px-3 py-6 text-center text-[13px] text-ink-3">
+            <CommandPrimitive.Empty className="px-3 py-6 text-center text-sm text-ink-3">
               {emptyMessage}
             </CommandPrimitive.Empty>
             {grouped
@@ -153,7 +153,7 @@ export function Combobox({
                   <CommandPrimitive.Group
                     key={group.heading}
                     heading={group.heading}
-                    className="[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-ink-3"
+                    className="[&_[cmdk-group-heading]]:px-2.5 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:pt-2 [&_[cmdk-group-heading]]:text-2xs [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:uppercase [&_[cmdk-group-heading]]:tracking-wider [&_[cmdk-group-heading]]:text-ink-3"
                   >
                     {group.items.map(renderOption)}
                   </CommandPrimitive.Group>

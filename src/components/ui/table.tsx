@@ -11,7 +11,7 @@ export function TableWrap({ className, ...props }: React.HTMLAttributes<HTMLDivE
 }
 
 export function Table({ className, ...props }: React.TableHTMLAttributes<HTMLTableElement>) {
-  return <table className={cn("w-full min-w-160 caption-bottom text-[13.5px]", className)} {...props} />;
+  return <table className={cn("w-full min-w-160 caption-bottom text-sm", className)} {...props} />;
 }
 
 export function THead({ className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) {
@@ -40,7 +40,7 @@ export function TH({
     <th
       scope="col"
       className={cn(
-        "px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-ink-3",
+        "px-4 py-2.5 text-left text-2xs font-semibold uppercase tracking-wider text-ink-3",
         numeric && "text-right",
         className,
       )}

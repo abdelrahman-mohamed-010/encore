@@ -36,7 +36,7 @@ export function SiteFooter() {
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
           <div className="max-w-xs">
             <Logo />
-            <p className="mt-3.5 text-[13.5px] leading-relaxed text-ink-3">
+            <p className="mt-3.5 text-sm leading-relaxed text-ink-3">
               A modern ticketing platform. Discover what is on, buy in seconds, and run your own
               events with real-time sales and check-in.
             </p>
@@ -50,7 +50,7 @@ export function SiteFooter() {
                   <li key={link.href + link.label}>
                     <Link
                       href={link.href}
-                      className="text-[13.5px] text-ink-2 transition-colors hover:text-ink"
+                      className="text-sm text-ink-2 transition-colors hover:text-ink"
                     >
                       {link.label}
                     </Link>
@@ -62,10 +62,10 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-10 flex flex-col gap-3 border-t border-hairline-soft pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[12.5px] text-ink-3">
+          <p className="text-xs text-ink-3">
             © {new Date().getFullYear()} Tazkarti. Built with Next.js, Supabase and Stripe.
           </p>
-          <div className="flex items-center gap-5 text-[12.5px] text-ink-3">
+          <div className="flex items-center gap-5 text-xs text-ink-3">
             <Link href="/legal/terms" className="transition-colors hover:text-ink-2">Terms</Link>
             <Link href="/legal/privacy" className="transition-colors hover:text-ink-2">Privacy</Link>
           </div>

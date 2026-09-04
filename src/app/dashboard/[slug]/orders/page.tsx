@@ -52,9 +52,9 @@ export default async function DashboardOrdersPage({
         <EmptyState icon={Receipt} title="No orders yet" description="Sales will appear here as they happen." />
       ) : (
         <Card className="overflow-x-auto">
-          <table className="w-full min-w-[52rem] text-left text-[13px]">
+          <table className="w-full min-w-[52rem] text-left text-sm">
             <thead>
-              <tr className="border-b border-hairline text-[11.5px] uppercase tracking-[0.06em] text-ink-3">
+              <tr className="border-b border-hairline text-2xs uppercase tracking-[0.06em] text-ink-3">
                 <th scope="col" className="px-4 py-3 font-semibold">Order</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Buyer</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Event</th>
@@ -70,14 +70,14 @@ export default async function DashboardOrdersPage({
                 return (
                   <tr key={order.id} className="border-b border-hairline-soft last:border-b-0 hover:bg-sunken">
                     <td className="px-4 py-3">
-                      <span className="font-mono text-[12.5px] text-ink">{order.order_number}</span>
-                      <span className="ml-2 text-[12px] text-ink-3">
+                      <span className="font-mono text-xs text-ink">{order.order_number}</span>
+                      <span className="ml-2 text-xs text-ink-3">
                         {count} {count === 1 ? "ticket" : "tickets"}
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <p className="truncate text-ink">{order.buyer_name}</p>
-                      <p className="truncate text-[12px] text-ink-3">{order.buyer_email}</p>
+                      <p className="truncate text-xs text-ink-3">{order.buyer_email}</p>
                     </td>
                     <td className="max-w-48 truncate px-4 py-3 text-ink-2">{order.event?.title}</td>
                     <td className="whitespace-nowrap px-4 py-3 text-ink-3">
@@ -86,7 +86,7 @@ export default async function DashboardOrdersPage({
                     <td className="whitespace-nowrap px-4 py-3 text-right tabular text-ink">
                       {formatMoney(order.total_cents, order.currency)}
                       {order.refunded_cents > 0 && (
-                        <span className="block text-[11.5px] text-critical">
+                        <span className="block text-2xs text-critical">
                           −{formatMoney(order.refunded_cents, order.currency)}
                         </span>
                       )}
@@ -116,7 +116,7 @@ export default async function DashboardOrdersPage({
         </Card>
       )}
 
-      <p className="text-[12.5px] text-ink-3">
+      <p className="text-xs text-ink-3">
         Showing the 200 most recent orders.{" "}
         <Link href={`/dashboard/${slug}/attendees`} className="underline underline-offset-4">
           See attendees

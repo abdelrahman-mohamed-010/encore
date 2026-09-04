@@ -134,7 +134,7 @@ export function SeatMap({
       <Card className="overflow-hidden">
         <div className="border-b border-hairline-soft bg-sunken px-4 py-3">
           <div className="mx-auto mb-1 h-1 w-2/3 rounded-full bg-n-300 dark:bg-n-700" />
-          <p className="text-center text-[11px] font-semibold uppercase tracking-[0.14em] text-ink-3">
+          <p className="text-center text-2xs font-semibold uppercase tracking-[0.14em] text-ink-3">
             Stage
           </p>
         </div>
@@ -149,13 +149,13 @@ export function SeatMap({
                     style={{ backgroundColor: section.color }}
                     aria-hidden
                   />
-                  <p className="text-[12px] font-semibold text-ink-2">{section.name}</p>
+                  <p className="text-xs font-semibold text-ink-2">{section.name}</p>
                 </div>
 
                 <div className="space-y-1.5">
                   {section.rows.map((row) => (
                     <div key={row.label} className="flex items-center gap-2">
-                      <span className="w-4 shrink-0 text-right text-[10px] font-medium text-ink-3">
+                      <span className="w-4 shrink-0 text-right text-2xs font-medium text-ink-3">
                         {row.label}
                       </span>
                       <div className="flex gap-1">
@@ -220,7 +220,7 @@ export function SeatMap({
 
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-hairline bg-card px-4 py-3.5">
         <div className="min-w-0">
-          <p className="text-[12.5px] text-ink-3">
+          <p className="text-xs text-ink-3">
             {selection.count > 0
               ? selection.selected
                   .map((id) => {
@@ -230,7 +230,7 @@ export function SeatMap({
                   .join(", ")
               : "No seats selected"}
           </p>
-          <p className="text-[18px] font-semibold tabular text-ink">
+          <p className="text-lg font-semibold tabular text-ink">
             {formatMoney(selection.subtotalCents, currency)}
           </p>
         </div>
@@ -252,7 +252,7 @@ export function SeatMap({
 
 function Legend({ className, label }: { className: string; label: string }) {
   return (
-    <span className="flex items-center gap-1.5 text-[12px] text-ink-3">
+    <span className="flex items-center gap-1.5 text-xs text-ink-3">
       <span className={cn("size-3 rounded-[3px] border", className)} />
       {label}
     </span>

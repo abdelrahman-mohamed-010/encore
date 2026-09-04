@@ -56,8 +56,8 @@ export function TicketPicker({
   if (availability.length === 0) {
     return (
       <Card inset className="p-5 text-center">
-        <p className="text-[14px] font-medium text-ink">Tickets are not on sale yet</p>
-        <p className="mt-1 text-[13px] text-ink-3">Check back soon or follow the organizer.</p>
+        <p className="text-base font-medium text-ink">Tickets are not on sale yet</p>
+        <p className="mt-1 text-sm text-ink-3">Check back soon or follow the organizer.</p>
       </Card>
     );
   }
@@ -81,14 +81,14 @@ export function TicketPicker({
             >
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-2">
-                  <p className="text-[14.5px] font-medium text-ink">{tier.name}</p>
+                  <p className="text-base font-medium text-ink">{tier.name}</p>
                   {soldOut && <Badge tone="critical" size="xs">Sold out</Badge>}
                   {!soldOut && !tier.on_sale && <Badge tone="caution" size="xs">Not on sale</Badge>}
                   {!soldOut && tier.available <= 10 && tier.on_sale && (
                     <Badge tone="caution" size="xs">{tier.available} left</Badge>
                   )}
                 </div>
-                <p className="mt-1 text-[13px] text-ink-3">
+                <p className="mt-1 text-sm text-ink-3">
                   {tier.price_cents === 0 ? "Free" : formatMoney(tier.price_cents, tier.currency)}
                   {tier.min_per_order > 1 && ` · minimum ${tier.min_per_order}`}
                 </p>
@@ -104,7 +104,7 @@ export function TicketPicker({
                 >
                   <Minus />
                 </Button>
-                <span className="w-8 text-center text-[14px] font-semibold tabular text-ink">
+                <span className="w-8 text-center text-base font-semibold tabular text-ink">
                   {qty}
                 </span>
                 <Button
@@ -124,12 +124,12 @@ export function TicketPicker({
 
       <div className="flex items-center justify-between gap-4 rounded-xl border border-hairline bg-card px-4 py-3.5">
         <div>
-          <p className="text-[12.5px] text-ink-3">
+          <p className="text-xs text-ink-3">
             {selection.count > 0
               ? `${selection.count} ${selection.count === 1 ? "ticket" : "tickets"}`
               : "No tickets selected"}
           </p>
-          <p className="text-[18px] font-semibold tabular text-ink">
+          <p className="text-lg font-semibold tabular text-ink">
             {formatMoney(selection.subtotalCents, currency)}
           </p>
         </div>
@@ -144,7 +144,7 @@ export function TicketPicker({
         </Button>
       </div>
 
-      <p className="text-center text-[12px] text-ink-3">
+      <p className="text-center text-xs text-ink-3">
         Tickets are held for 10 minutes while you check out.
       </p>
     </div>

@@ -20,7 +20,7 @@ export default async function DashboardIndex() {
     <div className="container-page py-12">
       <div className="mx-auto max-w-2xl">
         <h1 className="display-2 text-ink">Your organizations</h1>
-        <p className="mt-2 text-[15px] text-ink-2">
+        <p className="mt-2 text-md text-ink-2">
           Each organization has its own events, team, payouts and sales.
         </p>
 
@@ -47,8 +47,8 @@ export default async function DashboardIndex() {
                 >
                   <Avatar src={organizer.logo_url} name={organizer.name} size="md" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[14.5px] font-semibold text-ink">{organizer.name}</p>
-                    <p className="truncate text-[12.5px] text-ink-3">/{organizer.slug}</p>
+                    <p className="truncate text-base font-semibold text-ink">{organizer.name}</p>
+                    <p className="truncate text-xs text-ink-3">/{organizer.slug}</p>
                   </div>
                   <Badge tone="neutral" size="xs">{role}</Badge>
                 </Link>

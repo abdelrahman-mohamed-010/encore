@@ -47,10 +47,10 @@ export function EventCard({
 
         <div className="absolute left-3 top-3 flex gap-1.5">
           {event.is_featured && (
-            <Badge tone="solid" size="sm" pill>Featured</Badge>
+            <Badge tone="solid" size="sm">Featured</Badge>
           )}
           {event.is_sold_out && (
-            <Badge tone="critical" size="sm" pill>Sold out</Badge>
+            <Badge tone="critical" size="sm">Sold out</Badge>
           )}
         </div>
       </div>
@@ -59,17 +59,17 @@ export function EventCard({
         <div className="flex items-start gap-3">
           <DateBlock date={event.starts_at} timeZone={event.timezone ?? undefined} />
           <div className="min-w-0 flex-1">
-            <h3 className="line-clamp-2 text-[15px] font-semibold leading-snug tracking-[-0.015em] text-ink">
+            <h3 className="line-clamp-2 text-md font-semibold leading-snug tracking-[-0.015em] text-ink">
               {event.title}
             </h3>
-            <p className="mt-1 truncate text-[12.5px] text-ink-3">
+            <p className="mt-1 truncate text-xs text-ink-3">
               {formatEventStamp(event.starts_at, event.timezone ?? undefined)}
             </p>
           </div>
         </div>
 
         <div className="mt-auto flex items-end justify-between gap-3 border-t border-hairline-soft pt-3">
-          <span className="flex min-w-0 items-center gap-1.5 text-[12.5px] text-ink-3">
+          <span className="flex min-w-0 items-center gap-1.5 text-xs text-ink-3">
             {event.is_online ? (
               <Video className="size-3.5 shrink-0" />
             ) : (
@@ -77,7 +77,7 @@ export function EventCard({
             )}
             <span className="truncate">{placeLabel(event)}</span>
           </span>
-          <span className="shrink-0 text-[13px] font-semibold tabular text-ink">
+          <span className="shrink-0 text-sm font-semibold tabular text-ink">
             {priceRange(event.min_price_cents, event.max_price_cents, event.currency)}
           </span>
         </div>
@@ -115,14 +115,14 @@ export function EventRow({
       </div>
 
       <div className="min-w-0 flex-1">
-        <p className="text-[12px] font-medium text-ink-3">
+        <p className="text-xs font-medium text-ink-3">
           {formatEventStamp(event.starts_at, event.timezone ?? undefined)}
         </p>
-        <h3 className="mt-0.5 truncate text-[14px] font-semibold text-ink">{event.title}</h3>
-        <p className="mt-0.5 truncate text-[12.5px] text-ink-3">{placeLabel(event)}</p>
+        <h3 className="mt-0.5 truncate text-base font-semibold text-ink">{event.title}</h3>
+        <p className="mt-0.5 truncate text-xs text-ink-3">{placeLabel(event)}</p>
       </div>
 
-      <span className="shrink-0 text-[13px] font-semibold tabular text-ink">
+      <span className="shrink-0 text-sm font-semibold tabular text-ink">
         {event.is_sold_out
           ? "Sold out"
           : priceRange(event.min_price_cents, event.max_price_cents, event.currency)}

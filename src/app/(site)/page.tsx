@@ -42,7 +42,7 @@ export default async function HomePage() {
           <div className="mx-auto max-w-3xl text-center">
             <Link
               href="/events?featured=1"
-              className="inline-flex items-center gap-2 rounded-full border border-hairline bg-sunken px-3 py-1.5 text-[12.5px] font-medium text-ink-2 transition-colors hover:text-ink"
+              className="inline-flex items-center gap-2 rounded-lg border border-hairline bg-sunken px-3 py-1.5 text-xs font-medium text-ink-2 transition-colors hover:text-ink"
             >
               <Sparkles className="size-3.5" />
               {formatNumber(Number(totalEvents))} events on sale right now
@@ -55,13 +55,13 @@ export default async function HomePage() {
               night out.
             </h1>
 
-            <p className="mx-auto mt-5 max-w-xl text-[16px] leading-relaxed text-ink-2">
+            <p className="mx-auto mt-5 max-w-xl text-md leading-relaxed text-ink-2">
               Concerts, theatre, conferences and festivals — booked in seconds, with your tickets
               waiting in your pocket.
             </p>
 
             <div className="mx-auto mt-8 max-w-xl">
-              <Suspense fallback={<div className="h-12 rounded-full bg-sunken" />}>
+              <Suspense fallback={<div className="h-12 rounded-lg bg-sunken" />}>
                 <SearchField size="lg" autoFocus={false} />
               </Suspense>
             </div>
@@ -145,7 +145,7 @@ export default async function HomePage() {
               <h2 className="display-2 mt-3 text-ink">
                 Sell tickets on your own Stripe account.
               </h2>
-              <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-ink-2">
+              <p className="mt-4 max-w-lg text-md leading-relaxed text-ink-2">
                 Connect Stripe once and money from every sale lands directly in your account —
                 Tazkarti only takes its service fee. Build your event, set your tiers, and watch
                 sales land in real time.
@@ -171,8 +171,8 @@ export default async function HomePage() {
                   <span className="grid size-9 place-items-center rounded-lg border border-hairline bg-card text-ink-2">
                     <feature.icon className="size-4" />
                   </span>
-                  <p className="mt-3 text-[14px] font-semibold text-ink">{feature.title}</p>
-                  <p className="mt-1 text-[12.5px] leading-relaxed text-ink-3">{feature.body}</p>
+                  <p className="mt-3 text-base font-semibold text-ink">{feature.title}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-ink-3">{feature.body}</p>
                 </div>
               ))}
             </div>

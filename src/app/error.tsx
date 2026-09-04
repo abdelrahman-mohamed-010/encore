@@ -20,11 +20,11 @@ export default function GlobalError({
       <Logo />
       <p className="eyebrow mt-10">Something went wrong</p>
       <h1 className="display-2 mt-3 text-ink">That did not work</h1>
-      <p className="mt-3 max-w-md text-[15px] leading-relaxed text-ink-2">
+      <p className="mt-3 max-w-md text-md leading-relaxed text-ink-2">
         The page hit an unexpected error. Trying again often clears it.
       </p>
       {error.digest && (
-        <p className="mt-3 font-mono text-[12px] text-ink-3">Reference: {error.digest}</p>
+        <p className="mt-3 font-mono text-xs text-ink-3">Reference: {error.digest}</p>
       )}
       <Button variant="solid" size="lg" className="mt-8" onClick={reset}>
         Try again

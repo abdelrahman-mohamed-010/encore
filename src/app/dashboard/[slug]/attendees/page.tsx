@@ -73,9 +73,9 @@ export default async function AttendeesPage({
         />
       ) : (
         <Card className="overflow-x-auto">
-          <table className="w-full min-w-[48rem] text-left text-[13px]">
+          <table className="w-full min-w-[48rem] text-left text-sm">
             <thead>
-              <tr className="border-b border-hairline text-[11.5px] uppercase tracking-[0.06em] text-ink-3">
+              <tr className="border-b border-hairline text-2xs uppercase tracking-[0.06em] text-ink-3">
                 <th scope="col" className="px-4 py-3 font-semibold">Attendee</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Event</th>
                 <th scope="col" className="px-4 py-3 font-semibold">Ticket</th>
@@ -88,22 +88,22 @@ export default async function AttendeesPage({
                 <tr key={ticket.id} className="border-b border-hairline-soft last:border-b-0 hover:bg-sunken">
                   <td className="px-4 py-3">
                     <p className="truncate text-ink">{ticket.attendee_name ?? "—"}</p>
-                    <p className="truncate text-[12px] text-ink-3">{ticket.attendee_email ?? ""}</p>
+                    <p className="truncate text-xs text-ink-3">{ticket.attendee_email ?? ""}</p>
                   </td>
                   <td className="max-w-40 truncate px-4 py-3 text-ink-2">{ticket.event?.title}</td>
                   <td className="px-4 py-3 text-ink-2">
                     {ticket.ticket_type?.name}
                     {ticket.seat_label && (
-                      <span className="block text-[12px] text-ink-3">{ticket.seat_label}</span>
+                      <span className="block text-xs text-ink-3">{ticket.seat_label}</span>
                     )}
                   </td>
-                  <td className="px-4 py-3 font-mono text-[12.5px] text-ink-2">{ticket.ticket_code}</td>
+                  <td className="px-4 py-3 font-mono text-xs text-ink-2">{ticket.ticket_code}</td>
                   <td className="px-4 py-3">
                     {ticket.status === "used" ? (
                       <div>
                         <Badge tone="positive" size="xs">Checked in</Badge>
                         {ticket.checked_in_at && (
-                          <span className="mt-1 block text-[11.5px] text-ink-3">
+                          <span className="mt-1 block text-2xs text-ink-3">
                             {formatDateTime(ticket.checked_in_at)}
                           </span>
                         )}

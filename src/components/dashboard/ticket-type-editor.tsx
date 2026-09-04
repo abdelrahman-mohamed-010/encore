@@ -136,7 +136,7 @@ export function TicketTypeEditor({
           <div>
             <CardTitle>Ticket types</CardTitle>
             {seatingType === "reserved_seating" && (
-              <p className="mt-0.5 text-[12.5px] text-ink-3">
+              <p className="mt-0.5 text-xs text-ink-3">
                 This event uses reserved seating — each type maps to a seating section.
               </p>
             )}
@@ -172,11 +172,11 @@ export function TicketTypeEditor({
                 >
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-[14px] font-medium text-ink">{tier.name}</p>
+                      <p className="text-base font-medium text-ink">{tier.name}</p>
                       {tier.is_hidden && <Badge tone="neutral" size="xs">Hidden</Badge>}
                       {available === 0 && <Badge tone="critical" size="xs">Sold out</Badge>}
                     </div>
-                    <p className="mt-1 text-[12.5px] text-ink-3">
+                    <p className="mt-1 text-xs text-ink-3">
                       {tier.price_cents === 0 ? "Free" : formatMoney(tier.price_cents, tier.currency)}
                       {" · "}
                       {formatNumber(tier.quantity_sold)} sold, {formatNumber(available)} left
@@ -250,7 +250,7 @@ export function TicketTypeEditor({
               <div className="flex items-center justify-between gap-4 rounded-lg border border-hairline bg-sunken px-3.5 py-3">
                 <div>
                   <Label>Hidden</Label>
-                  <p className="mt-0.5 text-[12px] text-ink-3">
+                  <p className="mt-0.5 text-xs text-ink-3">
                     Keeps this tier off the public event page.
                   </p>
                 </div>
