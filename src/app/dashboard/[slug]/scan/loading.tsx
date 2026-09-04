@@ -2,7 +2,7 @@ import { PageHeaderSkeleton, Shimmer } from "@/components/ui/skeleton";
 
 export default function ScanLoading() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-5 py-8 md:px-8">
       <PageHeaderSkeleton withAction={false} />
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="space-y-5">

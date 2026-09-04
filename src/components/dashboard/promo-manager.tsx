@@ -104,7 +104,7 @@ export function PromoManager({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-5 py-8 md:px-8">
       <SectionHeader
         level={1}
         title="Promo codes"

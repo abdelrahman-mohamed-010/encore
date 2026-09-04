@@ -2,7 +2,7 @@ import { ChartSkeleton, ListSkeleton, PageHeaderSkeleton, StatRowSkeleton } from
 
 export default function DashboardOverviewLoading() {
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 px-5 py-8 md:px-8">
       <PageHeaderSkeleton />
       <StatRowSkeleton />
       <div className="grid gap-5 lg:grid-cols-2">

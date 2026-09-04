@@ -6,10 +6,12 @@ import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, SectionHeader } from "@/components/ui/surface";
+import { Card } from "@/components/ui/surface";
+
 import { EmptyState, Meter } from "@/components/ui/misc";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";
 import type { EventStatus } from "@/lib/types";
+import { DashboardBody, DashboardHeader } from "@/components/dashboard/page-header";
 
 export const metadata: Metadata = { title: "Events" };
 
@@ -41,17 +43,18 @@ export default async function DashboardEventsPage({
     .order("starts_at", { ascending: false });
 
   return (
-    <div className="space-y-6">
-      <SectionHeader
-        level={1}
+    <>
+      <DashboardHeader
         title="Events"
         description="Everything you have created, on sale or not."
-        action={
+        actions={
           <Button asChild variant="solid" size="md">
             <Link href={`/dashboard/${slug}/events/new`}><Plus /> New event</Link>
           </Button>
         }
       />
+
+      <DashboardBody className="space-y-6">
 
       {!events || events.length === 0 ? (
         <EmptyState
@@ -118,6 +121,7 @@ export default async function DashboardEventsPage({
           })}
         </Card>
       )}
-    </div>
-  );
+      </DashboardBody>
+    </>
+);
 }

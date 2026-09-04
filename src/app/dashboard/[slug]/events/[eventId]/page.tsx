@@ -52,7 +52,7 @@ export default async function ManageEventPage({
   const currency = ticketTypes?.[0]?.currency ?? "USD";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-5 py-8 md:px-8">
       <Link
         href={`/dashboard/${slug}/events`}
         className="inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
