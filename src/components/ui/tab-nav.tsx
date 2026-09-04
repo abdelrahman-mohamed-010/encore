@@ -2,7 +2,19 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Heart, Receipt, Settings, Ticket } from "lucide-react";
 import { cn } from "@/lib/utils";
+
+export const ACCOUNT_TABS = [
+  { href: "/account/tickets", label: "Tickets", icon: Ticket },
+  { href: "/account/orders", label: "Orders", icon: Receipt },
+  { href: "/account/saved", label: "Saved", icon: Heart },
+  { href: "/account/settings", label: "Settings", icon: Settings },
+];
+
+export function AccountTabs({ className }: { className?: string }) {
+  return <TabNav items={ACCOUNT_TABS} className={className} />;
+}
 
 /**
  * The underlined tab strip that sits on a page header's closing rule.

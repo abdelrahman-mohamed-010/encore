@@ -42,7 +42,7 @@ export default async function HomePage() {
       <HeroCollage />
 
       {/* ---- Search + categories -------------------------------------------- */}
-      <section className="container-page pt-4 pb-6">
+      <section className="container-page relative z-10 pt-4 pb-6">
         <div className="mx-auto max-w-xl">
           <Suspense fallback={<div className="h-(--size-field-lg) rounded-md bg-sunken" />}>
             <SearchField size="lg" autoFocus={false} />

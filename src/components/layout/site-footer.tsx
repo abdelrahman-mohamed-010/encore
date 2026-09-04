@@ -25,7 +25,7 @@ export function SiteFooter() {
   return (
     <footer className="mt-24">
       <div className="container-page">
-        <div className="flex flex-col gap-6 border-t border-hairline py-8 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-6 py-8 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <Logo />
             {LINKS.map((link) => (

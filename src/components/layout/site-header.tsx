@@ -13,7 +13,7 @@ export async function SiteHeader() {
   const [profile, memberships] = await Promise.all([getProfile(), getMyOrganizers()]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-hairline bg-paper/85 backdrop-blur-xl supports-[backdrop-filter]:bg-paper/70">
+    <header className="relative z-40 bg-transparent">
       <div className="container-page">
         {/*
           Three tracks rather than a flex row: the outer columns are always

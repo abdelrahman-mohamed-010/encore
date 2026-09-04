@@ -1,16 +1,8 @@
 import Link from "next/link";
-import { Heart, Receipt, Settings, Ticket } from "lucide-react";
 import { requireProfile } from "@/lib/auth";
 import { Avatar } from "@/components/ui/misc";
 import { Button } from "@/components/ui/button";
-import { TabNav } from "@/components/ui/tab-nav";
-
-const TABS = [
-  { href: "/account/tickets", label: "Tickets", icon: Ticket },
-  { href: "/account/orders", label: "Orders", icon: Receipt },
-  { href: "/account/saved", label: "Saved", icon: Heart },
-  { href: "/account/settings", label: "Settings", icon: Settings },
-];
+import { AccountTabs } from "@/components/ui/tab-nav";
 
 /**
  * The account area gets the same header treatment as the dashboard: a washed
@@ -23,7 +15,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
 
   return (
     <>
-      <div className="page-wash">
+      <div className="page-wash -mt-(--size-nav) pt-(--size-nav)">
         <div className="container-page pt-10">
           <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
             <div className="flex min-w-0 items-center gap-4">
@@ -48,7 +40,7 @@ export default async function AccountLayout({ children }: { children: React.Reac
 
         <div className="mt-7 border-b border-hairline">
           <div className="container-page">
-            <TabNav items={TABS} />
+            <AccountTabs />
           </div>
         </div>
       </div>

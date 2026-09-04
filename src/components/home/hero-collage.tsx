@@ -24,39 +24,19 @@ type Card = {
   top: number;
   width: number;
   height: number;
-  rotate: number;
   /** Shown from this breakpoint up. Undefined means always. */
   from?: "sm" | "md" | "lg" | "xl";
 };
 
 const CARDS: Card[] = [
   {
-    className: "art-studio",
-    left: 38.5, top: -58, width: 262, height: 262, rotate: -1.5,
-    art: (
-      <>
-        <div className="stars">
-          <span style={{ left: 14, top: 46 }}>✦</span>
-          <span style={{ right: 22, top: 38, fontSize: 28 }}>✦</span>
-          <span style={{ left: 52, bottom: 34, fontSize: 16 }}>✦</span>
-          <span style={{ right: 48, bottom: 24 }}>✦</span>
-        </div>
-        <div className="w">
-          STUDIO
-          <br />
-          SESSION
-        </div>
-      </>
-    ),
-  },
-  {
     className: "art-retro",
-    left: 20, top: 86, width: 188, height: 188, rotate: 1.5, from: "md",
+    left: 20, top: 86, width: 188, height: 188, from: "md",
     art: <div className="w">RETRO<br />NIGHT</div>,
   },
   {
     className: "art-book",
-    left: 69, top: 34, width: 206, height: 206, rotate: -1, from: "sm",
+    left: 69, top: 34, width: 206, height: 206, from: "sm",
     art: (
       <>
         <div className="circle" />
@@ -66,7 +46,7 @@ const CARDS: Card[] = [
   },
   {
     className: "art-makers",
-    left: 8, top: 268, width: 146, height: 146, rotate: -2.5, from: "xl",
+    left: 8, top: 268, width: 146, height: 146, from: "xl",
     art: (
       <>
         <div className="w">MAKERS +<br />MENTORS</div>
@@ -77,7 +57,7 @@ const CARDS: Card[] = [
   },
   {
     className: "art-bday",
-    left: 82, top: 252, width: 178, height: 178, rotate: 2, from: "lg",
+    left: 82, top: 252, width: 178, height: 178, from: "lg",
     art: (
       <div className="w">
         birthday
@@ -89,12 +69,12 @@ const CARDS: Card[] = [
   },
   {
     className: "art-pasta",
-    left: 12, top: 428, width: 224, height: 224, rotate: -1, from: "lg",
+    left: 12, top: 428, width: 224, height: 224, from: "lg",
     art: <div className="badge">PASTA<br />NIGHT</div>,
   },
   {
     className: "art-cocktail",
-    left: 67, top: 438, width: 172, height: 172, rotate: 1, from: "md",
+    left: 67, top: 438, width: 172, height: 172, from: "md",
     art: (
       <>
         <div className="w">Happy Hour</div>
@@ -105,7 +85,7 @@ const CARDS: Card[] = [
   },
   {
     className: "art-hack",
-    left: 76, top: 592, width: 196, height: 196, rotate: -2, from: "xl",
+    left: 76, top: 592, width: 196, height: 196, from: "xl",
     art: (
       <>
         <div className="t">Cairo AI Hackathon</div>
@@ -116,31 +96,11 @@ const CARDS: Card[] = [
   },
   {
     className: "art-bbq",
-    left: 1, top: 660, width: 186, height: 224, rotate: -3, from: "xl",
+    left: 1, top: 660, width: 186, height: 224, from: "xl",
     art: (
       <>
         <div className="w">GRILL<br />DAY</div>
         <div className="flame">🔥</div>
-      </>
-    ),
-  },
-  {
-    className: "art-earth",
-    left: 26, top: 762, width: 208, height: 208, rotate: 2, from: "lg",
-    art: (
-      <>
-        <div className="leaf">🌿</div>
-        <div className="w">make it<br />greener</div>
-      </>
-    ),
-  },
-  {
-    className: "art-yoga",
-    left: 55, top: 772, width: 274, height: 190, rotate: -1, from: "lg",
-    art: (
-      <>
-        <div className="w">SUNRISE</div>
-        <small>ROOFTOP YOGA · 6:30 AM</small>
       </>
     ),
   },
@@ -155,36 +115,28 @@ const VISIBILITY: Record<NonNullable<Card["from"]>, string> = {
 
 export function HeroCollage() {
   return (
-    <section className="relative h-[880px] overflow-hidden">
-      {CARDS.map((card) => (
+    <section className="relative -mt-(--size-nav) pt-(--size-nav) min-h-[720px] overflow-x-clip overflow-y-visible bg-paper">
+      {CARDS.map((card, index) => (
         <div
           key={card.className}
           aria-hidden
-          className={cn("fcard pointer-events-none", card.from && VISIBILITY[card.from])}
+          className={cn("fcard-wrapper pointer-events-none", card.from && VISIBILITY[card.from])}
           style={{
             left: `${card.left}%`,
             top: card.top,
             width: card.width,
             height: card.height,
-            transform: `rotate(${card.rotate}deg)`,
+            animationDuration: `${3.8 + (index % 5) * 0.6}s`,
+            animationDelay: `${(index * 0.4) % 2.4}s`,
           }}
         >
-          <div className={cn("art", card.className)}>{card.art}</div>
+          <div className="fcard">
+            <div className={cn("art", card.className)}>{card.art}</div>
+          </div>
         </div>
       ))}
 
-      {/*
-        The headline sits over the collage, so it needs its own ground. A
-        radial wash keeps the posters readable at the edges while clearing
-        enough space in the middle for the type to hold contrast.
-      */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_44%_42%_at_50%_48%,var(--color-paper)_46%,rgb(249_249_250/0.7)_72%,transparent_100%)]"
-      />
-
-      {/* The top padding clears the studio card, which hangs above the fold. */}
-      <div className="container-page relative pt-[184px] text-center">
+      <div className="container-page relative z-10 pt-[184px] text-center">
         <h1 className="display-1 text-ink">
           Find your next
           <br />
@@ -199,7 +151,7 @@ export function HeroCollage() {
         <div className="mt-10 flex flex-col items-center gap-6">
           <Link
             href="/events"
-            className="inline-flex h-14 items-center rounded-full bg-solid px-7 text-lg font-medium text-on-solid transition-colors hover:bg-solid-hover"
+            className="relative z-10 inline-flex h-14 items-center rounded-full bg-solid px-7 text-lg font-medium text-on-solid transition-colors hover:bg-solid-hover"
           >
             Discover events
           </Link>

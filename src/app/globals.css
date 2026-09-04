@@ -443,13 +443,21 @@
      loads. Kept here rather than as utility soup because these are one-off
      illustrations, not reusable system pieces.
      --------------------------------------------------------------------- */
-  .fcard {
+  .fcard-wrapper {
     position: absolute;
-    z-index: 1;
+    z-index: 0;
+    will-change: transform;
+    animation: card-float 4.5s ease-in-out infinite;
+  }
+  .fcard {
+    position: relative;
+    width: 100%;
+    height: 100%;
     padding: 8px;
     border-radius: 16px;
     background: #fff;
     box-shadow: 0 10px 34px rgb(20 20 30 / 0.13), 0 0 0 1px rgb(20 20 30 / 0.05);
+    transition: transform 0.3s ease;
   }
   .fcard .art {
     position: relative;
@@ -466,11 +474,6 @@
     line-height: 1;
     text-align: center;
   }
-
-  .art-studio { background: #cdbaf9; color: #2a1c5c; }
-  .art-studio .w { font-size: 30px; letter-spacing: -0.5px; }
-  .art-studio .stars { position: absolute; inset: 0; pointer-events: none; }
-  .art-studio .stars span { position: absolute; color: #f5e86b; font-size: 22px; }
 
   .art-retro {
     background: repeating-linear-gradient(135deg, #ff5fa2 0 16px, #ffd23f 16px 32px, #3ed8ff 32px 48px, #9b5cff 48px 64px);
@@ -555,14 +558,6 @@
   .art-bbq .w { font-size: 30px; letter-spacing: -1px; line-height: 1.05; }
   .art-bbq .flame { font-size: 34px; margin-top: 8px; }
 
-  .art-earth { background: #dfe9c4; color: #2f5d34; }
-  .art-earth .w { font-family: var(--font-serif); font-size: 26px; font-weight: 700; line-height: 1.1; }
-  .art-earth .leaf { font-size: 30px; margin-bottom: 6px; }
-
-  .art-yoga { background: linear-gradient(160deg, #ffb26b, #f16a7a 60%, #b45fb8); color: #fff; }
-  .art-yoga .w { font-size: 30px; font-weight: 700; letter-spacing: 3px; }
-  .art-yoga small { display: block; margin-top: 10px; font-size: 10px; font-weight: 500; letter-spacing: 1px; opacity: 0.9; }
-
   /* Scattered confetti for the closing panel: two offset dot grids, masked
      down to a few soft blobs so it never reads as a uniform screen. */
   .dot-field {
@@ -582,6 +577,15 @@
       radial-gradient(circle 96px at 72% 82%, #000 30%, transparent 100%),
       radial-gradient(circle 88px at 24% 90%, #000 30%, transparent 100%);
     mask-repeat: no-repeat;
+  }
+}
+
+@keyframes card-float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-9px);
   }
 }
 
