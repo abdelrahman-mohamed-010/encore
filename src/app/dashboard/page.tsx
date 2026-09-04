@@ -38,7 +38,7 @@ export default async function DashboardIndex() {
           />
         ) : (
           <>
-            <div className="mt-8 overflow-hidden rounded-xl border border-hairline bg-card">
+            <div className="mt-8 overflow-hidden rounded-xl bg-card shadow-e1">
               {memberships.map(({ organizer, role }) => (
                 <Link
                   key={organizer.id}

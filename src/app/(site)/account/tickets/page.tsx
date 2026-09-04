@@ -129,7 +129,7 @@ function TicketCard({
   return (
     <article
       className={cn(
-        "overflow-hidden rounded-xl border border-hairline bg-card",
+        "overflow-hidden rounded-xl bg-card shadow-e1",
         past && "opacity-70",
       )}
     >

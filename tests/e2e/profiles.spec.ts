@@ -10,9 +10,12 @@ test.describe("host profile", () => {
     await expect(page.getByText("Booking live music in Cairo since 2011.")).toBeVisible();
     await expect(page.getByText(/Joined/)).toBeVisible();
 
-    await expect(page.getByText("6").first()).toBeVisible();
-    await expect(page.getByText("Hosted")).toBeVisible();
-    await expect(page.getByText("Attended")).toBeVisible();
+    // Assert each count through the label it belongs to. A bare getByText("6")
+    // matches any element containing that digit anywhere on the page — the
+    // clock in the nav among them — and `.first()` then picks whichever the
+    // DOM happens to order first.
+    await expect(page.getByText(/^6 Hosted$/)).toBeVisible();
+    await expect(page.getByText(/Attended$/)).toBeVisible();
 
     // Upcoming and past are separate sections, both linking to the event page.
     await expect(page.getByRole("heading", { name: "Hosting" })).toBeVisible();

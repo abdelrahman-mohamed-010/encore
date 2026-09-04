@@ -122,7 +122,7 @@ export function TicketPicker({
         })}
       </Card>
 
-      <div className="flex items-center justify-between gap-4 rounded-xl border border-hairline bg-card px-4 py-3.5">
+      <div className="flex items-center justify-between gap-4 rounded-xl bg-card shadow-e1 px-4 py-3.5">
         <div>
           <p className="text-xs text-ink-3">
             {selection.count > 0

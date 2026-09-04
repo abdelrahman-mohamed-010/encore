@@ -31,7 +31,7 @@ export function SheetContent({
         {...props}
       >
         {/* The grab handle is the affordance that says "drag me down". */}
-        <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-n-300 dark:bg-n-700" aria-hidden />
+        <div className="mx-auto mt-3 h-1 w-10 shrink-0 rounded-full bg-line-2" aria-hidden />
         {children}
       </Drawer.Content>
     </Drawer.Portal>

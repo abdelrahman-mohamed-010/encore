@@ -253,7 +253,7 @@ export function EventMap({
         </div>
       )}
 
-      <div className="absolute bottom-4 right-3 z-10 flex flex-col overflow-hidden rounded-lg border border-hairline bg-card shadow-e2">
+      <div className="absolute bottom-4 right-3 z-10 flex flex-col overflow-hidden rounded-lg bg-card shadow-e1 shadow-e2">
         <button
           type="button"
           aria-label="Zoom in"

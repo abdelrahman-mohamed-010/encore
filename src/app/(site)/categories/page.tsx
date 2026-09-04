@@ -43,7 +43,7 @@ export default async function CategoriesPage() {
             <Link
               key={category.id}
               href={`/events?category=${category.slug}`}
-              className="group rounded-xl border border-hairline bg-card p-5 transition-colors hover:bg-sunken"
+              className="group rounded-xl bg-card shadow-e1 p-5 transition-colors hover:bg-sunken"
             >
               <span
                 className="grid size-10 place-items-center rounded-lg"

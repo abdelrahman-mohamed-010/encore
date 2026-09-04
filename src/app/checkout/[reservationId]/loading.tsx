@@ -8,7 +8,7 @@ export default function CheckoutLoading() {
         <div className="space-y-6">
           <Shimmer className="h-9 w-40" />
           <Shimmer className="h-12 w-full rounded-xl" />
-          <div className="rounded-xl border border-hairline bg-card">
+          <div className="rounded-xl bg-card shadow-e1">
             <div className="border-b border-hairline-soft px-5 py-4">
               <Shimmer className="h-3.5 w-24" />
             </div>

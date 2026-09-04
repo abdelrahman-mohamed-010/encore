@@ -42,7 +42,7 @@ export function EventCard({
             className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="size-full bg-gradient-to-br from-n-100 to-n-200 dark:from-n-800 dark:to-n-900" />
+          <div className="size-full bg-gradient-to-br from-sunken to-sunken-2" />
         )}
 
         <div className="absolute left-3 top-3 flex gap-1.5">

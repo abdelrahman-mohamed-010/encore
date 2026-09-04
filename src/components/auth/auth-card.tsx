@@ -22,7 +22,7 @@ export function AuthCard({
         )}
       </div>
 
-      <div className="rounded-2xl border border-hairline bg-card p-6">{children}</div>
+      <div className="rounded-2xl bg-card shadow-e1 p-6">{children}</div>
 
       {footer && <div className="mt-6 text-center text-sm text-ink-2">{footer}</div>}
     </div>

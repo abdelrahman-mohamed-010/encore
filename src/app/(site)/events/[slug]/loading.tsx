@@ -23,7 +23,7 @@ export default function EventDetailLoading() {
           <Shimmer className="mt-4 h-12 w-4/5" />
           <Shimmer className="mt-3 h-5 w-3/5" />
 
-          <div className="mt-7 overflow-hidden rounded-xl border border-hairline bg-card">
+          <div className="mt-7 overflow-hidden rounded-xl bg-card shadow-e1">
             {Array.from({ length: 4 }).map((_, i) => (
               <div key={i} className="flex items-center gap-3.5 border-b border-hairline-soft px-4 py-3.5 last:border-b-0">
                 <Shimmer className="size-9 shrink-0" />
@@ -36,7 +36,7 @@ export default function EventDetailLoading() {
           </div>
 
           <Shimmer className="mt-10 h-7 w-28" />
-          <div className="mt-4 overflow-hidden rounded-xl border border-hairline bg-card">
+          <div className="mt-4 overflow-hidden rounded-xl bg-card shadow-e1">
             {Array.from({ length: 3 }).map((_, i) => (
               <div key={i} className="flex items-center gap-4 border-b border-hairline-soft px-4 py-4 last:border-b-0">
                 <div className="flex-1 space-y-2">

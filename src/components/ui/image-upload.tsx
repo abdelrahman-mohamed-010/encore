@@ -152,7 +152,7 @@ export function ImageUpload({
             type="button"
             disabled={disabled || upload.pending}
             onClick={() => inputRef.current?.click()}
-            className="flex size-full flex-col items-center justify-center gap-2 text-center transition-colors hover:bg-n-150 dark:hover:bg-n-800"
+            className="flex size-full flex-col items-center justify-center gap-2 text-center transition-colors hover:bg-sunken-2"
           >
             <ImagePlus className="size-5 text-ink-3" aria-hidden />
             <span className="text-sm font-medium text-ink">

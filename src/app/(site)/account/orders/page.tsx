@@ -50,7 +50,7 @@ export default async function OrdersPage() {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-hairline bg-card">
+    <div className="overflow-hidden rounded-xl bg-card shadow-e1">
       {orders.map((order) => {
         const ticketCount = (order.tickets as unknown as { count: number }[])?.[0]?.count ?? 0;
         return (

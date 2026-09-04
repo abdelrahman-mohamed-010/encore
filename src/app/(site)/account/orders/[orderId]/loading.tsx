@@ -12,7 +12,7 @@ export default function OrderDetailLoading() {
         <Shimmer className="h-6 w-16 rounded-lg" />
       </div>
       {Array.from({ length: 3 }).map((_, card) => (
-        <div key={card} className="overflow-hidden rounded-xl border border-hairline bg-card">
+        <div key={card} className="overflow-hidden rounded-xl bg-card shadow-e1">
           <div className="border-b border-hairline-soft px-4 py-3.5">
             <Shimmer className="h-3.5 w-24" />
           </div>

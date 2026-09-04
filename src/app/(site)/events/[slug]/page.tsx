@@ -121,7 +121,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                 className="object-cover"
               />
             ) : (
-              <div className="size-full bg-gradient-to-br from-n-100 to-n-200 dark:from-n-800 dark:to-n-900" />
+              <div className="size-full bg-gradient-to-br from-sunken to-sunken-2" />
             )}
           </div>
 
