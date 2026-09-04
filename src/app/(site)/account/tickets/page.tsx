@@ -143,7 +143,7 @@ function TicketCard({
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <Link href={`/events/${event.slug}`} className="min-w-0">
-              <h3 className="truncate text-md font-semibold text-ink hover:underline">
+              <h3 className="truncate font-flourish text-lg text-ink hover:underline">
                 {event.title}
               </h3>
             </Link>
@@ -152,11 +152,11 @@ function TicketCard({
             </Badge>
           </div>
 
-          <p className="mt-1.5 flex items-center gap-1.5 text-xs text-ink-3">
+          <p className="mt-2 flex items-center gap-1.5 text-sm text-ink-2">
             <CalendarDays className="size-3.5 shrink-0" />
             {formatEventStamp(event.starts_at, event.timezone ?? undefined)}
           </p>
-          <p className="mt-0.5 flex items-center gap-1.5 text-xs text-ink-3">
+          <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-2">
             <MapPin className="size-3.5 shrink-0" />
             <span className="truncate">
               {event.is_online ? "Online event" : [event.venue?.name, event.venue?.city].filter(Boolean).join(" · ")}

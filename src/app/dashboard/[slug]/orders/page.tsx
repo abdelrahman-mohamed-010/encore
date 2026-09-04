@@ -4,11 +4,13 @@ import { Receipt } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
-import { Card, SectionHeader } from "@/components/ui/surface";
+import { Card } from "@/components/ui/surface";
+
 import { EmptyState } from "@/components/ui/misc";
 import { RefundButton } from "@/components/dashboard/refund-button";
 import { formatDateTime, formatMoney } from "@/lib/format";
 import type { OrderStatus } from "@/lib/types";
+import { DashboardBody, DashboardHeader } from "@/components/dashboard/page-header";
 
 export const metadata: Metadata = { title: "Orders" };
 
@@ -45,8 +47,10 @@ export default async function DashboardOrdersPage({
   const canRefund = role === "owner" || role === "admin";
 
   return (
-    <div className="space-y-6">
-      <SectionHeader level={1} title="Orders" description="Every purchase across your events." />
+    <>
+      <DashboardHeader title="Orders" description="Every purchase across your events." />
+
+      <DashboardBody className="space-y-6">
 
       {!orders || orders.length === 0 ? (
         <EmptyState icon={Receipt} title="No orders yet" description="Sales will appear here as they happen." />
@@ -123,6 +127,7 @@ export default async function DashboardOrdersPage({
         </Link>{" "}
         for a per-ticket view.
       </p>
-    </div>
-  );
+      </DashboardBody>
+    </>
+);
 }

@@ -2,7 +2,7 @@ import { PageHeaderSkeleton, Shimmer } from "@/components/ui/skeleton";
 
 export default function PaymentsLoading() {
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-2xl space-y-6 px-5 py-8 md:px-8">
       <PageHeaderSkeleton withAction={false} />
       <div className="overflow-hidden rounded-xl bg-card shadow-e1">
         <div className="flex items-center justify-between border-b border-hairline-soft px-5 py-4">

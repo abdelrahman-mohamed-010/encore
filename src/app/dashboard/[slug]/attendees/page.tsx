@@ -3,10 +3,12 @@ import { Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
-import { Card, SectionHeader } from "@/components/ui/surface";
+import { Card } from "@/components/ui/surface";
+
 import { EmptyState } from "@/components/ui/misc";
 import { QuerySelect } from "@/components/ui/query-select";
 import { formatDateTime } from "@/lib/format";
+import { DashboardBody, DashboardHeader } from "@/components/dashboard/page-header";
 
 export const metadata: Metadata = { title: "Attendees" };
 
@@ -48,12 +50,11 @@ export default async function AttendeesPage({
   const checkedIn = rows.filter((t) => t.status === "used").length;
 
   return (
-    <div className="space-y-6">
-      <SectionHeader
-        level={1}
+    <>
+      <DashboardHeader
         title="Attendees"
         description={`${rows.length} tickets issued · ${checkedIn} checked in`}
-        action={
+        actions={
           <QuerySelect
             param="event"
             label="Filter by event"
@@ -64,6 +65,8 @@ export default async function AttendeesPage({
           />
         }
       />
+
+      <DashboardBody className="space-y-6">
 
       {rows.length === 0 ? (
         <EmptyState
@@ -120,6 +123,7 @@ export default async function AttendeesPage({
           </table>
         </Card>
       )}
-    </div>
-  );
+      </DashboardBody>
+    </>
+);
 }

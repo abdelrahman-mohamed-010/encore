@@ -31,7 +31,7 @@ export default async function EditEventPage({
   if (!event) notFound();
 
   return (
-    <div className="max-w-3xl space-y-6">
+    <div className="max-w-3xl space-y-6 px-5 py-8 md:px-8">
       <Link
         href={`/dashboard/${slug}/events/${eventId}`}
         className="inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"

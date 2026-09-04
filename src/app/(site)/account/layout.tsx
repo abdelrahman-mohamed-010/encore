@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Heart, Receipt, Settings, Ticket } from "lucide-react";
 import { requireProfile } from "@/lib/auth";
 import { Avatar } from "@/components/ui/misc";
+import { Button } from "@/components/ui/button";
+import { TabNav } from "@/components/ui/tab-nav";
 
 const TABS = [
   { href: "/account/tickets", label: "Tickets", icon: Ticket },
@@ -10,33 +12,48 @@ const TABS = [
   { href: "/account/settings", label: "Settings", icon: Settings },
 ];
 
+/**
+ * The account area gets the same header treatment as the dashboard: a washed
+ * identity block that fades into the page, closed by a tab rule. The rule
+ * spans the full width while the tabs sit on the content column, so the
+ * sections read as one surface rather than four separate pages.
+ */
 export default async function AccountLayout({ children }: { children: React.ReactNode }) {
   const profile = await requireProfile();
 
   return (
-    <div className="container-page py-10 md:py-12">
-      <header className="flex items-center gap-4">
-        <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="xl" />
-        <div className="min-w-0">
-          <h1 className="display-3 truncate text-ink">{profile.full_name ?? "Your account"}</h1>
-          <p className="mt-1 truncate text-base text-ink-3">{profile.email}</p>
+    <>
+      <div className="page-wash">
+        <div className="container-page pt-10">
+          <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
+            <div className="flex min-w-0 items-center gap-4">
+              <Avatar
+                src={profile.avatar_url}
+                name={profile.full_name ?? profile.email}
+                size="xl"
+              />
+              <div className="min-w-0">
+                <h1 className="display-3 truncate text-ink">
+                  {profile.full_name ?? "Your account"}
+                </h1>
+                <p className="mt-1 truncate text-base text-ink-2">{profile.email}</p>
+              </div>
+            </div>
+
+            <Button asChild variant="soft" size="md">
+              <Link href="/events">Find something to do</Link>
+            </Button>
+          </div>
         </div>
-      </header>
 
-      <nav className="mt-8 flex items-center gap-6 overflow-x-auto border-b border-hairline no-scrollbar">
-        {TABS.map((tab) => (
-          <Link
-            key={tab.href}
-            href={tab.href}
-            className="-mb-px flex items-center gap-2 whitespace-nowrap border-b-2 border-transparent pb-2.5 text-base font-medium text-ink-3 transition-colors hover:text-ink-2"
-          >
-            <tab.icon className="size-4" />
-            {tab.label}
-          </Link>
-        ))}
-      </nav>
+        <div className="mt-7 border-b border-hairline">
+          <div className="container-page">
+            <TabNav items={TABS} />
+          </div>
+        </div>
+      </div>
 
-      <div className="mt-8">{children}</div>
-    </div>
+      <div className="container-page py-8">{children}</div>
+    </>
   );
 }

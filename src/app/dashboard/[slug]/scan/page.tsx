@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
-import { SectionHeader } from "@/components/ui/surface";
+
 import { EmptyState } from "@/components/ui/misc";
 import { CalendarDays } from "lucide-react";
 import { Scanner } from "@/components/dashboard/scanner";
+import { DashboardBody, DashboardHeader } from "@/components/dashboard/page-header";
 
 export const metadata: Metadata = { title: "Check-in" };
 
@@ -32,12 +33,13 @@ export default async function ScanPage({ params }: { params: Promise<{ slug: str
     .order("starts_at", { ascending: true });
 
   return (
-    <div className="space-y-6">
-      <SectionHeader
-        level={1}
+    <>
+      <DashboardHeader
         title="Check-in"
         description="Scan a ticket QR code, or type the code if the camera is unavailable."
       />
+
+      <DashboardBody className="space-y-6">
 
       {!events || events.length === 0 ? (
         <EmptyState
@@ -48,6 +50,7 @@ export default async function ScanPage({ params }: { params: Promise<{ slug: str
       ) : (
         <Scanner events={events} />
       )}
-    </div>
-  );
+      </DashboardBody>
+    </>
+);
 }

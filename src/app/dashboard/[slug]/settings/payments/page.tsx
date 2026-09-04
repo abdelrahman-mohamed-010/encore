@@ -5,10 +5,12 @@ import { requireOrganizer } from "@/lib/auth";
 import { isStripeConnectConfigured } from "@/lib/payments/stripe";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardBody, CardHeader, CardTitle, CardDescription, SectionHeader } from "@/components/ui/surface";
+import { Card, CardBody, CardHeader, CardTitle, CardDescription } from "@/components/ui/surface";
+
 import { FieldRow } from "@/components/ui/field-row";
 import { DisconnectStripeButton } from "@/components/dashboard/disconnect-stripe";
 import { formatDate } from "@/lib/format";
+import { DashboardBody, DashboardHeader } from "@/components/dashboard/page-header";
 
 export const metadata: Metadata = { title: "Payments" };
 
@@ -34,12 +36,13 @@ export default async function PaymentsSettingsPage({
   const live = Boolean(account?.charges_enabled && !account?.disconnected_at);
 
   return (
-    <div className="max-w-2xl space-y-6">
-      <SectionHeader
-        level={1}
+    <>
+      <DashboardHeader
         title="Payments"
         description="Connect your own Stripe account. Ticket money goes straight to you; Tazkarti takes only its service fee as an application fee on each charge."
       />
+
+      <DashboardBody className="max-w-2xl space-y-6">
 
       {connected === "1" && (
         <div className="flex items-start gap-2.5 rounded-xl border border-transparent bg-positive-bg px-4 py-3 text-sm text-positive">
@@ -154,6 +157,7 @@ export default async function PaymentsSettingsPage({
           back proportionally.
         </p>
       </Card>
-    </div>
-  );
+      </DashboardBody>
+    </>
+);
 }

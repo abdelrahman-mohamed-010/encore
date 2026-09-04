@@ -39,15 +39,18 @@ export default async function HomePage() {
   return (
     <>
       {/* ---- Hero ---------------------------------------------------------- */}
-      <HeroCollage events={upcoming} totalEvents={formatNumber(Number(totalEvents))} />
+      <HeroCollage />
 
       {/* ---- Search + categories -------------------------------------------- */}
-      <section className="container-page pb-6">
+      <section className="container-page pt-4 pb-6">
         <div className="mx-auto max-w-xl">
           <Suspense fallback={<div className="h-(--size-field-lg) rounded-md bg-sunken" />}>
             <SearchField size="lg" autoFocus={false} />
           </Suspense>
         </div>
+        <p className="mt-4 text-center text-md text-ink-2">
+          {formatNumber(Number(totalEvents))} events on sale right now
+        </p>
         <div className="mt-8">
           <CategoryRail categories={categories} className="justify-center" />
         </div>
