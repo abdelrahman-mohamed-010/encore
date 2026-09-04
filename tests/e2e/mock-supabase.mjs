@@ -55,6 +55,49 @@ export const SEARCH_EVENTS = [
   }),
 ];
 
+/**
+ * `events_map` rows. Coordinates are the real venues: two a couple of
+ * kilometres apart in Cairo and one ~180 km away in Alexandria, so a radius
+ * filter has something meaningful to both include and exclude.
+ */
+const mapRow = (over) => ({
+  id: "e1", slug: "cairokee-roots-live", title: "Cairokee — Roots Live",
+  starts_at: days(24), ends_at: days(24), timezone: "Africa/Cairo",
+  cover_image_url: "https://picsum.photos/seed/cairokee/1200/675",
+  is_featured: true,
+  venue_name: "Cairo International Stadium", venue_address: "Nasr City, Cairo",
+  city: "Cairo", country: "EG",
+  latitude: 30.0688, longitude: 31.3122,
+  category_name: "Music", category_color: "#8b5cf6",
+  organizer_name: "Cairo Live Nation", organizer_slug: "cairo-live-nation",
+  min_price_cents: 4500, currency: "USD", is_sold_out: false,
+  distance_km: null,
+  ...over,
+});
+
+export const EVENTS_MAP = [
+  mapRow({}),
+  mapRow({
+    id: "e2", slug: "aida-opening-night", title: "Aida — Opening Night",
+    cover_image_url: "https://picsum.photos/seed/aidaopera/1200/675",
+    starts_at: days(30), ends_at: days(30),
+    venue_name: "Cairo Opera House — Main Hall", venue_address: "Gezira, Cairo",
+    latitude: 30.0426, longitude: 31.2247,
+    category_name: "Theatre", category_color: "#ec4899",
+    organizer_name: "Nile Arts Collective", organizer_slug: "nile-arts-collective",
+    min_price_cents: 9000,
+  }),
+  mapRow({
+    id: "e3", slug: "riseup-summit-2026", title: "RiseUp Summit 2026",
+    cover_image_url: "https://picsum.photos/seed/riseupsummit/1200/675",
+    starts_at: days(38), ends_at: days(40), is_featured: false,
+    venue_name: "Bibliotheca Alexandrina", venue_address: "Chatby, Alexandria",
+    city: "Alexandria", latitude: 31.2089, longitude: 29.9092,
+    category_name: "Conference", category_color: "#0ea5e9",
+    min_price_cents: 0,
+  }),
+];
+
 export const EVENT_DETAIL = {
   id: "e1", organizer_id: "o1", category_id: "c1", venue_id: "v1",
   title: "Cairokee — Roots Live", slug: "cairokee-roots-live",
@@ -165,6 +208,37 @@ export function createMockSupabase(port = 54321) {
       }
       rows = rows.map((r) => ({ ...r, total_count: rows.length }));
       return json(res, rows.slice(0, body.p_limit ?? 24));
+    }
+
+    if (pathname === "/rest/v1/rpc/events_map") {
+      let rows = EVENTS_MAP;
+      if (body.p_organizer_slug) {
+        rows = rows.filter((r) => r.organizer_slug === body.p_organizer_slug);
+      }
+      if (body.p_city) {
+        rows = rows.filter((r) => r.city.toLowerCase() === String(body.p_city).toLowerCase());
+      }
+
+      // Mirror the real function: compute distance whenever a point is given,
+      // and only filter when a radius is given too.
+      if (body.p_lat != null && body.p_lng != null) {
+        const R = 6371;
+        const rad = (d) => (d * Math.PI) / 180;
+        rows = rows.map((r) => {
+          const dLat = rad(r.latitude - body.p_lat);
+          const dLng = rad(r.longitude - body.p_lng);
+          const h =
+            Math.sin(dLat / 2) ** 2 +
+            Math.sin(dLng / 2) ** 2 * Math.cos(rad(body.p_lat)) * Math.cos(rad(r.latitude));
+          return { ...r, distance_km: 2 * R * Math.asin(Math.sqrt(h)) };
+        });
+        if (body.p_radius_km != null) {
+          rows = rows.filter((r) => r.distance_km <= body.p_radius_km);
+        }
+        rows = [...rows].sort((a, b) => a.distance_km - b.distance_km);
+      }
+
+      return json(res, rows.slice(0, body.p_limit ?? 200));
     }
 
     if (pathname === "/rest/v1/rpc/event_availability") return json(res, AVAILABILITY);

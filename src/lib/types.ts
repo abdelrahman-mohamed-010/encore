@@ -40,6 +40,25 @@ export type ScanResult = Enums["scan_result"];
  * generated row is assignable to this, and other pages that assemble the same
  * shape by hand can be honest about the nulls.
  */
+/**
+ * One event on the map. Derived from the generated function type rather than
+ * hand-written, so adding a column to `events_map` is a compile error here
+ * instead of a silent mismatch — then loosened where the generator's
+ * non-nullable defaults are not the truth (a category is optional).
+ */
+export type EventPin = Omit<
+  Functions["events_map"]["Returns"][number],
+  "category_name" | "category_color" | "venue_name" | "venue_address" | "distance_km" | "min_price_cents" | "currency"
+> & {
+  category_name: string | null;
+  category_color: string | null;
+  venue_name: string | null;
+  venue_address: string | null;
+  distance_km: number | null;
+  min_price_cents: number | null;
+  currency: string | null;
+};
+
 export type EventSearchResult = {
   id: string;
   slug: string;

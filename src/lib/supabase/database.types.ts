@@ -1,6 +1,3 @@
-// Generated from the live Supabase schema. Regenerate with:
-//   supabase gen types typescript --project-id cpxhgrlbidgnadeahndp
-
 export type Json =
   | string
   | number
@@ -1581,6 +1578,43 @@ export type Database = {
         }[]
       }
       event_stats: { Args: { p_event_id: string }; Returns: Json }
+      events_map: {
+        Args: {
+          p_category_slug?: string
+          p_city?: string
+          p_from?: string
+          p_lat?: number
+          p_limit?: number
+          p_lng?: number
+          p_organizer_slug?: string
+          p_radius_km?: number
+          p_to?: string
+        }
+        Returns: {
+          category_color: string
+          category_name: string
+          city: string
+          country: string
+          cover_image_url: string
+          currency: string
+          distance_km: number
+          ends_at: string
+          id: string
+          is_featured: boolean
+          is_sold_out: boolean
+          latitude: number
+          longitude: number
+          min_price_cents: number
+          organizer_name: string
+          organizer_slug: string
+          slug: string
+          starts_at: string
+          timezone: string
+          title: string
+          venue_address: string
+          venue_name: string
+        }[]
+      }
       expire_reservations: { Args: { p_event_id?: string }; Returns: number }
       fail_order_payment: {
         Args: { p_order_id: string; p_reason: string; p_secret: string }

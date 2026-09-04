@@ -5,6 +5,7 @@ import { Globe, Mail, ShieldCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Avatar, EmptyState } from "@/components/ui/misc";
 import { EventCard } from "@/components/events/event-card";
+import { NearbyEvents } from "@/components/map/nearby-events";
 import { Badge } from "@/components/ui/badge";
 import type { EventSearchResult } from "@/lib/types";
 
@@ -119,6 +120,10 @@ export default async function OrganizerPage({ params }: { params: Promise<{ slug
             ))}
           </div>
         )}
+
+        {/* Personalised, so it loads behind its own request rather than making
+            this ISR-cached page dynamic for everyone. */}
+        <NearbyEvents organizerSlug={slug} organizerName={organizer.name} />
       </div>
     </>
   );

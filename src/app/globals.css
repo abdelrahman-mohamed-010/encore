@@ -415,6 +415,61 @@
   /* Numeric UI — clock times, money, seat numbers — must not shift width. */
   .tnum { font-variant-numeric: tabular-nums; }
 
+  /* ---- Map markers ------------------------------------------------------
+     Created imperatively by MapLibre, so they are styled here rather than
+     with utility classes. They still read from the same tokens as everything
+     else, which is what keeps the map from looking like a foreign widget. */
+  .tz-marker {
+    display: grid;
+    place-items: center;
+    min-width: 1.25rem;
+    height: 1.25rem;
+    padding-inline: 0.25rem;
+    border: 2px solid var(--color-card);
+    border-radius: 999px;
+    background-color: var(--color-brand-600);
+    color: #fff;
+    font-family: var(--font-sans);
+    font-size: 11px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 1px 4px oklch(0.15 0.01 286 / 0.35);
+    transition: transform 0.12s var(--ease-out-quint), background-color 0.12s linear;
+  }
+  .tz-marker:hover { transform: scale(1.18); }
+  .tz-marker:focus-visible {
+    outline: 2px solid var(--color-brand-500);
+    outline-offset: 2px;
+  }
+  .tz-marker[data-selected="true"] {
+    background-color: var(--color-ink);
+    transform: scale(1.35);
+    z-index: 2;
+  }
+
+  /* "You are here". Distinct from an event pin: a soft halo, not a token. */
+  .tz-viewer-dot {
+    width: 0.875rem;
+    height: 0.875rem;
+    border: 2.5px solid var(--color-card);
+    border-radius: 999px;
+    background-color: var(--color-info);
+    box-shadow: 0 0 0 6px oklch(from var(--color-info) l c h / 0.22);
+  }
+
+  /* MapLibre's own chrome, pulled onto our surface tokens. */
+  .maplibregl-ctrl-attrib {
+    background-color: oklch(from var(--color-card) l c h / 0.82) !important;
+    color: var(--color-ink-3);
+    font-size: 10px;
+    border-radius: var(--radius-sm) 0 0 0;
+  }
+  .maplibregl-ctrl-attrib a { color: var(--color-ink-2); }
+  .maplibregl-ctrl-attrib-button { filter: none; }
+  .dark .maplibregl-ctrl-attrib-button { filter: invert(1); }
+
   /* Perforation between a ticket's stub and body. */
   .perforation {
     background-image: repeating-linear-gradient(
