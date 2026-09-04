@@ -51,7 +51,28 @@ export function FieldRow({
   );
 }
 
-/** A soft square icon chip, used in lists and empty states. */
+/**
+ * Tones for the icon tile. The six named hues are decorative, not semantic —
+ * use them to tell one shortcut or category apart from another. The status
+ * tones (positive/caution/critical) do carry meaning, so never pick those
+ * just because the colour looks right.
+ */
+export const CHIP_TONES = {
+  neutral: "border-hairline bg-sunken text-ink-2",
+  accent: "border-transparent bg-primary-soft text-brand-700 dark:text-brand-200",
+  positive: "border-transparent bg-positive-bg text-positive",
+  caution: "border-transparent bg-caution-bg text-caution",
+  critical: "border-transparent bg-critical-bg text-critical",
+  info: "border-transparent bg-info-bg text-info",
+  violet: "border-transparent bg-tint-violet text-tint-violet-fg",
+  blue: "border-transparent bg-tint-blue text-tint-blue-fg",
+  cyan: "border-transparent bg-tint-cyan text-tint-cyan-fg",
+  emerald: "border-transparent bg-tint-emerald text-tint-emerald-fg",
+  amber: "border-transparent bg-tint-amber text-tint-amber-fg",
+  pink: "border-transparent bg-tint-pink text-tint-pink-fg",
+} as const;
+
+/** A soft square icon chip, used in lists, shortcuts and empty states. */
 export function IconChip({
   icon: Icon,
   tone = "neutral",
@@ -59,26 +80,21 @@ export function IconChip({
   className,
 }: {
   icon: React.ComponentType<{ className?: string }>;
-  tone?: "neutral" | "accent" | "positive" | "caution" | "critical" | "info";
-  size?: "sm" | "md" | "lg";
+  tone?: keyof typeof CHIP_TONES;
+  size?: "sm" | "md" | "lg" | "xl";
   className?: string;
 }) {
-  const tones = {
-    neutral: "border-hairline bg-sunken text-ink-2",
-    accent: "border-transparent bg-accent-100 text-accent-700 dark:bg-accent-950 dark:text-accent-300",
-    positive: "border-transparent bg-positive-bg text-positive",
-    caution: "border-transparent bg-caution-bg text-caution",
-    critical: "border-transparent bg-critical-bg text-critical",
-    info: "border-transparent bg-info-bg text-info",
-  } as const;
   const sizes = {
-    sm: "size-7 rounded-md [&_svg]:size-3.5",
-    md: "size-9 rounded-lg [&_svg]:size-4",
+    sm: "size-7 rounded-lg [&_svg]:size-3.5",
+    md: "size-9 rounded-xl [&_svg]:size-4",
     lg: "size-11 rounded-xl [&_svg]:size-5",
+    xl: "size-12 rounded-2xl [&_svg]:size-[22px]",
   } as const;
 
   return (
-    <span className={cn("grid shrink-0 place-items-center border", tones[tone], sizes[size], className)}>
+    <span
+      className={cn("grid shrink-0 place-items-center border", CHIP_TONES[tone], sizes[size], className)}
+    >
       <Icon className="" />
     </span>
   );

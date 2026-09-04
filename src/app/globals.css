@@ -4,65 +4,119 @@
 
 /* ===========================================================================
    Tazkarti design system
-   Neutral-first: paper and ink carry the page, one accent hue carries meaning.
-   Hairline borders instead of shadows. One 4px spacing grid. Tight display type.
+   ---------------------------------------------------------------------------
+   Three layers, in order. Never reach past a layer:
+
+     1. RAMPS      raw colour scales. Never used directly in a component.
+     2. SEMANTIC   what a colour MEANS here (paper, ink, brand, danger). This is
+                   the only layer components are allowed to name.
+     3. COMPONENT  a handful of control-specific tokens (field height, ring).
+
+   Dark mode re-points layer 2 only, so every component inherits it for free.
    =========================================================================== */
 @theme {
-  /* ---- Neutral ramp (the whole product is built from this) -------------- */
+  /* == 1. RAMPS ============================================================ */
+
+  /* Neutral — very slightly cool, so brand violet sits on it without clashing */
   --color-n-0:   oklch(1 0 0);
-  --color-n-25:  oklch(0.992 0.001 285);
-  --color-n-50:  oklch(0.979 0.002 285);
-  --color-n-100: oklch(0.960 0.003 285);
-  --color-n-150: oklch(0.940 0.003 285);
-  --color-n-200: oklch(0.918 0.004 285);
-  --color-n-300: oklch(0.860 0.005 285);
-  --color-n-400: oklch(0.715 0.008 285);
-  --color-n-500: oklch(0.605 0.010 285);
-  --color-n-600: oklch(0.505 0.011 285);
-  --color-n-700: oklch(0.396 0.011 285);
-  --color-n-800: oklch(0.288 0.010 285);
-  --color-n-850: oklch(0.238 0.009 285);
-  --color-n-900: oklch(0.193 0.008 285);
-  --color-n-950: oklch(0.152 0.007 285);
-  --color-n-1000:oklch(0.118 0.006 285);
+  --color-n-25:  oklch(0.992 0.002 286);
+  --color-n-50:  oklch(0.980 0.003 286);
+  --color-n-100: oklch(0.962 0.004 286);
+  --color-n-150: oklch(0.942 0.005 286);
+  --color-n-200: oklch(0.920 0.006 286);
+  --color-n-300: oklch(0.862 0.008 286);
+  --color-n-400: oklch(0.718 0.012 286);
+  --color-n-500: oklch(0.606 0.015 286);
+  --color-n-600: oklch(0.506 0.016 286);
+  --color-n-700: oklch(0.398 0.016 286);
+  --color-n-800: oklch(0.290 0.015 286);
+  --color-n-850: oklch(0.240 0.014 286);
+  --color-n-900: oklch(0.195 0.012 286);
+  --color-n-950: oklch(0.154 0.010 286);
+  --color-n-1000:oklch(0.120 0.008 286);
 
-  /* ---- Accent: used for focus, links, selection, active state ----------- */
-  --color-accent-50:  oklch(0.970 0.015 286);
-  --color-accent-100: oklch(0.936 0.032 286);
-  --color-accent-200: oklch(0.885 0.060 286);
-  --color-accent-300: oklch(0.806 0.104 286);
-  --color-accent-400: oklch(0.712 0.152 286);
-  --color-accent-500: oklch(0.628 0.188 286);
-  --color-accent-600: oklch(0.556 0.204 286);
-  --color-accent-700: oklch(0.487 0.186 286);
-  --color-accent-800: oklch(0.416 0.152 286);
-  --color-accent-900: oklch(0.352 0.120 286);
-  --color-accent-950: oklch(0.242 0.082 286);
+  /* Brand — violet. Carries primary actions, links, focus and selection.
+     500 is the UI anchor; 600 is the resting fill (4.6:1 on white). */
+  --color-brand-50:  oklch(0.976 0.014 296);
+  --color-brand-100: oklch(0.946 0.033 296);
+  --color-brand-200: oklch(0.898 0.066 296);
+  --color-brand-300: oklch(0.822 0.118 295);
+  --color-brand-400: oklch(0.728 0.176 294);
+  --color-brand-500: oklch(0.646 0.216 293);
+  --color-brand-600: oklch(0.572 0.232 292);
+  --color-brand-700: oklch(0.498 0.212 292);
+  --color-brand-800: oklch(0.424 0.174 292);
+  --color-brand-900: oklch(0.360 0.136 293);
+  --color-brand-950: oklch(0.248 0.096 294);
 
-  /* ---- Status: muted, never neon --------------------------------------- */
-  --color-positive:   oklch(0.596 0.132 152);
-  --color-positive-bg:oklch(0.955 0.031 152);
-  --color-caution:    oklch(0.640 0.132 70);
-  --color-caution-bg: oklch(0.960 0.043 82);
-  --color-critical:   oklch(0.586 0.192 25);
-  --color-critical-bg:oklch(0.955 0.026 25);
-  --color-info:       oklch(0.585 0.128 245);
-  --color-info-bg:    oklch(0.955 0.028 245);
+  /* `accent-*` is a permanent alias of the brand ramp. Older components name
+     it; both spellings resolve to the same colour, so neither can drift. */
+  --color-accent-50:  var(--color-brand-50);
+  --color-accent-100: var(--color-brand-100);
+  --color-accent-200: var(--color-brand-200);
+  --color-accent-300: var(--color-brand-300);
+  --color-accent-400: var(--color-brand-400);
+  --color-accent-500: var(--color-brand-500);
+  --color-accent-600: var(--color-brand-600);
+  --color-accent-700: var(--color-brand-700);
+  --color-accent-800: var(--color-brand-800);
+  --color-accent-900: var(--color-brand-900);
+  --color-accent-950: var(--color-brand-950);
 
-  /* ---- Semantic surfaces (light) --------------------------------------- */
-  --color-paper:    oklch(0.985 0.002 285);  /* page background            */
+  /* == 2. SEMANTIC ========================================================= */
+
+  /* Status. Held to one lightness band so badges never jitter in a row. */
+  --color-positive:   oklch(0.582 0.146 152);
+  --color-positive-bg:oklch(0.950 0.038 152);
+  --color-caution:    oklch(0.626 0.142 70);
+  --color-caution-bg: oklch(0.956 0.050 82);
+  --color-critical:   oklch(0.578 0.203 25);
+  --color-critical-bg:oklch(0.950 0.032 25);
+  --color-info:       oklch(0.574 0.140 245);
+  --color-info-bg:    oklch(0.950 0.034 245);
+
+  /* Tints — the six families behind icon tiles, category chips and empty
+     states. Each is one fill + one foreground that clears 4.5:1 on it. */
+  --color-tint-violet:    oklch(0.948 0.038 295);
+  --color-tint-violet-fg: oklch(0.520 0.216 293);
+  --color-tint-blue:      oklch(0.946 0.038 250);
+  --color-tint-blue-fg:   oklch(0.522 0.176 252);
+  --color-tint-cyan:      oklch(0.948 0.042 210);
+  --color-tint-cyan-fg:   oklch(0.508 0.108 220);
+  --color-tint-emerald:   oklch(0.950 0.042 160);
+  --color-tint-emerald-fg:oklch(0.505 0.122 158);
+  --color-tint-amber:     oklch(0.958 0.050 84);
+  --color-tint-amber-fg:  oklch(0.530 0.132 62);
+  --color-tint-pink:      oklch(0.948 0.038 350);
+  --color-tint-pink-fg:   oklch(0.542 0.204 358);
+
+  /* Surfaces (light). Dark mode re-points these in @layer base. */
+  --color-paper:    oklch(0.983 0.003 286);  /* page background            */
   --color-card:     oklch(1 0 0);            /* raised surface             */
-  --color-sunken:   oklch(0.964 0.003 285);  /* inset rows, inputs at rest */
-  --color-hairline: oklch(0.912 0.004 285);  /* 1px separators             */
-  --color-hairline-soft: oklch(0.948 0.003 285);
+  --color-sunken:   oklch(0.962 0.004 286);  /* inset rows, grouped panels */
+  --color-hairline: oklch(0.908 0.006 286);  /* 1px separators             */
+  --color-hairline-soft: oklch(0.945 0.005 286);
+  --color-overlay:  oklch(0.195 0.012 286 / 0.45);  /* modal scrim         */
 
-  --color-ink:      oklch(0.205 0.008 285);  /* primary text               */
-  --color-ink-2:    oklch(0.455 0.010 285);  /* secondary text             */
-  --color-ink-3:    oklch(0.605 0.010 285);  /* tertiary / placeholder     */
+  --color-ink:      oklch(0.198 0.012 286);  /* primary text               */
+  --color-ink-2:    oklch(0.452 0.014 286);  /* secondary text             */
+  --color-ink-3:    oklch(0.606 0.015 286);  /* tertiary / placeholder     */
 
-  /* Solid button: near-black in light, near-white in dark. */
-  --color-solid:    oklch(0.205 0.008 285);
+  /* Primary action: brand-filled. */
+  --color-primary:       var(--color-brand-600);
+  --color-primary-hover: var(--color-brand-700);
+  --color-on-primary:    oklch(1 0 0);
+  --color-primary-soft:  oklch(0.948 0.038 295);  /* tinted/ghost primary  */
+
+  /* Neutral action: near-black in light, near-white in dark. */
+  --color-solid:    oklch(0.198 0.012 286);
+  --color-solid-hover: oklch(0.290 0.015 286);
   --color-on-solid: oklch(1 0 0);
+
+  /* == 3. COMPONENT ======================================================== */
+  --size-field:    2.5rem;   /* 40px — the one control height   */
+  --size-field-lg: 2.875rem; /* 46px — hero/auth forms          */
+  --size-field-sm: 2rem;     /* 32px — toolbars, table filters  */
 
   /* ---- Radii: one family ------------------------------------------------ */
   --radius-xs: 6px;
@@ -73,41 +127,74 @@
   --radius-2xl: 20px;
   --radius-3xl: 28px;
 
-  /* ---- Elevation: barely there ----------------------------------------- */
-  --shadow-e1: 0 1px 2px oklch(0.15 0.007 285 / 0.05);
-  --shadow-e2: 0 1px 2px oklch(0.15 0.007 285 / 0.05), 0 4px 12px oklch(0.15 0.007 285 / 0.05);
-  --shadow-e3: 0 2px 6px oklch(0.15 0.007 285 / 0.07), 0 16px 40px oklch(0.15 0.007 285 / 0.10);
+  /* ---- Elevation: barely there, then decisive for popovers -------------- */
+  --shadow-e1: 0 1px 2px oklch(0.15 0.010 286 / 0.05);
+  --shadow-e2: 0 1px 2px oklch(0.15 0.010 286 / 0.05), 0 4px 12px oklch(0.15 0.010 286 / 0.05);
+  --shadow-e3: 0 2px 6px oklch(0.15 0.010 286 / 0.07), 0 16px 40px oklch(0.15 0.010 286 / 0.10);
+  --shadow-pop: 0 0 0 1px oklch(0.15 0.010 286 / 0.06), 0 8px 24px oklch(0.15 0.010 286 / 0.10),
+                0 2px 6px oklch(0.15 0.010 286 / 0.06);
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
 
   /* ---- Motion ----------------------------------------------------------- */
   --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 @layer base {
+  /* Dark mode re-points the SEMANTIC layer only. Ramps are absolute, so a
+     component that named `bg-card` or `text-ink` needs no dark: variant. */
   .dark {
-    --color-paper:    oklch(0.145 0.006 285);
-    --color-card:     oklch(0.186 0.007 285);
-    --color-sunken:   oklch(0.222 0.008 285);
-    --color-hairline: oklch(0.278 0.009 285);
-    --color-hairline-soft: oklch(0.238 0.008 285);
+    --color-paper:    oklch(0.148 0.010 286);
+    --color-card:     oklch(0.190 0.012 286);
+    --color-sunken:   oklch(0.228 0.013 286);
+    --color-hairline: oklch(0.284 0.014 286);
+    --color-hairline-soft: oklch(0.242 0.013 286);
+    --color-overlay:  oklch(0.100 0.008 286 / 0.66);
 
-    --color-ink:      oklch(0.972 0.002 285);
-    --color-ink-2:    oklch(0.740 0.009 285);
-    --color-ink-3:    oklch(0.585 0.010 285);
+    --color-ink:      oklch(0.970 0.004 286);
+    --color-ink-2:    oklch(0.742 0.012 286);
+    --color-ink-3:    oklch(0.586 0.014 286);
 
-    --color-solid:    oklch(0.972 0.002 285);
-    --color-on-solid: oklch(0.165 0.007 285);
+    /* Brand lifts on a dark surface: 600 is too dense to read at 14px. */
+    --color-primary:       var(--color-brand-500);
+    --color-primary-hover: var(--color-brand-400);
+    --color-on-primary:    oklch(0.152 0.010 286);
+    --color-primary-soft:  oklch(0.300 0.088 294);
 
-    --color-positive-bg: oklch(0.290 0.052 152);
-    --color-caution-bg:  oklch(0.310 0.056 78);
-    --color-critical-bg: oklch(0.300 0.070 25);
-    --color-info-bg:     oklch(0.295 0.055 245);
+    --color-solid:    oklch(0.970 0.004 286);
+    --color-solid-hover: oklch(0.880 0.008 286);
+    --color-on-solid: oklch(0.166 0.010 286);
+
+    /* Status foregrounds lighten; their fills become low-chroma washes. */
+    --color-positive:    oklch(0.760 0.148 152);
+    --color-positive-bg: oklch(0.288 0.062 152);
+    --color-caution:     oklch(0.812 0.140 82);
+    --color-caution-bg:  oklch(0.306 0.062 78);
+    --color-critical:    oklch(0.740 0.166 25);
+    --color-critical-bg: oklch(0.302 0.080 25);
+    --color-info:        oklch(0.760 0.126 245);
+    --color-info-bg:     oklch(0.296 0.064 245);
+
+    --color-tint-violet:    oklch(0.298 0.080 295);
+    --color-tint-violet-fg: oklch(0.816 0.126 295);
+    --color-tint-blue:      oklch(0.296 0.078 250);
+    --color-tint-blue-fg:   oklch(0.812 0.106 252);
+    --color-tint-cyan:      oklch(0.294 0.062 215);
+    --color-tint-cyan-fg:   oklch(0.818 0.088 215);
+    --color-tint-emerald:   oklch(0.292 0.066 158);
+    --color-tint-emerald-fg:oklch(0.816 0.104 158);
+    --color-tint-amber:     oklch(0.302 0.062 74);
+    --color-tint-amber-fg:  oklch(0.836 0.116 78);
+    --color-tint-pink:      oklch(0.300 0.080 352);
+    --color-tint-pink-fg:   oklch(0.818 0.112 352);
 
     --shadow-e1: 0 1px 2px oklch(0 0 0 / 0.35);
     --shadow-e2: 0 1px 2px oklch(0 0 0 / 0.30), 0 4px 12px oklch(0 0 0 / 0.30);
     --shadow-e3: 0 2px 6px oklch(0 0 0 / 0.40), 0 16px 40px oklch(0 0 0 / 0.45);
+    --shadow-pop: 0 0 0 1px oklch(1 0 0 / 0.07), 0 8px 24px oklch(0 0 0 / 0.50),
+                  0 2px 6px oklch(0 0 0 / 0.40);
   }
 
   * { border-color: var(--color-hairline); }
@@ -188,6 +275,50 @@
   .animate-rise { animation: rise 0.4s var(--ease-out-quint) both; }
   .animate-fade { animation: fade 0.25s var(--ease-out-quint) both; }
 
+  /* ---- Layered surfaces -------------------------------------------------
+     One class for every floating panel — select menu, combobox, calendar,
+     date picker, dropdown. Keeping it here (rather than repeated per
+     component) is what makes them all read as the same object. */
+  .surface-pop {
+    background-color: var(--color-card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-pop);
+    overflow: hidden;
+  }
+
+  /* Radix sets data-state / data-side on its content; drive motion off those
+     so a popover animates out of the edge it is anchored to. */
+  .motion-pop {
+    transform-origin: var(--radix-popover-content-transform-origin,
+                      var(--radix-select-content-transform-origin,
+                      var(--radix-dropdown-menu-content-transform-origin, center)));
+  }
+  .motion-pop[data-state="open"]   { animation: pop-in  0.16s var(--ease-out-quint); }
+  .motion-pop[data-state="closed"] { animation: pop-out 0.11s ease-in forwards; }
+
+  /* A row inside any floating panel: menu item, option, command result. */
+  .pop-item {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    width: 100%;
+    padding: 0.5rem 0.625rem;
+    border-radius: var(--radius-md);
+    font-size: 13.5px;
+    color: var(--color-ink);
+    cursor: pointer;
+    user-select: none;
+    outline: none;
+    transition: background-color 0.1s linear;
+  }
+  .pop-item[data-highlighted],
+  .pop-item[data-selected="true"]:not([data-disabled]),
+  .pop-item:hover:not([data-disabled]) { background-color: var(--color-sunken); }
+  .pop-item[data-disabled] { opacity: 0.45; cursor: not-allowed; }
+
+  /* Numeric UI — clock times, money, seat numbers — must not shift width. */
+  .tnum { font-variant-numeric: tabular-nums; }
+
   /* Perforation between a ticket's stub and body. */
   .perforation {
     background-image: repeating-linear-gradient(
@@ -216,6 +347,8 @@
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes sweep { 100% { transform: translateX(100%); } }
+@keyframes pop-in  { from { opacity: 0; transform: scale(0.965) translateY(-3px); } }
+@keyframes pop-out { to   { opacity: 0; transform: scale(0.975); } }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

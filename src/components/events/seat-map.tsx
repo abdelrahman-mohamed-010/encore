@@ -235,7 +235,7 @@ export function SeatMap({
           </p>
         </div>
         <Button
-          variant="solid"
+          variant="primary"
           size="lg"
           loading={reserve.pending}
           disabled={selection.count === 0}

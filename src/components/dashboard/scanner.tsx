@@ -7,7 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 import { useAsyncAction, useQrScanner } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/surface";
-import { Field, Input, Select } from "@/components/ui/input";
+import { Field, Input } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { parseTicketPayload } from "@/lib/qr";
 import { formatTime } from "@/lib/format";
@@ -91,11 +92,13 @@ export function Scanner({ events }: { events: { id: string; title: string }[] })
 
           <CardBody className="space-y-4">
             <Field label="Event" htmlFor="scanEvent">
-              <Select id="scanEvent" value={eventId} onChange={(e) => setEventId(e.target.value)}>
-                {events.map((event) => (
-                  <option key={event.id} value={event.id}>{event.title}</option>
-                ))}
-              </Select>
+              <SelectField
+                id="scanEvent"
+                value={eventId}
+                onChange={setEventId}
+                placeholder="Choose an event"
+                options={events.map((event) => ({ value: event.id, label: event.title }))}
+              />
             </Field>
 
             <div className="relative aspect-video overflow-hidden rounded-xl border border-hairline bg-n-950">

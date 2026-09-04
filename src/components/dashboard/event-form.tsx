@@ -10,17 +10,18 @@ import { eventSchema, type EventData, type EventValues } from "@/lib/validation/
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/surface";
 import { Form, FormError, FormField } from "@/components/ui/form";
-import { Input, Select, Textarea, Switch, Label } from "@/components/ui/input";
+import { Input, Textarea, Switch, Label } from "@/components/ui/input";
+import { Combobox } from "@/components/ui/combobox";
+import { DateTimeField, formatLocalDateTime } from "@/components/ui/date-picker";
 import type { EventRow } from "@/lib/types";
 
 type Option = { id: string; name: string; city?: string | null };
 
-/** `datetime-local` expects "YYYY-MM-DDTHH:mm" in the viewer's own timezone. */
+/** A stored UTC timestamp -> the "YYYY-MM-DDTHH:mm" wall-clock DateTimeField uses. */
 function toLocalInput(value: string | null | undefined) {
   if (!value) return "";
   const date = new Date(value);
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
+  return Number.isNaN(date.getTime()) ? "" : formatLocalDateTime(date);
 }
 
 export function EventForm({
@@ -121,10 +122,14 @@ export function EventForm({
 
           <div className="grid gap-5 sm:grid-cols-2">
             <FormField<EventValues, "startsAt"> name="startsAt" label="Starts" required>
-              {(field) => <Input {...field} type="datetime-local" />}
+              {({ value, onChange, onBlur, ...field }) => (
+                <DateTimeField {...field} value={value ?? ""} onChange={onChange} onBlur={onBlur} />
+              )}
             </FormField>
             <FormField<EventValues, "endsAt"> name="endsAt" label="Ends" required>
-              {(field) => <Input {...field} type="datetime-local" />}
+              {({ value, onChange, onBlur, ...field }) => (
+                <DateTimeField {...field} value={value ?? ""} onChange={onChange} onBlur={onBlur} />
+              )}
             </FormField>
           </div>
         </CardBody>
@@ -157,16 +162,21 @@ export function EventForm({
             </FormField>
           ) : (
             <FormField<EventValues, "venueId"> name="venueId" label="Venue" required>
-              {(field) => (
-                <Select {...field}>
-                  <option value="">Choose a venue…</option>
-                  {venues.map((venue) => (
-                    <option key={venue.id} value={venue.id}>
-                      {venue.name}
-                      {venue.city ? ` — ${venue.city}` : ""}
-                    </option>
-                  ))}
-                </Select>
+              {({ value, onChange, ...field }) => (
+                <Combobox
+                  {...field}
+                  value={value ?? ""}
+                  onChange={onChange}
+                  placeholder="Choose a venue…"
+                  searchPlaceholder="Search venues…"
+                  emptyMessage="No venue matches."
+                  options={venues.map((venue) => ({
+                    value: venue.id,
+                    label: venue.name,
+                    hint: venue.city ?? undefined,
+                    keywords: venue.city ?? "",
+                  }))}
+                />
               )}
             </FormField>
           )}
@@ -182,13 +192,19 @@ export function EventForm({
         <CardBody className="space-y-5">
           <div className="grid gap-5 sm:grid-cols-2">
             <FormField<EventValues, "categoryId"> name="categoryId" label="Category">
-              {(field) => (
-                <Select {...field}>
-                  <option value="">Uncategorised</option>
-                  {categories.map((category) => (
-                    <option key={category.id} value={category.id}>{category.name}</option>
-                  ))}
-                </Select>
+              {({ value, onChange, ...field }) => (
+                <Combobox
+                  {...field}
+                  value={value ?? ""}
+                  onChange={onChange}
+                  clearable
+                  placeholder="Uncategorised"
+                  searchPlaceholder="Search categories…"
+                  options={categories.map((category) => ({
+                    value: category.id,
+                    label: category.name,
+                  }))}
+                />
               )}
             </FormField>
 

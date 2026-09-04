@@ -4,9 +4,16 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback } from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Select } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import type { Category } from "@/lib/types";
+
+/**
+ * A listbox option can never carry an empty value — an empty string is how the
+ * control says "nothing is selected". So "no filter" travels as this sentinel
+ * and is mapped back to an absent query param on the way out.
+ */
+const ANY = "__any";
 
 const SORTS = [
   { value: "soonest", label: "Soonest" },
@@ -17,7 +24,7 @@ const SORTS = [
 ];
 
 const WHEN = [
-  { value: "", label: "Any date" },
+  { value: ANY, label: "Any date" },
   { value: "today", label: "Today" },
   { value: "weekend", label: "This weekend" },
   { value: "week", label: "Next 7 days" },
@@ -70,40 +77,38 @@ export function EventFilters({
           Filter
         </span>
 
-        <Select
+        <SelectField
           aria-label="Category"
-          className="h-9 w-auto min-w-36 text-[13px]"
-          value={params.get("category") ?? ""}
-          onChange={(e) => setParam("category", e.target.value)}
-        >
-          <option value="">All categories</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.slug}>{c.name}</option>
-          ))}
-        </Select>
+          size="sm"
+          className="w-auto min-w-36"
+          value={params.get("category") || ANY}
+          onChange={(value) => setParam("category", value === ANY ? "" : value)}
+          options={[
+            { value: ANY, label: "All categories" },
+            ...categories.map((c) => ({ value: c.slug, label: c.name })),
+          ]}
+        />
 
-        <Select
+        <SelectField
           aria-label="City"
-          className="h-9 w-auto min-w-32 text-[13px]"
-          value={params.get("city") ?? ""}
-          onChange={(e) => setParam("city", e.target.value)}
-        >
-          <option value="">Anywhere</option>
-          {cities.map((city) => (
-            <option key={city} value={city}>{city}</option>
-          ))}
-        </Select>
+          size="sm"
+          className="w-auto min-w-32"
+          value={params.get("city") || ANY}
+          onChange={(value) => setParam("city", value === ANY ? "" : value)}
+          options={[
+            { value: ANY, label: "Anywhere" },
+            ...cities.map((city) => ({ value: city, label: city })),
+          ]}
+        />
 
-        <Select
+        <SelectField
           aria-label="When"
-          className="h-9 w-auto min-w-32 text-[13px]"
-          value={params.get("when") ?? ""}
-          onChange={(e) => setParam("when", e.target.value)}
-        >
-          {WHEN.map((w) => (
-            <option key={w.value} value={w.value}>{w.label}</option>
-          ))}
-        </Select>
+          size="sm"
+          className="w-auto min-w-32"
+          value={params.get("when") || ANY}
+          onChange={(value) => setParam("when", value === ANY ? "" : value)}
+          options={WHEN}
+        />
 
         <Button
           type="button"
@@ -115,19 +120,17 @@ export function EventFilters({
         </Button>
 
         <div className="ml-auto flex items-center gap-2.5">
-          <span className="hidden text-[13px] text-ink-3 sm:inline tabular">
+          <span className="hidden text-[13px] text-ink-3 sm:inline tnum">
             {total} {total === 1 ? "event" : "events"}
           </span>
-          <Select
+          <SelectField
             aria-label="Sort by"
-            className="h-9 w-auto min-w-40 text-[13px]"
-            value={params.get("sort") ?? "soonest"}
-            onChange={(e) => setParam("sort", e.target.value === "soonest" ? "" : e.target.value)}
-          >
-            {SORTS.map((s) => (
-              <option key={s.value} value={s.value}>{s.label}</option>
-            ))}
-          </Select>
+            size="sm"
+            className="w-auto min-w-40"
+            value={params.get("sort") || "soonest"}
+            onChange={(value) => setParam("sort", value === "soonest" ? "" : value)}
+            options={SORTS}
+          />
         </div>
       </div>
 

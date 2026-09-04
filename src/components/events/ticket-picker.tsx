@@ -134,7 +134,7 @@ export function TicketPicker({
           </p>
         </div>
         <Button
-          variant="solid"
+          variant="primary"
           size="lg"
           loading={reserve.pending}
           disabled={selection.count === 0}

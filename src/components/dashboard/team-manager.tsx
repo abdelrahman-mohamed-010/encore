@@ -14,7 +14,8 @@ import { Card, SectionHeader } from "@/components/ui/surface";
 import {
   Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { Input, Select } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Avatar } from "@/components/ui/misc";
 import type { OrgMemberRole } from "@/lib/types";
@@ -153,19 +154,17 @@ export function TeamManager({
               <p className="truncate text-[12.5px] text-ink-3">{member.email}</p>
             </div>
 
-            <Select
+            <SelectField
               value={member.role}
-              onChange={(e) => changeRole(member, e.target.value as OrgMemberRole)}
+              onChange={(value) => changeRole(member, value as OrgMemberRole)}
               aria-label={`Role for ${member.email}`}
-              className="h-9 w-32 text-[13px]"
+              size="sm"
+              className="w-32"
               disabled={member.role === "owner" && !canManageOwners}
-            >
-              {(["owner", "admin", "staff", "scanner"] as OrgMemberRole[])
+              options={(["owner", "admin", "staff", "scanner"] as OrgMemberRole[])
                 .filter((r) => r !== "owner" || canManageOwners || member.role === "owner")
-                .map((r) => (
-                  <option key={r} value={r}>{r}</option>
-                ))}
-            </Select>
+                .map((r) => ({ value: r, label: r[0].toUpperCase() + r.slice(1) }))}
+            />
 
             <Button
               variant="ghost"
@@ -207,13 +206,18 @@ export function TeamManager({
               </FormField>
 
               <FormField<TeamMemberValues, "role"> name="role" label="Role" hint={ROLE_HELP[selectedRole]}>
-                {(field) => (
-                  <Select {...field}>
-                    <option value="scanner">Scanner</option>
-                    <option value="staff">Staff</option>
-                    <option value="admin">Admin</option>
-                    {canManageOwners && <option value="owner">Owner</option>}
-                  </Select>
+                {({ value, onChange, ...field }) => (
+                  <SelectField
+                    {...field}
+                    value={value ?? "scanner"}
+                    onChange={onChange}
+                    options={[
+                      { value: "scanner", label: "Scanner" },
+                      { value: "staff", label: "Staff" },
+                      { value: "admin", label: "Admin" },
+                      ...(canManageOwners ? [{ value: "owner", label: "Owner" }] : []),
+                    ]}
+                  />
                 )}
               </FormField>
 

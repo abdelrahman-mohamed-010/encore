@@ -54,7 +54,7 @@ export async function SiteHeader() {
                 <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
                   <Link href="/auth/login">Sign in</Link>
                 </Button>
-                <Button asChild variant="solid" size="sm">
+                <Button asChild variant="primary" size="sm">
                   <Link href="/auth/register">Get started</Link>
                 </Button>
               </>
@@ -63,7 +63,7 @@ export async function SiteHeader() {
             <MobileNav
               action={
                 profile ? null : (
-                  <Button asChild variant="solid" size="lg" block>
+                  <Button asChild variant="primary" size="lg" block>
                     <Link href="/auth/register">Get started</Link>
                   </Button>
                 )

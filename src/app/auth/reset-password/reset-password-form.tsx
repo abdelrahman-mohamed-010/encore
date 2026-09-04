@@ -57,7 +57,7 @@ export function ResetPasswordForm() {
 
       <Button
         type="submit"
-        variant="solid"
+        variant="primary"
         size="lg"
         block
         loading={form.formState.isSubmitting}

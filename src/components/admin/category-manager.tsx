@@ -17,6 +17,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
 import { Input, Switch } from "@/components/ui/input";
+import { ColorPicker } from "@/components/ui/color-picker";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import type { Category } from "@/lib/types";
 
@@ -124,11 +125,12 @@ export function CategoryManager({ categories }: { categories: Category[] }) {
             </FormField>
 
             <FormField<CategoryValues, "color"> name="color" label="Colour">
-              {(field) => (
-                <input
+              {({ value, onChange, onBlur, ...field }) => (
+                <ColorPicker
                   {...field}
-                  type="color"
-                  className="h-10 w-16 cursor-pointer rounded-lg border border-hairline bg-card p-1"
+                  value={value ?? "#7c5cff"}
+                  onChange={onChange}
+                  onBlur={onBlur}
                 />
               )}
             </FormField>

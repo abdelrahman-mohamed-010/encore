@@ -14,27 +14,35 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        /** Near-black in light, near-white in dark. The one high-emphasis action. */
-        solid: "bg-solid text-on-solid hover:opacity-88 active:opacity-95",
+        /**
+         * The one high-emphasis action per view. Brand-filled, so a page's
+         * primary action is findable by colour rather than by position.
+         */
+        primary:
+          "bg-primary text-on-primary shadow-e1 hover:bg-primary-hover active:translate-y-px",
+        /** Neutral high-emphasis: near-black in light, near-white in dark. */
+        solid: "bg-solid text-on-solid hover:bg-solid-hover active:translate-y-px",
         /** Default surface action: hairline border, no shadow noise. */
-        outline: "border border-hairline bg-card text-ink hover:bg-sunken",
+        outline: "border border-hairline bg-card text-ink hover:bg-sunken hover:border-n-300 dark:hover:border-n-700",
         /** Lowest emphasis: nothing until hovered. */
         ghost: "text-ink-2 hover:bg-sunken hover:text-ink",
         /** Inset chip sitting on a card. */
         soft: "bg-sunken text-ink hover:bg-n-150 dark:hover:bg-n-800",
-        accent: "bg-accent-600 text-white hover:bg-accent-700",
-        danger: "bg-critical text-white hover:opacity-90",
-        link: "h-auto p-0 text-accent-600 underline-offset-4 hover:underline dark:text-accent-400",
+        /** Brand-tinted, for a secondary action that still belongs to the brand. */
+        accent: "bg-primary-soft text-brand-700 hover:bg-brand-100 dark:text-brand-200 dark:hover:bg-brand-900",
+        danger: "bg-critical text-white hover:opacity-90 active:translate-y-px",
+        "danger-soft": "bg-critical-bg text-critical hover:bg-critical hover:text-white",
+        link: "h-auto p-0 text-brand-600 underline-offset-4 hover:underline dark:text-brand-400",
       },
       size: {
-        xs: "h-7 rounded-md px-2.5 text-[12px] [&_svg]:size-3.5",
-        sm: "h-8 rounded-md px-3 text-[13px] [&_svg]:size-3.5",
-        md: "h-10 rounded-lg px-4 text-sm [&_svg]:size-4",
-        lg: "h-11 rounded-lg px-5 text-[15px] [&_svg]:size-4",
-        xl: "h-13 rounded-xl px-6 text-base [&_svg]:size-[18px]",
-        icon: "size-10 rounded-lg [&_svg]:size-4",
-        "icon-sm": "size-8 rounded-md [&_svg]:size-4",
-        "icon-xs": "size-7 rounded-md [&_svg]:size-3.5",
+        xs: "h-7 rounded-lg px-2.5 text-[12px] [&_svg]:size-3.5",
+        sm: "h-8 rounded-lg px-3 text-[13px] [&_svg]:size-3.5",
+        md: "h-(--size-field) rounded-xl px-4 text-sm [&_svg]:size-4",
+        lg: "h-(--size-field-lg) rounded-xl px-5 text-[15px] [&_svg]:size-4",
+        xl: "h-13 rounded-2xl px-6 text-base [&_svg]:size-[18px]",
+        icon: "size-(--size-field) rounded-xl [&_svg]:size-4",
+        "icon-sm": "size-8 rounded-lg [&_svg]:size-4",
+        "icon-xs": "size-7 rounded-lg [&_svg]:size-3.5",
       },
       block: { true: "w-full", false: "" },
     },

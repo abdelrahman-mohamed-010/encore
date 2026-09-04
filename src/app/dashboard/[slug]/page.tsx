@@ -61,7 +61,7 @@ export default async function DashboardOverview({
         title="Overview"
         description={`How ${organizer.name} is doing over the last 30 days.`}
         action={
-          <Button asChild variant="solid" size="md">
+          <Button asChild variant="primary" size="md">
             <Link href={`/dashboard/${slug}/events/new`}><Plus /> New event</Link>
           </Button>
         }
@@ -168,7 +168,7 @@ export default async function DashboardOverview({
               title="No events yet"
               description="Create your first event and start selling."
               action={
-                <Button asChild variant="solid" size="md">
+                <Button asChild variant="primary" size="md">
                   <Link href={`/dashboard/${slug}/events/new`}><Plus /> New event</Link>
                 </Button>
               }

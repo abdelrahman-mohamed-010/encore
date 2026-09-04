@@ -61,7 +61,7 @@ export function LoginForm({ next }: { next?: string }) {
 
       <FormError message={signIn.error} />
 
-      <Button type="submit" variant="solid" size="lg" block loading={form.formState.isSubmitting}>
+      <Button type="submit" variant="primary" size="lg" block loading={form.formState.isSubmitting}>
         Sign in
       </Button>
     </Form>

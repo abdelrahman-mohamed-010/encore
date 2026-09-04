@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
-import { Input, Select } from "@/components/ui/input";
+import { Input } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select";
 import { Avatar, EmptyState } from "@/components/ui/misc";
 import { Badge } from "@/components/ui/badge";
 import { formatDate } from "@/lib/format";
@@ -86,18 +87,20 @@ export function UserTable({
                     {formatDate(profile.created_at, "medium")}
                   </td>
                   <td className="px-4 py-3">
-                    <Select
+                    <SelectField
                       value={profile.role}
                       aria-label={`Role for ${profile.email}`}
-                      className="h-8 w-32 text-[12.5px]"
-                      onChange={(e) =>
-                        update(profile.id, { role: e.target.value as UserRole }, "Role updated")
+                      size="sm"
+                      className="w-32"
+                      onChange={(value) =>
+                        update(profile.id, { role: value as UserRole }, "Role updated")
                       }
-                    >
-                      <option value="attendee">Attendee</option>
-                      <option value="organizer">Organizer</option>
-                      <option value="admin">Admin</option>
-                    </Select>
+                      options={[
+                        { value: "attendee", label: "Attendee" },
+                        { value: "organizer", label: "Organizer" },
+                        { value: "admin", label: "Admin" },
+                      ]}
+                    />
                   </td>
                   <td className="px-4 py-3">
                     <Badge tone={profile.is_banned ? "critical" : "positive"} size="xs">

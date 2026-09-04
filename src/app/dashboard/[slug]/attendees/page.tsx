@@ -5,7 +5,7 @@ import { requireOrganizer } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import { Card, SectionHeader } from "@/components/ui/surface";
 import { EmptyState } from "@/components/ui/misc";
-import { Select } from "@/components/ui/input";
+import { QuerySelect } from "@/components/ui/query-select";
 import { formatDateTime } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Attendees" };
@@ -54,22 +54,14 @@ export default async function AttendeesPage({
         title="Attendees"
         description={`${rows.length} tickets issued · ${checkedIn} checked in`}
         action={
-          <form>
-            <Select
-              name="event"
-              defaultValue={eventFilter ?? ""}
-              aria-label="Filter by event"
-              className="h-9 w-56 text-[13px]"
-            >
-              <option value="">All events</option>
-              {(events ?? []).map((event) => (
-                <option key={event.id} value={event.id}>{event.title}</option>
-              ))}
-            </Select>
-            <noscript>
-              <button type="submit" className="ml-2 text-[13px] underline">Apply</button>
-            </noscript>
-          </form>
+          <QuerySelect
+            param="event"
+            label="Filter by event"
+            allLabel="All events"
+            className="w-56"
+            value={eventFilter ?? ""}
+            options={(events ?? []).map((event) => ({ value: event.id, label: event.title }))}
+          />
         }
       />
 

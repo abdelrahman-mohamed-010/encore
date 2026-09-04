@@ -233,7 +233,7 @@ export function CheckoutClient({
 
           <Button
             type="submit"
-            variant="solid"
+            variant="primary"
             size="xl"
             block
             loading={form.formState.isSubmitting}
@@ -338,7 +338,7 @@ export function CheckoutClient({
               <Button
                 type="submit"
                 form="checkout-form"
-                variant="solid"
+                variant="primary"
                 size="lg"
                 block
                 loading={form.formState.isSubmitting}

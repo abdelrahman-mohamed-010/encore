@@ -1,18 +1,31 @@
 import * as React from "react";
+import { Search as SearchIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Shared shell for every text-entry control. Anything that is NOT text entry —
+ * a select, a date, a colour — is a popover component of its own (see
+ * select.tsx, date-picker.tsx, combobox.tsx, color-picker.tsx). Native
+ * `<select>`, `<input type="date">` and `<input type="color">` are deliberately
+ * not used anywhere in this app: the browser draws their popups itself, so they
+ * cannot honour these tokens or dark mode.
+ */
 const control = [
-  "w-full rounded-lg border border-hairline bg-card text-ink",
-  "placeholder:text-ink-3 transition-colors duration-150",
+  "w-full rounded-xl border border-hairline bg-card text-ink",
+  "placeholder:text-ink-3 transition-[border-color,box-shadow] duration-150",
   "hover:border-n-300 dark:hover:border-n-700",
-  "focus-visible:border-accent-500 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-accent-500/18",
+  "focus-visible:border-brand-500 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20",
   "disabled:cursor-not-allowed disabled:bg-sunken disabled:opacity-60",
-  "aria-[invalid=true]:border-critical aria-[invalid=true]:ring-critical/18",
+  "aria-[invalid=true]:border-critical aria-[invalid=true]:ring-critical/20",
 ].join(" ");
 
 export const Input = React.forwardRef<HTMLInputElement, React.InputHTMLAttributes<HTMLInputElement>>(
   ({ className, ...props }, ref) => (
-    <input ref={ref} className={cn(control, "h-10 px-3 text-[14px]", className)} {...props} />
+    <input
+      ref={ref}
+      className={cn(control, "h-(--size-field) px-3 text-[14px]", className)}
+      {...props}
+    />
   ),
 );
 Input.displayName = "Input";
@@ -29,25 +42,24 @@ export const Textarea = React.forwardRef<
 ));
 Textarea.displayName = "Textarea";
 
-const CHEVRON =
-  "url(\"data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")";
-
-export const Select = React.forwardRef<
-  HTMLSelectElement,
-  React.SelectHTMLAttributes<HTMLSelectElement>
->(({ className, style, ...props }, ref) => (
-  <select
-    ref={ref}
-    style={{ backgroundImage: CHEVRON, ...style }}
-    className={cn(
-      control,
-      "h-10 cursor-pointer appearance-none bg-[length:1rem_1rem] bg-[right_0.625rem_center] bg-no-repeat pl-3 pr-9 text-[14px]",
-      className,
-    )}
-    {...props}
-  />
+/** Text input with a leading icon, for search and filter bars. */
+export const SearchInput = React.forwardRef<
+  HTMLInputElement,
+  React.InputHTMLAttributes<HTMLInputElement> & { icon?: React.ReactNode }
+>(({ className, icon, ...props }, ref) => (
+  <div className="relative">
+    <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-3" aria-hidden>
+      {icon ?? <SearchIcon className="size-4" />}
+    </span>
+    <input
+      ref={ref}
+      type="search"
+      className={cn(control, "h-(--size-field) pl-9 pr-3 text-[14px]", className)}
+      {...props}
+    />
+  </div>
 ));
-Select.displayName = "Select";
+SearchInput.displayName = "SearchInput";
 
 export function Label({
   className,
@@ -105,18 +117,20 @@ export const AffixInput = React.forwardRef<
 >(({ className, prefix, suffix, ...props }, ref) => (
   <div
     className={cn(
-      "flex h-10 items-center rounded-lg border border-hairline bg-card transition-colors",
-      "focus-within:border-accent-500 focus-within:ring-[3px] focus-within:ring-accent-500/18",
+      "flex h-(--size-field) items-center rounded-xl border border-hairline bg-card",
+      "transition-[border-color,box-shadow] duration-150",
+      "focus-within:border-brand-500 focus-within:ring-[3px] focus-within:ring-brand-500/20",
+      "has-[input[aria-invalid=true]]:border-critical has-[input[aria-invalid=true]]:ring-critical/20",
       className,
     )}
   >
-    {prefix && <span className="pl-3 text-[13px] text-ink-3">{prefix}</span>}
+    {prefix && <span className="pl-3 text-[13px] font-medium text-ink-3">{prefix}</span>}
     <input
       ref={ref}
       className="h-full min-w-0 flex-1 bg-transparent px-2.5 text-[14px] text-ink placeholder:text-ink-3 focus:outline-none"
       {...props}
     />
-    {suffix && <span className="pr-3 text-[13px] text-ink-3">{suffix}</span>}
+    {suffix && <span className="pr-3 text-[13px] font-medium text-ink-3">{suffix}</span>}
   </div>
 ));
 AffixInput.displayName = "AffixInput";
@@ -143,15 +157,17 @@ export function Switch({
       disabled={disabled}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        "relative inline-flex h-6 w-10 shrink-0 items-center rounded-full border border-transparent transition-colors duration-200",
-        checked ? "bg-solid" : "bg-n-300 dark:bg-n-700",
+        "relative inline-flex h-6 w-10 shrink-0 items-center rounded-full border border-transparent",
+        "transition-colors duration-200",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-card",
+        checked ? "bg-brand-600 dark:bg-brand-500" : "bg-n-300 dark:bg-n-700",
         disabled && "cursor-not-allowed opacity-50",
         className,
       )}
     >
       <span
         className={cn(
-          "size-5 rounded-full bg-white shadow-e1 transition-transform duration-200",
+          "size-5 rounded-full bg-white shadow-e1 transition-transform duration-200 ease-(--ease-spring)",
           checked ? "translate-x-[18px]" : "translate-x-0.5",
         )}
       />

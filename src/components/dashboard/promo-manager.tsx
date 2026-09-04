@@ -14,7 +14,9 @@ import { Card, SectionHeader } from "@/components/ui/surface";
 import {
   Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { AffixInput, Input, Select, Switch } from "@/components/ui/input";
+import { AffixInput, Input, Switch } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select";
+import { Combobox } from "@/components/ui/combobox";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/misc";
@@ -191,11 +193,16 @@ export function PromoManager({
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField<PromoValues, "discountType"> name="discountType" label="Discount type">
-                  {(field) => (
-                    <Select {...field}>
-                      <option value="percentage">Percentage</option>
-                      <option value="fixed">Fixed amount</option>
-                    </Select>
+                  {({ value, onChange, ...field }) => (
+                    <SelectField
+                      {...field}
+                      value={value ?? "percentage"}
+                      onChange={onChange}
+                      options={[
+                        { value: "percentage", label: "Percentage" },
+                        { value: "fixed", label: "Fixed amount" },
+                      ]}
+                    />
                   )}
                 </FormField>
 
@@ -212,13 +219,16 @@ export function PromoManager({
               </div>
 
               <FormField<PromoValues, "eventId"> name="eventId" label="Applies to">
-                {(field) => (
-                  <Select {...field}>
-                    <option value="">All of your events</option>
-                    {events.map((event) => (
-                      <option key={event.id} value={event.id}>{event.title}</option>
-                    ))}
-                  </Select>
+                {({ value, onChange, ...field }) => (
+                  <Combobox
+                    {...field}
+                    value={value ?? ""}
+                    onChange={onChange}
+                    clearable
+                    placeholder="All of your events"
+                    searchPlaceholder="Search events…"
+                    options={events.map((event) => ({ value: event.id, label: event.title }))}
+                  />
                 )}
               </FormField>
 

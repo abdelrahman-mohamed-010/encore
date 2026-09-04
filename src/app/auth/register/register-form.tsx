@@ -82,7 +82,7 @@ export function RegisterForm({ next }: { next?: string }) {
 
       <FormError message={register.error} />
 
-      <Button type="submit" variant="solid" size="lg" block loading={form.formState.isSubmitting}>
+      <Button type="submit" variant="primary" size="lg" block loading={form.formState.isSubmitting}>
         Create account
       </Button>
 
