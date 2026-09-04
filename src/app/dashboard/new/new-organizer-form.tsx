@@ -1,133 +1,108 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction } from "@/hooks";
+import { organizerSchema, slugify, type OrganizerData, type OrganizerValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardFooter } from "@/components/ui/surface";
-import { Field, Input, Textarea } from "@/components/ui/input";
-
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 60);
-}
+import { Form, FormError, FormField } from "@/components/ui/form";
+import { Input, Textarea } from "@/components/ui/input";
 
 export function NewOrganizerForm() {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [slugTouched, setSlugTouched] = useState(false);
-  const [description, setDescription] = useState("");
-  const [supportEmail, setSupportEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
 
-  const effectiveSlug = slugTouched ? slug : slugify(name);
+  const form = useForm<OrganizerValues, unknown, OrganizerData>({
+    resolver: zodResolver(organizerSchema),
+    defaultValues: { name: "", slug: "", description: "", supportEmail: "", website: "", logoUrl: "" },
+  });
 
-  async function submit(event: React.FormEvent) {
-    event.preventDefault();
-    setError(null);
+  const slug = useWatch({ control: form.control, name: "slug" });
 
-    if (name.trim().length < 2) return setError("Give your organization a name.");
-    if (effectiveSlug.length < 2) return setError("The web address needs at least 2 characters.");
-
-    setSaving(true);
+  const create = useAsyncAction(async (values: OrganizerData) => {
     const supabase = createClient();
     const { data: auth } = await supabase.auth.getUser();
-    if (!auth.user) {
-      setSaving(false);
-      return setError("Your session expired. Sign in again.");
-    }
+    if (!auth.user) throw new Error("Your session expired. Sign in again.");
 
     const { data, error } = await supabase
       .from("organizers")
       .insert({
         owner_id: auth.user.id,
-        name: name.trim(),
-        slug: effectiveSlug,
-        description: description.trim() || null,
-        support_email: supportEmail.trim() || null,
+        name: values.name,
+        slug: values.slug,
+        description: values.description || null,
+        support_email: values.supportEmail || null,
       })
       .select("slug")
       .single();
 
-    setSaving(false);
-
     if (error) {
-      setError(
+      throw new Error(
         error.code === "23505"
           ? "That web address is already taken. Try another."
           : error.message,
       );
-      return;
     }
 
     toast.success("Organization created");
     router.push(`/dashboard/${data.slug}`);
     router.refresh();
-  }
+  });
 
   return (
-    <form onSubmit={submit}>
+    <Form form={form} onSubmit={create.run}>
       <Card>
         <CardBody className="space-y-5">
-          <Field label="Organization name" htmlFor="name" required>
-            <Input
-              id="name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Cairo Live Nation"
-              required
-            />
-          </Field>
+          <FormField<OrganizerValues, "name"> name="name" label="Organization name" required>
+            {(field) => (
+              <Input
+                {...field}
+                placeholder="Cairo Live Nation"
+                onChange={(e) => {
+                  field.onChange(e);
+                  // Suggest a web address until the organiser edits one themselves.
+                  if (!form.getFieldState("slug").isDirty) {
+                    form.setValue("slug", slugify(e.target.value));
+                  }
+                }}
+              />
+            )}
+          </FormField>
 
-          <Field
+          <FormField<OrganizerValues, "slug">
+            name="slug"
             label="Web address"
-            htmlFor="slug"
-            hint={`Your page will be tazkarti.app/organizers/${effectiveSlug || "your-org"}`}
+            hint={`Your page will be /organizers/${slug || "your-org"}`}
           >
-            <Input
-              id="slug"
-              value={effectiveSlug}
-              onChange={(e) => {
-                setSlugTouched(true);
-                setSlug(slugify(e.target.value));
-              }}
-              placeholder="cairo-live-nation"
-            />
-          </Field>
+            {(field) => (
+              <Input
+                {...field}
+                placeholder="cairo-live-nation"
+                onChange={(e) => field.onChange(slugify(e.target.value))}
+              />
+            )}
+          </FormField>
 
-          <Field label="Description" htmlFor="description" hint="Optional. Shown on your organizer page.">
-            <Textarea
-              id="description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={3}
-            />
-          </Field>
+          <FormField<OrganizerValues, "description"> name="description" label="Description" hint="Optional. Shown on your organizer page.">
+            {(field) => <Textarea {...field} rows={3} />}
+          </FormField>
 
-          <Field label="Support email" htmlFor="supportEmail" hint="Where ticket holders can reach you." error={error}>
-            <Input
-              id="supportEmail"
-              type="email"
-              value={supportEmail}
-              onChange={(e) => setSupportEmail(e.target.value)}
-              placeholder="hello@example.com"
-              aria-invalid={Boolean(error)}
-            />
-          </Field>
+          <FormField<OrganizerValues, "supportEmail"> name="supportEmail" label="Support email" hint="Where ticket holders can reach you.">
+            {(field) => <Input {...field} type="email" placeholder="hello@example.com" />}
+          </FormField>
+
+          <FormError message={create.error} />
         </CardBody>
 
         <CardFooter className="justify-end">
-          <Button type="submit" variant="solid" loading={saving}>
+          <Button type="submit" variant="solid" loading={form.formState.isSubmitting}>
             Create organization
           </Button>
         </CardFooter>
       </Card>
-    </form>
+    </Form>
   );
 }

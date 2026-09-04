@@ -1,15 +1,14 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction, useTicketSelection } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
 import { Badge } from "@/components/ui/badge";
 import { formatMoney } from "@/lib/format";
-import { stepQuantity } from "@/lib/pricing";
 import { cn } from "@/lib/utils";
 import type { TicketAvailability } from "@/lib/types";
 
@@ -23,65 +22,36 @@ export function TicketPicker({
   signedIn: boolean;
 }) {
   const router = useRouter();
-  const [quantities, setQuantities] = useState<Record<string, number>>({});
-  const [pending, startTransition] = useTransition();
-
+  const selection = useTicketSelection(availability);
   const currency = availability[0]?.currency ?? "USD";
-  const { subtotal, count } = useMemo(() => {
-    let subtotal = 0;
-    let count = 0;
-    for (const tier of availability) {
-      const qty = quantities[tier.ticket_type_id] ?? 0;
-      subtotal += qty * tier.price_cents;
-      count += qty;
-    }
-    return { subtotal, count };
-  }, [quantities, availability]);
 
-  function adjust(tier: TicketAvailability, delta: number) {
-    setQuantities((prev) => ({
-      ...prev,
-      [tier.ticket_type_id]: stepQuantity(prev[tier.ticket_type_id] ?? 0, delta, {
-        minPerOrder: tier.min_per_order,
-        maxPerOrder: tier.max_per_order,
-        available: tier.available,
-      }),
-    }));
-  }
-
-  function reserve() {
+  const reserve = useAsyncAction(async () => {
     if (!signedIn) {
-      router.push(`/auth/login?next=${encodeURIComponent(`/events?reserve=${eventId}`)}`);
+      router.push(`/auth/login?next=${encodeURIComponent(`/events/${eventId}`)}`);
       return;
     }
-
-    const items = Object.entries(quantities)
-      .filter(([, qty]) => qty > 0)
-      .map(([ticket_type_id, quantity]) => ({ ticket_type_id, quantity }));
-
-    if (items.length === 0) {
+    if (selection.lines.length === 0) {
       toast.error("Choose at least one ticket");
       return;
     }
 
-    startTransition(async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase.rpc("create_reservation", {
-        p_event_id: eventId,
-        p_items: items,
-        p_seat_ids: [],
-      });
-
-      if (error) {
-        toast.error("Could not hold those tickets", { description: error.message });
-        router.refresh();
-        return;
-      }
-
-      const reservation = data as { reservation_id: string };
-      router.push(`/checkout/${reservation.reservation_id}`);
+    const { data, error } = await createClient().rpc("create_reservation", {
+      p_event_id: eventId,
+      p_items: selection.lines,
+      p_seat_ids: [],
     });
-  }
+
+    if (error) {
+      // Someone else may have taken the last ticket while this page was open.
+      toast.error("Could not hold those tickets", { description: error.message });
+      selection.clear();
+      router.refresh();
+      return;
+    }
+
+    const reservation = data as { reservation_id: string };
+    router.push(`/checkout/${reservation.reservation_id}`);
+  });
 
   if (availability.length === 0) {
     return (
@@ -96,7 +66,7 @@ export function TicketPicker({
     <div className="space-y-4">
       <Card className="overflow-hidden">
         {availability.map((tier) => {
-          const qty = quantities[tier.ticket_type_id] ?? 0;
+          const qty = selection.quantities[tier.ticket_type_id] ?? 0;
           const soldOut = tier.available <= 0;
           const disabled = soldOut || !tier.on_sale;
           const ceiling = Math.min(tier.max_per_order, tier.available);
@@ -130,7 +100,7 @@ export function TicketPicker({
                   size="icon-sm"
                   aria-label={`Remove one ${tier.name}`}
                   disabled={disabled || qty === 0}
-                  onClick={() => adjust(tier, -1)}
+                  onClick={() => selection.step(tier, -1)}
                 >
                   <Minus />
                 </Button>
@@ -142,7 +112,7 @@ export function TicketPicker({
                   size="icon-sm"
                   aria-label={`Add one ${tier.name}`}
                   disabled={disabled || qty >= ceiling}
-                  onClick={() => adjust(tier, 1)}
+                  onClick={() => selection.step(tier, 1)}
                 >
                   <Plus />
                 </Button>
@@ -155,13 +125,21 @@ export function TicketPicker({
       <div className="flex items-center justify-between gap-4 rounded-xl border border-hairline bg-card px-4 py-3.5">
         <div>
           <p className="text-[12.5px] text-ink-3">
-            {count > 0 ? `${count} ${count === 1 ? "ticket" : "tickets"}` : "No tickets selected"}
+            {selection.count > 0
+              ? `${selection.count} ${selection.count === 1 ? "ticket" : "tickets"}`
+              : "No tickets selected"}
           </p>
           <p className="text-[18px] font-semibold tabular text-ink">
-            {formatMoney(subtotal, currency)}
+            {formatMoney(selection.subtotalCents, currency)}
           </p>
         </div>
-        <Button variant="solid" size="lg" loading={pending} disabled={count === 0} onClick={reserve}>
+        <Button
+          variant="solid"
+          size="lg"
+          loading={reserve.pending}
+          disabled={selection.count === 0}
+          onClick={() => reserve.run()}
+        >
           {signedIn ? "Get tickets" : "Sign in to book"}
         </Button>
       </div>

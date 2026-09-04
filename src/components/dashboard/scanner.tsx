@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
-import { BrowserQRCodeReader } from "@zxing/browser";
+import { useCallback, useState } from "react";
 import { Camera, CameraOff, CheckCircle2, KeyRound, XCircle } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction, useQrScanner } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/surface";
 import { Field, Input, Select } from "@/components/ui/input";
@@ -33,101 +33,50 @@ const COPY: Record<ScanResult, { label: string; tone: "positive" | "caution" | "
 
 export function Scanner({ events }: { events: { id: string; title: string }[] }) {
   const [eventId, setEventId] = useState(events[0]?.id ?? "");
-  const [scanning, setScanning] = useState(false);
-  const [cameraError, setCameraError] = useState<string | null>(null);
   const [manualCode, setManualCode] = useState("");
   const [history, setHistory] = useState<ScanOutcome[]>([]);
-  const [busy, setBusy] = useState(false);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const controlsRef = useRef<{ stop: () => void } | null>(null);
-  // Debounce: a camera fires the same code many times a second.
-  const lastPayload = useRef<{ value: string; at: number }>({ value: "", at: 0 });
+  const scan = useAsyncAction(async (payload: string) => {
+    const parsed = parseTicketPayload(payload);
+    if (!parsed) {
+      toast.error("That QR code is not a Tazkarti ticket");
+      return;
+    }
+    if (!eventId) return;
 
-  const submit = useCallback(
-    async (payload: string) => {
-      const parsed = parseTicketPayload(payload);
-      if (!parsed) {
-        toast.error("That QR code is not a Tazkarti ticket");
-        return;
-      }
-      if (!eventId) return;
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc("scan_ticket", {
+      p_ticket_code: parsed.ticketCode,
+      p_qr_secret: parsed.qrSecret,
+      p_event_id: eventId,
+      p_device_info: navigator.userAgent.slice(0, 120),
+    });
 
-      setBusy(true);
-      const supabase = createClient();
-      const { data, error } = await supabase.rpc("scan_ticket", {
-        p_ticket_code: parsed.ticketCode,
-        p_qr_secret: parsed.qrSecret,
-        p_event_id: eventId,
-        p_device_info: navigator.userAgent.slice(0, 120),
-      });
-      setBusy(false);
-
-      if (error) {
-        toast.error("Scan failed", { description: error.message });
-        return;
-      }
-
-      const outcome = { ...(data as unknown as Omit<ScanOutcome, "at">), at: Date.now() };
-      setHistory((prev) => [outcome, ...prev].slice(0, 25));
-
-      if (outcome.result === "valid") {
-        toast.success(`Admitted ${outcome.attendee_name ?? outcome.ticket_code}`);
-        navigator.vibrate?.(40);
-      } else {
-        toast.error(COPY[outcome.result].label, { description: outcome.ticket_code });
-        navigator.vibrate?.([40, 60, 40]);
-      }
-    },
-    [eventId],
-  );
-
-  // Camera lifecycle. Stopping is essential — leaving the stream open keeps the
-  // device light on after navigating away.
-  useEffect(() => {
-    if (!scanning) {
-      controlsRef.current?.stop();
-      controlsRef.current = null;
+    if (error) {
+      toast.error("Scan failed", { description: error.message });
       return;
     }
 
-    let cancelled = false;
-    const reader = new BrowserQRCodeReader();
+    const outcome = { ...(data as unknown as Omit<ScanOutcome, "at">), at: Date.now() };
+    setHistory((prev) => [outcome, ...prev].slice(0, 25));
 
-    (async () => {
-      try {
-        const controls = await reader.decodeFromVideoDevice(
-          undefined,
-          videoRef.current!,
-          (result) => {
-            if (!result) return;
-            const value = result.getText();
-            const now = Date.now();
-            if (value === lastPayload.current.value && now - lastPayload.current.at < 2500) return;
-            lastPayload.current = { value, at: now };
-            void submit(value);
-          },
-        );
-        if (cancelled) controls.stop();
-        else controlsRef.current = controls;
-      } catch (error) {
-        if (!cancelled) {
-          setCameraError(
-            (error as Error).name === "NotAllowedError"
-              ? "Camera access was denied. Enter codes manually instead."
-              : "No camera available on this device.",
-          );
-          setScanning(false);
-        }
-      }
-    })();
+    if (outcome.result === "valid") {
+      toast.success(`Admitted ${outcome.attendee_name ?? outcome.ticket_code}`);
+      navigator.vibrate?.(40);
+    } else {
+      toast.error(COPY[outcome.result].label, { description: outcome.ticket_code });
+      navigator.vibrate?.([40, 60, 40]);
+    }
+  });
 
-    return () => {
-      cancelled = true;
-      controlsRef.current?.stop();
-      controlsRef.current = null;
-    };
-  }, [scanning, submit]);
+  const submit = scan.run;
+  const onDecode = useCallback((payload: string) => void submit(payload), [submit]);
+  const {
+    videoRef,
+    scanning,
+    error: cameraError,
+    toggle: toggleCamera,
+  } = useQrScanner({ onDecode });
 
   return (
     <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -177,10 +126,7 @@ export function Scanner({ events }: { events: { id: string; title: string }[] })
               variant={scanning ? "outline" : "solid"}
               size="lg"
               block
-              onClick={() => {
-                setCameraError(null);
-                setScanning((on) => !on);
-              }}
+              onClick={toggleCamera}
             >
               <Camera />
               {scanning ? "Stop camera" : "Start camera"}
@@ -212,7 +158,12 @@ export function Scanner({ events }: { events: { id: string; title: string }[] })
                 aria-label="Ticket code"
                 className="font-mono"
               />
-              <Button type="submit" variant="solid" loading={busy} disabled={!manualCode.trim()}>
+              <Button
+                type="submit"
+                variant="solid"
+                loading={scan.pending}
+                disabled={!manualCode.trim()}
+              >
                 Check in
               </Button>
             </form>

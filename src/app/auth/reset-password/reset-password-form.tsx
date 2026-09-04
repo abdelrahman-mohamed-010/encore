@@ -2,87 +2,69 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction } from "@/hooks";
+import { resetPasswordSchema, type ResetPasswordData, type ResetPasswordValues } from "@/lib/validation/auth";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/input";
+import { Form, FormError, FormField } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 export function ResetPasswordForm() {
   const router = useRouter();
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [linkVerified, setLinkVerified] = useState(false);
 
-  // Supabase puts the recovery session in the URL fragment; wait for the client
-  // to pick it up before letting anyone submit.
+  const form = useForm<ResetPasswordValues, unknown, ResetPasswordData>({
+    resolver: zodResolver(resetPasswordSchema),
+    defaultValues: { password: "", confirm: "" },
+  });
+
+  // Supabase delivers the recovery session in the URL fragment; wait for the
+  // client to pick it up before allowing a submission.
   useEffect(() => {
     const supabase = createClient();
     const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") setReady(true);
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") setLinkVerified(true);
     });
     supabase.auth.getSession().then(({ data: session }) => {
-      if (session.session) setReady(true);
+      if (session.session) setLinkVerified(true);
     });
     return () => data.subscription.unsubscribe();
   }, []);
 
-  async function onSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    setError(null);
-
-    if (password.length < 8) {
-      setError("Use at least 8 characters.");
-      return;
-    }
-    if (password !== confirm) {
-      setError("Those passwords do not match.");
-      return;
-    }
-
-    setLoading(true);
-    const supabase = createClient();
-    const { error } = await supabase.auth.updateUser({ password });
-    setLoading(false);
-
-    if (error) {
-      setError(error.message);
-      return;
-    }
+  const update = useAsyncAction(async ({ password }: ResetPasswordData) => {
+    const { error } = await createClient().auth.updateUser({ password });
+    if (error) throw new Error(error.message);
 
     toast.success("Password updated");
     router.push("/account/tickets");
     router.refresh();
-  }
+  });
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4" noValidate>
-      <Field label="New password" htmlFor="password">
-        <Input
-          id="password"
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={8}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </Field>
-      <Field label="Confirm password" htmlFor="confirm" error={error}>
-        <Input
-          id="confirm"
-          type="password"
-          autoComplete="new-password"
-          required
-          value={confirm}
-          onChange={(e) => setConfirm(e.target.value)}
-          aria-invalid={Boolean(error)}
-        />
-      </Field>
-      <Button type="submit" variant="solid" size="lg" block loading={loading} disabled={!ready}>
-        {ready ? "Update password" : "Verifying link…"}
+    <Form form={form} onSubmit={update.run} className="space-y-4">
+      <FormField<ResetPasswordValues, "password"> name="password" label="New password" required>
+        {(field) => <Input {...field} type="password" autoComplete="new-password" />}
+      </FormField>
+
+      <FormField<ResetPasswordValues, "confirm"> name="confirm" label="Confirm password" required>
+        {(field) => <Input {...field} type="password" autoComplete="new-password" />}
+      </FormField>
+
+      <FormError message={update.error} />
+
+      <Button
+        type="submit"
+        variant="solid"
+        size="lg"
+        block
+        loading={form.formState.isSubmitting}
+        disabled={!linkVerified}
+      >
+        {linkVerified ? "Update password" : "Verifying link…"}
       </Button>
-    </form>
+    </Form>
   );
 }

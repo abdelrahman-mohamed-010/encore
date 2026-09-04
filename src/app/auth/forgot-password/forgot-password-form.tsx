@@ -1,37 +1,38 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { MailCheck } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction } from "@/hooks";
+import { forgotPasswordSchema, type ForgotPasswordData, type ForgotPasswordValues } from "@/lib/validation/auth";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/input";
+import { Form, FormError, FormField } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 export function ForgotPasswordForm() {
-  const [email, setEmail] = useState("");
-  const [sent, setSent] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [sentTo, setSentTo] = useState<string | null>(null);
 
-  async function onSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    setError(null);
-    setLoading(true);
+  const form = useForm<ForgotPasswordValues, unknown, ForgotPasswordData>({
+    resolver: zodResolver(forgotPasswordSchema),
+    defaultValues: { email: "" },
+  });
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+  const request = useAsyncAction(async ({ email }: ForgotPasswordData) => {
+    const { error } = await createClient().auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/auth/reset-password`,
     });
 
-    setLoading(false);
-    // Always report success: revealing which addresses exist is an enumeration leak.
+    // Report success either way: revealing which addresses exist would leak the
+    // user list.
     if (error && !error.message.toLowerCase().includes("user not found")) {
-      setError(error.message);
-      return;
+      throw new Error(error.message);
     }
-    setSent(true);
-  }
+    setSentTo(email);
+  });
 
-  if (sent) {
+  if (sentTo) {
     return (
       <div className="text-center">
         <span className="mx-auto grid size-11 place-items-center rounded-xl border border-hairline bg-sunken text-ink-2">
@@ -39,29 +40,24 @@ export function ForgotPasswordForm() {
         </span>
         <p className="mt-4 text-[15px] font-medium text-ink">Check your inbox</p>
         <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-2">
-          If an account exists for{" "}
-          <span className="font-medium text-ink">{email}</span>, a reset link is on its way.
+          If an account exists for <span className="font-medium text-ink">{sentTo}</span>, a reset
+          link is on its way.
         </p>
       </div>
     );
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4" noValidate>
-      <Field label="Email" htmlFor="email" error={error}>
-        <Input
-          id="email"
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-        />
-      </Field>
-      <Button type="submit" variant="solid" size="lg" block loading={loading}>
+    <Form form={form} onSubmit={request.run} className="space-y-4">
+      <FormField<ForgotPasswordValues, "email"> name="email" label="Email">
+        {(field) => <Input {...field} type="email" autoComplete="email" placeholder="you@example.com" />}
+      </FormField>
+
+      <FormError message={request.error} />
+
+      <Button type="submit" variant="solid" size="lg" block loading={form.formState.isSubmitting}>
         Send reset link
       </Button>
-    </form>
+    </Form>
   );
 }

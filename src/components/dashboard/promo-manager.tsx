@@ -2,15 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Tag, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction } from "@/hooks";
+import { promoSchema, type PromoData, type PromoValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Card, SectionHeader } from "@/components/ui/surface";
 import {
   Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { AffixInput, Field, Input, Select, Switch } from "@/components/ui/input";
+import { AffixInput, Input, Select, Switch } from "@/components/ui/input";
+import { Form, FormError, FormField } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/misc";
 import { formatMoney, formatNumber } from "@/lib/format";
@@ -27,50 +32,46 @@ export function PromoManager({
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [code, setCode] = useState("");
-  const [type, setType] = useState<"percentage" | "fixed">("percentage");
-  const [value, setValue] = useState("10");
-  const [eventId, setEventId] = useState("");
-  const [maxRedemptions, setMaxRedemptions] = useState("");
-  const [minOrder, setMinOrder] = useState("0");
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
   const [, startTransition] = useTransition();
 
-  async function create() {
-    setError(null);
-    const numeric = Number(value);
+  const form = useForm<PromoValues, unknown, PromoData>({
+    resolver: zodResolver(promoSchema),
+    defaultValues: {
+      code: "",
+      discountType: "percentage",
+      value: "10",
+      eventId: "",
+      maxRedemptions: "",
+      minOrder: "0",
+    },
+  });
 
-    if (code.trim().length < 3) return setError("Codes need at least 3 characters.");
-    if (!Number.isFinite(numeric) || numeric <= 0) return setError("Enter a discount above zero.");
-    if (type === "percentage" && numeric > 100) return setError("A percentage cannot exceed 100.");
+  const discountType = useWatch({ control: form.control, name: "discountType" });
 
-    setSaving(true);
-    const supabase = createClient();
-    const { error: writeError } = await supabase.from("promo_codes").insert({
+  const create = useAsyncAction(async (values: PromoData) => {
+    const numeric = Number(values.value);
+    const { error } = await createClient().from("promo_codes").insert({
       organizer_id: organizerId,
-      event_id: eventId || null,
-      code: code.trim().toUpperCase(),
-      discount_type: type,
-      // Percentages are stored as-is; fixed amounts are stored in cents.
-      discount_value: type === "percentage" ? numeric : Math.round(numeric * 100),
-      max_redemptions: maxRedemptions ? Number(maxRedemptions) : null,
-      min_order_cents: Math.round(Number(minOrder || 0) * 100),
+      event_id: values.eventId || null,
+      code: values.code,
+      discount_type: values.discountType,
+      // Percentages are stored as typed; fixed amounts are stored in cents.
+      discount_value: values.discountType === "percentage" ? numeric : Math.round(numeric * 100),
+      max_redemptions: values.maxRedemptions ? Number(values.maxRedemptions) : null,
+      min_order_cents: Math.round(Number(values.minOrder || 0) * 100),
     });
-    setSaving(false);
 
-    if (writeError) {
-      setError(
-        writeError.code === "23505" ? "You already have a code with that name." : writeError.message,
+    if (error) {
+      throw new Error(
+        error.code === "23505" ? "You already have a code with that name." : error.message,
       );
-      return;
     }
 
     toast.success("Promo code created");
     setOpen(false);
-    setCode("");
+    form.reset();
     router.refresh();
-  }
+  });
 
   function toggleActive(promo: PromoCode) {
     startTransition(async () => {
@@ -175,77 +176,71 @@ export function PromoManager({
             <DialogDescription>Buyers type this at checkout to get the discount.</DialogDescription>
           </DialogHeader>
 
-          <DialogBody className="space-y-4">
-            <Field label="Code" htmlFor="promoCode" required hint="Letters and numbers work best.">
-              <Input
-                id="promoCode"
-                value={code}
-                onChange={(e) => setCode(e.target.value.toUpperCase())}
-                placeholder="EARLYBIRD"
-                className="font-mono"
-              />
-            </Field>
+          <Form form={form} onSubmit={create.run}>
+            <DialogBody className="space-y-4">
+              <FormField<PromoValues, "code"> name="code" label="Code" required hint="Letters, numbers, dashes and underscores.">
+                {(field) => (
+                  <Input
+                    {...field}
+                    placeholder="EARLYBIRD"
+                    className="font-mono"
+                    onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                  />
+                )}
+              </FormField>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Discount type" htmlFor="promoType">
-                <Select
-                  id="promoType"
-                  value={type}
-                  onChange={(e) => setType(e.target.value as "percentage" | "fixed")}
-                >
-                  <option value="percentage">Percentage</option>
-                  <option value="fixed">Fixed amount</option>
-                </Select>
-              </Field>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField<PromoValues, "discountType"> name="discountType" label="Discount type">
+                  {(field) => (
+                    <Select {...field}>
+                      <option value="percentage">Percentage</option>
+                      <option value="fixed">Fixed amount</option>
+                    </Select>
+                  )}
+                </FormField>
 
-              <Field label="Value" htmlFor="promoValue">
-                <AffixInput
-                  id="promoValue"
-                  inputMode="decimal"
-                  prefix={type === "fixed" ? "USD" : undefined}
-                  suffix={type === "percentage" ? "%" : undefined}
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                />
-              </Field>
-            </div>
+                <FormField<PromoValues, "value"> name="value" label="Value">
+                  {(field) => (
+                    <AffixInput
+                      {...field}
+                      inputMode="decimal"
+                      prefix={discountType === "fixed" ? "USD" : undefined}
+                      suffix={discountType === "percentage" ? "%" : undefined}
+                    />
+                  )}
+                </FormField>
+              </div>
 
-            <Field label="Applies to" htmlFor="promoEvent">
-              <Select id="promoEvent" value={eventId} onChange={(e) => setEventId(e.target.value)}>
-                <option value="">All of your events</option>
-                {events.map((event) => (
-                  <option key={event.id} value={event.id}>{event.title}</option>
-                ))}
-              </Select>
-            </Field>
+              <FormField<PromoValues, "eventId"> name="eventId" label="Applies to">
+                {(field) => (
+                  <Select {...field}>
+                    <option value="">All of your events</option>
+                    {events.map((event) => (
+                      <option key={event.id} value={event.id}>{event.title}</option>
+                    ))}
+                  </Select>
+                )}
+              </FormField>
 
-            <div className="grid gap-4 sm:grid-cols-2">
-              <Field label="Redemption limit" htmlFor="promoMax" hint="Blank for unlimited.">
-                <Input
-                  id="promoMax"
-                  type="number"
-                  min={1}
-                  value={maxRedemptions}
-                  onChange={(e) => setMaxRedemptions(e.target.value)}
-                />
-              </Field>
-              <Field label="Minimum order" htmlFor="promoMin" error={error}>
-                <AffixInput
-                  id="promoMin"
-                  prefix="USD"
-                  inputMode="decimal"
-                  value={minOrder}
-                  onChange={(e) => setMinOrder(e.target.value)}
-                  aria-invalid={Boolean(error)}
-                />
-              </Field>
-            </div>
-          </DialogBody>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormField<PromoValues, "maxRedemptions"> name="maxRedemptions" label="Redemption limit" hint="Blank for unlimited.">
+                  {(field) => <Input {...field} type="number" min={1} />}
+                </FormField>
+                <FormField<PromoValues, "minOrder"> name="minOrder" label="Minimum order">
+                  {(field) => <AffixInput {...field} prefix="USD" inputMode="decimal" />}
+                </FormField>
+              </div>
 
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button variant="solid" loading={saving} onClick={create}>Create code</Button>
-          </DialogFooter>
+              <FormError message={create.error} />
+            </DialogBody>
+
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+              <Button type="submit" variant="solid" loading={form.formState.isSubmitting}>
+                Create code
+              </Button>
+            </DialogFooter>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>

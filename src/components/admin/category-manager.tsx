@@ -1,51 +1,52 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction } from "@/hooks";
+import {
+  categorySchema,
+  slugify,
+  type CategoryData,
+  type CategoryValues,
+} from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
-import { Field, Input, Switch } from "@/components/ui/input";
+import { Input, Switch } from "@/components/ui/input";
+import { Form, FormError, FormField } from "@/components/ui/form";
 import type { Category } from "@/lib/types";
-
-function slugify(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
-}
 
 export function CategoryManager({ categories }: { categories: Category[] }) {
   const router = useRouter();
-  const [name, setName] = useState("");
-  const [color, setColor] = useState("#2a78d6");
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
   const [, startTransition] = useTransition();
 
-  async function add(event: React.FormEvent) {
-    event.preventDefault();
-    setError(null);
-    if (name.trim().length < 2) return setError("Give the category a name.");
+  const form = useForm<CategoryValues, unknown, CategoryData>({
+    resolver: zodResolver(categorySchema),
+    defaultValues: { name: "", color: "#2a78d6" },
+  });
 
-    setSaving(true);
-    const supabase = createClient();
-    const { error: writeError } = await supabase.from("categories").insert({
-      name: name.trim(),
-      slug: slugify(name),
-      color,
+  const add = useAsyncAction(async (values: CategoryData) => {
+    const { error } = await createClient().from("categories").insert({
+      name: values.name,
+      slug: slugify(values.name),
+      color: values.color,
       sort_order: categories.length + 1,
     });
-    setSaving(false);
 
-    if (writeError) {
-      setError(writeError.code === "23505" ? "That category already exists." : writeError.message);
-      return;
+    if (error) {
+      throw new Error(
+        error.code === "23505" ? "That category already exists." : error.message,
+      );
     }
 
     toast.success("Category added");
-    setName("");
+    form.reset({ name: "", color: values.color });
     router.refresh();
-  }
+  });
 
   function toggle(category: Category) {
     startTransition(async () => {
@@ -112,29 +113,33 @@ export function CategoryManager({ categories }: { categories: Category[] }) {
       </Card>
 
       <Card>
-        <form onSubmit={add} className="flex flex-wrap items-end gap-3 p-4">
-          <Field label="New category" htmlFor="categoryName" error={error} className="min-w-48 flex-1">
-            <Input
-              id="categoryName"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Workshops"
-              aria-invalid={Boolean(error)}
-            />
-          </Field>
-          <Field label="Colour" htmlFor="categoryColor">
-            <input
-              id="categoryColor"
-              type="color"
-              value={color}
-              onChange={(e) => setColor(e.target.value)}
-              className="h-10 w-16 cursor-pointer rounded-lg border border-hairline bg-card p-1"
-            />
-          </Field>
-          <Button type="submit" variant="solid" loading={saving}>
-            <Plus /> Add
-          </Button>
-        </form>
+        <Form form={form} onSubmit={add.run} className="space-y-3 p-4">
+          <div className="flex flex-wrap items-end gap-3">
+            <FormField<CategoryValues, "name">
+              name="name"
+              label="New category"
+              className="min-w-48 flex-1"
+            >
+              {(field) => <Input {...field} placeholder="Workshops" />}
+            </FormField>
+
+            <FormField<CategoryValues, "color"> name="color" label="Colour">
+              {(field) => (
+                <input
+                  {...field}
+                  type="color"
+                  className="h-10 w-16 cursor-pointer rounded-lg border border-hairline bg-card p-1"
+                />
+              )}
+            </FormField>
+
+            <Button type="submit" variant="solid" loading={form.formState.isSubmitting}>
+              <Plus /> Add
+            </Button>
+          </div>
+
+          <FormError message={add.error} />
+        </Form>
       </Card>
     </div>
   );

@@ -24,7 +24,13 @@ test.describe("home page", () => {
 
   test("search sends the visitor to the browse page with the query applied", async ({ page }) => {
     await page.goto("/");
+
+    // The hero search streams in behind a Suspense boundary, so wait for it to
+    // exist before acting: otherwise `.last()` can resolve to the header field
+    // on fill and the hero field on submit, sending an empty query.
     const search = page.getByRole("searchbox", { name: "Search events" }).last();
+    await expect(search).toBeVisible();
+
     await search.fill("Aida");
     await search.press("Enter");
 

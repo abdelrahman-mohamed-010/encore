@@ -1,53 +1,56 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction } from "@/hooks";
+import { organizerSchema, type OrganizerData, type OrganizerValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/surface";
-import { Field, Input, Textarea } from "@/components/ui/input";
+import { Form, FormError, FormField } from "@/components/ui/form";
+import { Input, Textarea } from "@/components/ui/input";
 import { Avatar } from "@/components/ui/misc";
 import type { Organizer } from "@/lib/types";
 
 export function OrganizerSettingsForm({ organizer }: { organizer: Organizer }) {
   const router = useRouter();
-  const [name, setName] = useState(organizer.name);
-  const [description, setDescription] = useState(organizer.description ?? "");
-  const [logoUrl, setLogoUrl] = useState(organizer.logo_url ?? "");
-  const [website, setWebsite] = useState(organizer.website ?? "");
-  const [supportEmail, setSupportEmail] = useState(organizer.support_email ?? "");
-  const [saving, setSaving] = useState(false);
 
-  async function save(event: React.FormEvent) {
-    event.preventDefault();
-    setSaving(true);
+  const form = useForm<OrganizerValues, unknown, OrganizerData>({
+    resolver: zodResolver(organizerSchema),
+    defaultValues: {
+      name: organizer.name,
+      slug: organizer.slug,
+      description: organizer.description ?? "",
+      supportEmail: organizer.support_email ?? "",
+      website: organizer.website ?? "",
+      logoUrl: organizer.logo_url ?? "",
+    },
+  });
 
-    const supabase = createClient();
-    const { error } = await supabase
+  const logoUrl = useWatch({ control: form.control, name: "logoUrl" });
+  const name = useWatch({ control: form.control, name: "name" });
+
+  const save = useAsyncAction(async (values: OrganizerData) => {
+    const { error } = await createClient()
       .from("organizers")
       .update({
-        name: name.trim(),
-        description: description.trim() || null,
-        logo_url: logoUrl.trim() || null,
-        website: website.trim() || null,
-        support_email: supportEmail.trim() || null,
+        name: values.name,
+        description: values.description || null,
+        logo_url: values.logoUrl || null,
+        website: values.website || null,
+        support_email: values.supportEmail || null,
       })
       .eq("id", organizer.id);
 
-    setSaving(false);
-
-    if (error) {
-      toast.error("Could not save", { description: error.message });
-      return;
-    }
-
+    if (error) throw new Error(error.message);
     toast.success("Settings saved");
     router.refresh();
-  }
+  });
 
   return (
-    <form onSubmit={save}>
+    <Form form={form} onSubmit={save.run}>
       <Card>
         <CardHeader bordered className="flex-col items-start">
           <CardTitle>Organization</CardTitle>
@@ -57,37 +60,45 @@ export function OrganizerSettingsForm({ organizer }: { organizer: Organizer }) {
         <CardBody className="space-y-5">
           <div className="flex items-center gap-4">
             <Avatar src={logoUrl || null} name={name} size="xl" />
-            <Field label="Logo URL" htmlFor="logoUrl" className="flex-1">
-              <Input id="logoUrl" value={logoUrl} onChange={(e) => setLogoUrl(e.target.value)} placeholder="https://…" />
-            </Field>
+            <FormField<OrganizerValues, "logoUrl"> name="logoUrl" label="Logo URL" className="flex-1">
+              {(field) => <Input {...field} placeholder="https://…" />}
+            </FormField>
           </div>
 
-          <Field label="Name" htmlFor="orgName" required>
-            <Input id="orgName" value={name} onChange={(e) => setName(e.target.value)} required />
-          </Field>
+          <FormField<OrganizerValues, "name"> name="name" label="Name" required>
+            {(field) => <Input {...field} />}
+          </FormField>
 
-          <Field label="Web address" htmlFor="orgSlug" hint="Changing this would break existing links, so it is fixed.">
-            <Input id="orgSlug" value={organizer.slug} disabled />
-          </Field>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[13px] font-medium text-ink-2">Web address</span>
+            <Input value={organizer.slug} disabled readOnly />
+            <p className="text-[12px] text-ink-3">
+              Fixed — changing it would break every existing link to your events.
+            </p>
+          </div>
 
-          <Field label="Description" htmlFor="orgDescription">
-            <Textarea id="orgDescription" rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
-          </Field>
+          <FormField<OrganizerValues, "description"> name="description" label="Description">
+            {(field) => <Textarea {...field} rows={4} />}
+          </FormField>
 
           <div className="grid gap-5 sm:grid-cols-2">
-            <Field label="Website" htmlFor="orgWebsite">
-              <Input id="orgWebsite" type="url" value={website} onChange={(e) => setWebsite(e.target.value)} placeholder="https://…" />
-            </Field>
-            <Field label="Support email" htmlFor="orgSupport">
-              <Input id="orgSupport" type="email" value={supportEmail} onChange={(e) => setSupportEmail(e.target.value)} />
-            </Field>
+            <FormField<OrganizerValues, "website"> name="website" label="Website">
+              {(field) => <Input {...field} type="url" placeholder="https://…" />}
+            </FormField>
+            <FormField<OrganizerValues, "supportEmail"> name="supportEmail" label="Support email">
+              {(field) => <Input {...field} type="email" />}
+            </FormField>
           </div>
+
+          <FormError message={save.error} />
         </CardBody>
 
         <CardFooter className="justify-end">
-          <Button type="submit" variant="solid" loading={saving}>Save changes</Button>
+          <Button type="submit" variant="solid" loading={form.formState.isSubmitting}>
+            Save changes
+          </Button>
         </CardFooter>
       </Card>
-    </form>
+    </Form>
   );
 }

@@ -2,62 +2,53 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { MailCheck } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction } from "@/hooks";
+import { signUpSchema, type SignUpData, type SignUpValues } from "@/lib/validation/auth";
 import { Button } from "@/components/ui/button";
-import { Field, Input } from "@/components/ui/input";
+import { Form, FormError, FormField } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 
 export function RegisterForm({ next }: { next?: string }) {
   const router = useRouter();
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [awaitingConfirmation, setAwaitingConfirmation] = useState(false);
+  // The only genuine piece of local UI state: which of the two panels to show.
+  const [pendingConfirmation, setPendingConfirmation] = useState<string | null>(null);
 
-  async function onSubmit(event: React.FormEvent) {
-    event.preventDefault();
-    setError(null);
+  const form = useForm<SignUpValues, unknown, SignUpData>({
+    resolver: zodResolver(signUpSchema),
+    defaultValues: { fullName: "", email: "", password: "" },
+  });
 
-    if (password.length < 8) {
-      setError("Use at least 8 characters.");
-      return;
-    }
-
-    setLoading(true);
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email: email.trim().toLowerCase(),
+  const register = useAsyncAction(async ({ fullName, email, password }: SignUpData) => {
+    const { data, error } = await createClient().auth.signUp({
+      email,
       password,
       options: {
-        data: { full_name: fullName.trim() },
+        data: { full_name: fullName },
         emailRedirectTo: `${window.location.origin}/auth/callback${
           next ? `?next=${encodeURIComponent(next)}` : ""
         }`,
       },
     });
 
-    if (error) {
-      setLoading(false);
-      setError(error.message);
-      return;
-    }
+    if (error) throw new Error(error.message);
 
-    // When the project requires email confirmation there is no session yet.
+    // No session means the project requires email confirmation first.
     if (!data.session) {
-      setLoading(false);
-      setAwaitingConfirmation(true);
+      setPendingConfirmation(email);
       return;
     }
 
     toast.success("Welcome to Tazkarti");
-    router.push(next && next.startsWith("/") ? next : "/account/tickets");
+    router.push(next?.startsWith("/") ? next : "/account/tickets");
     router.refresh();
-  }
+  });
 
-  if (awaitingConfirmation) {
+  if (pendingConfirmation) {
     return (
       <div className="text-center">
         <span className="mx-auto grid size-11 place-items-center rounded-xl border border-hairline bg-sunken text-ink-2">
@@ -65,15 +56,10 @@ export function RegisterForm({ next }: { next?: string }) {
         </span>
         <p className="mt-4 text-[15px] font-medium text-ink">Confirm your email</p>
         <p className="mt-1.5 text-[13.5px] leading-relaxed text-ink-2">
-          We sent a link to <span className="font-medium text-ink">{email}</span>. Open it to
-          finish creating your account.
+          We sent a link to <span className="font-medium text-ink">{pendingConfirmation}</span>.
+          Open it to finish creating your account.
         </p>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="mt-5"
-          onClick={() => setAwaitingConfirmation(false)}
-        >
+        <Button variant="ghost" size="sm" className="mt-5" onClick={() => setPendingConfirmation(null)}>
           Use a different email
         </Button>
       </div>
@@ -81,59 +67,28 @@ export function RegisterForm({ next }: { next?: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4" noValidate>
-      <Field label="Full name" htmlFor="fullName">
-        <Input
-          id="fullName"
-          name="fullName"
-          autoComplete="name"
-          required
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          placeholder="Nour Ibrahim"
-        />
-      </Field>
+    <Form form={form} onSubmit={register.run} className="space-y-4">
+      <FormField<SignUpValues, "fullName"> name="fullName" label="Full name" required>
+        {(field) => <Input {...field} autoComplete="name" placeholder="Nour Ibrahim" />}
+      </FormField>
 
-      <Field label="Email" htmlFor="email">
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="you@example.com"
-        />
-      </Field>
+      <FormField<SignUpValues, "email"> name="email" label="Email" required>
+        {(field) => <Input {...field} type="email" autoComplete="email" placeholder="you@example.com" />}
+      </FormField>
 
-      <Field
-        label="Password"
-        htmlFor="password"
-        hint="At least 8 characters."
-        error={error}
-      >
-        <Input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={8}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="••••••••"
-          aria-invalid={Boolean(error)}
-        />
-      </Field>
+      <FormField<SignUpValues, "password"> name="password" label="Password" required hint="At least 8 characters.">
+        {(field) => <Input {...field} type="password" autoComplete="new-password" placeholder="••••••••" />}
+      </FormField>
 
-      <Button type="submit" variant="solid" size="lg" block loading={loading}>
+      <FormError message={register.error} />
+
+      <Button type="submit" variant="solid" size="lg" block loading={form.formState.isSubmitting}>
         Create account
       </Button>
 
       <p className="text-center text-[12px] leading-relaxed text-ink-3">
         By creating an account you agree to our Terms and Privacy Policy.
       </p>
-    </form>
+    </Form>
   );
 }

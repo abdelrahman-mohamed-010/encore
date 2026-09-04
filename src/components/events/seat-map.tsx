@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useCallback, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction, useSeatSelection } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
 import { formatMoney } from "@/lib/format";
@@ -39,8 +40,6 @@ export function SeatMap({
   signedIn: boolean;
 }) {
   const router = useRouter();
-  const [selected, setSelected] = useState<string[]>([]);
-  const [pending, startTransition] = useTransition();
 
   const priceByType = useMemo(
     () => new Map(availability.map((tier) => [tier.ticket_type_id, tier])),
@@ -86,53 +85,49 @@ export function SeatMap({
   }, [seats]);
 
   const seatById = useMemo(() => new Map(seats.map((s) => [s.id, s])), [seats]);
-  const subtotal = selected.reduce((sum, id) => {
-    const seat = seatById.get(id);
-    const tier = seat?.ticket_type_id ? priceByType.get(seat.ticket_type_id) : undefined;
-    return sum + (seat?.price_cents ?? tier?.price_cents ?? 0);
-  }, 0);
+
+  const priceFor = useCallback(
+    (seat: { price_cents: number | null; ticket_type_id: string | null }) => {
+      const tier = seat.ticket_type_id ? priceByType.get(seat.ticket_type_id) : undefined;
+      return seat.price_cents ?? tier?.price_cents ?? 0;
+    },
+    [priceByType],
+  );
+
+  const selection = useSeatSelection(seats, priceFor, MAX_SEATS);
 
   function toggle(seat: SeatNode) {
-    if (seat.status !== "available") return;
-    setSelected((prev) => {
-      if (prev.includes(seat.id)) return prev.filter((id) => id !== seat.id);
-      if (prev.length >= MAX_SEATS) {
-        toast.error(`You can pick up to ${MAX_SEATS} seats at once`);
-        return prev;
-      }
-      return [...prev, seat.id];
-    });
+    const result = selection.toggle(seat.id);
+    if (!result.ok) toast.error(result.reason);
   }
 
-  function reserve() {
+  const reserve = useAsyncAction(async () => {
     if (!signedIn) {
-      router.push(`/auth/login?next=${encodeURIComponent(`/events?reserve=${eventId}`)}`);
+      router.push(`/auth/login?next=${encodeURIComponent(`/events/${eventId}`)}`);
       return;
     }
-    if (selected.length === 0) {
+    if (selection.count === 0) {
       toast.error("Pick at least one seat");
       return;
     }
 
-    startTransition(async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase.rpc("create_reservation", {
-        p_event_id: eventId,
-        p_items: [],
-        p_seat_ids: selected,
-      });
-
-      if (error) {
-        toast.error("Could not hold those seats", { description: error.message });
-        setSelected([]);
-        router.refresh();
-        return;
-      }
-
-      const reservation = data as { reservation_id: string };
-      router.push(`/checkout/${reservation.reservation_id}`);
+    const { data, error } = await createClient().rpc("create_reservation", {
+      p_event_id: eventId,
+      p_items: [],
+      p_seat_ids: selection.selected,
     });
-  }
+
+    if (error) {
+      // Another buyer may have taken one of these seats meanwhile.
+      toast.error("Could not hold those seats", { description: error.message });
+      selection.clear();
+      router.refresh();
+      return;
+    }
+
+    const reservation = data as { reservation_id: string };
+    router.push(`/checkout/${reservation.reservation_id}`);
+  });
 
   return (
     <div className="space-y-4">
@@ -165,7 +160,7 @@ export function SeatMap({
                       </span>
                       <div className="flex gap-1">
                         {row.seats.map((seat) => {
-                          const isSelected = selected.includes(seat.id);
+                          const isSelected = selection.isSelected(seat.id);
                           const available = seat.status === "available";
                           const tier = seat.ticket_type_id
                             ? priceByType.get(seat.ticket_type_id)
@@ -226,8 +221,8 @@ export function SeatMap({
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-hairline bg-card px-4 py-3.5">
         <div className="min-w-0">
           <p className="text-[12.5px] text-ink-3">
-            {selected.length > 0
-              ? selected
+            {selection.count > 0
+              ? selection.selected
                   .map((id) => {
                     const seat = seatById.get(id)!;
                     return `${seat.seat!.row_label}${seat.seat!.seat_number}`;
@@ -236,17 +231,19 @@ export function SeatMap({
               : "No seats selected"}
           </p>
           <p className="text-[18px] font-semibold tabular text-ink">
-            {formatMoney(subtotal, currency)}
+            {formatMoney(selection.subtotalCents, currency)}
           </p>
         </div>
         <Button
           variant="solid"
           size="lg"
-          loading={pending}
-          disabled={selected.length === 0}
-          onClick={reserve}
+          loading={reserve.pending}
+          disabled={selection.count === 0}
+          onClick={() => reserve.run()}
         >
-          {signedIn ? `Get ${selected.length || ""} ${selected.length === 1 ? "seat" : "seats"}`.trim() : "Sign in to book"}
+          {signedIn
+            ? `Get ${selection.count || ""} ${selection.count === 1 ? "seat" : "seats"}`.trim()
+            : "Sign in to book"}
         </Button>
       </div>
     </div>

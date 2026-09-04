@@ -1,48 +1,41 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction } from "@/hooks";
+import { ticketTypeSchema, type TicketTypeData, type TicketTypeValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/surface";
 import {
   Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { AffixInput, Field, Input, Switch, Textarea, Label } from "@/components/ui/input";
+import { AffixInput, Input, Switch, Textarea, Label } from "@/components/ui/input";
+import { Form, FormError, FormField } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState, Meter } from "@/components/ui/misc";
 import { formatMoney, formatNumber } from "@/lib/format";
 import type { SeatingType, TicketType } from "@/lib/types";
 
-type Draft = {
-  id?: string;
-  name: string;
-  description: string;
-  priceMajor: string;
-  quantityTotal: string;
-  minPerOrder: string;
-  maxPerOrder: string;
-  isHidden: boolean;
-};
-
-const EMPTY: Draft = {
+const EMPTY: TicketTypeValues = {
   name: "",
   description: "",
-  priceMajor: "0",
+  price: "0",
   quantityTotal: "100",
   minPerOrder: "1",
   maxPerOrder: "10",
   isHidden: false,
 };
 
-function toDraft(tier: TicketType): Draft {
+function toValues(tier: TicketType): TicketTypeValues {
   return {
-    id: tier.id,
     name: tier.name,
     description: tier.description ?? "",
-    priceMajor: (tier.price_cents / 100).toFixed(2),
+    price: (tier.price_cents / 100).toFixed(2),
     quantityTotal: String(tier.quantity_total),
     minPerOrder: String(tier.min_per_order),
     maxPerOrder: String(tier.max_per_order),
@@ -60,64 +53,62 @@ export function TicketTypeEditor({
   seatingType: SeatingType;
 }) {
   const router = useRouter();
-  const [draft, setDraft] = useState<Draft | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
+  // `editing` holds which tier the dialog is bound to: null = closed,
+  // "new" = creating. The field values themselves live in the form.
+  const [editing, setEditing] = useState<TicketType | "new" | null>(null);
   const [, startTransition] = useTransition();
 
   const currency = ticketTypes[0]?.currency ?? "USD";
 
-  async function save() {
-    if (!draft) return;
-    setError(null);
+  const form = useForm<TicketTypeValues, unknown, TicketTypeData>({
+    resolver: zodResolver(ticketTypeSchema),
+    defaultValues: EMPTY,
+  });
 
-    const price = Math.round(Number(draft.priceMajor) * 100);
-    const quantity = Number(draft.quantityTotal);
-    const min = Number(draft.minPerOrder);
-    const max = Number(draft.maxPerOrder);
+  // Refill the form whenever the dialog is pointed at a different tier.
+  useEffect(() => {
+    if (editing === null) return;
+    form.reset(editing === "new" ? EMPTY : toValues(editing));
+  }, [editing, form]);
 
-    if (draft.name.trim().length < 1) return setError("Give the ticket type a name.");
-    if (!Number.isFinite(price) || price < 0) return setError("Enter a valid price.");
-    if (!Number.isInteger(quantity) || quantity < 0) return setError("Enter a whole number of tickets.");
-    if (max < min) return setError("The maximum per order cannot be below the minimum.");
+  const save = useAsyncAction(async (values: TicketTypeData) => {
+    const priceCents = Math.round(Number(values.price) * 100);
+    const quantity = Number(values.quantityTotal);
+    const existing = editing !== "new" && editing !== null ? editing : null;
 
-    const existing = ticketTypes.find((t) => t.id === draft.id);
-    if (existing && quantity < existing.quantity_sold + existing.quantity_reserved) {
-      return setError(
-        `You cannot go below ${existing.quantity_sold + existing.quantity_reserved} — that many are already sold or held.`,
-      );
+    // Capacity can be lowered, but never below what is already committed.
+    if (existing) {
+      const committed = existing.quantity_sold + existing.quantity_reserved;
+      if (quantity < committed) {
+        throw new Error(
+          `You cannot go below ${committed} — that many are already sold or held.`,
+        );
+      }
     }
-
-    setSaving(true);
-    const supabase = createClient();
 
     const payload = {
       event_id: eventId,
-      name: draft.name.trim(),
-      description: draft.description.trim() || null,
-      price_cents: price,
+      name: values.name,
+      description: values.description || null,
+      price_cents: priceCents,
       quantity_total: quantity,
-      min_per_order: min,
-      max_per_order: max,
-      is_hidden: draft.isHidden,
-      sort_order: ticketTypes.length,
+      min_per_order: Number(values.minPerOrder),
+      max_per_order: Number(values.maxPerOrder),
+      is_hidden: values.isHidden,
+      sort_order: existing?.sort_order ?? ticketTypes.length,
     };
 
-    const { error: writeError } = draft.id
-      ? await supabase.from("ticket_types").update(payload).eq("id", draft.id)
+    const supabase = createClient();
+    const { error } = existing
+      ? await supabase.from("ticket_types").update(payload).eq("id", existing.id)
       : await supabase.from("ticket_types").insert(payload);
 
-    setSaving(false);
+    if (error) throw new Error(error.message);
 
-    if (writeError) {
-      setError(writeError.message);
-      return;
-    }
-
-    toast.success(draft.id ? "Ticket type saved" : "Ticket type added");
-    setDraft(null);
+    toast.success(existing ? "Ticket type saved" : "Ticket type added");
+    setEditing(null);
     router.refresh();
-  }
+  });
 
   function remove(tier: TicketType) {
     if (tier.quantity_sold > 0) {
@@ -128,8 +119,7 @@ export function TicketTypeEditor({
     }
 
     startTransition(async () => {
-      const supabase = createClient();
-      const { error } = await supabase.from("ticket_types").delete().eq("id", tier.id);
+      const { error } = await createClient().from("ticket_types").delete().eq("id", tier.id);
       if (error) {
         toast.error("Could not delete", { description: error.message });
         return;
@@ -151,7 +141,7 @@ export function TicketTypeEditor({
               </p>
             )}
           </div>
-          <Button variant="outline" size="sm" onClick={() => { setDraft({ ...EMPTY }); setError(null); }}>
+          <Button variant="outline" size="sm" onClick={() => setEditing("new")}>
             <Plus /> Add type
           </Button>
         </CardHeader>
@@ -162,7 +152,7 @@ export function TicketTypeEditor({
               title="No ticket types yet"
               description="Add at least one before submitting the event for review."
               action={
-                <Button variant="solid" size="sm" onClick={() => setDraft({ ...EMPTY })}>
+                <Button variant="solid" size="sm" onClick={() => setEditing("new")}>
                   <Plus /> Add ticket type
                 </Button>
               }
@@ -203,7 +193,7 @@ export function TicketTypeEditor({
                       variant="ghost"
                       size="icon-sm"
                       aria-label={`Edit ${tier.name}`}
-                      onClick={() => { setDraft(toDraft(tier)); setError(null); }}
+                      onClick={() => setEditing(tier)}
                     >
                       <Pencil />
                     </Button>
@@ -223,97 +213,64 @@ export function TicketTypeEditor({
         )}
       </Card>
 
-      <Dialog open={draft !== null} onOpenChange={(open) => !open && setDraft(null)}>
+      <Dialog open={editing !== null} onOpenChange={(open) => !open && setEditing(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{draft?.id ? "Edit ticket type" : "New ticket type"}</DialogTitle>
+            <DialogTitle>{editing && editing !== "new" ? "Edit ticket type" : "New ticket type"}</DialogTitle>
             <DialogDescription>
               Buyers see the name, price and how many are left.
             </DialogDescription>
           </DialogHeader>
 
-          {draft && (
+          <Form form={form} onSubmit={save.run}>
             <DialogBody className="space-y-4">
-              <Field label="Name" htmlFor="ttName" required>
-                <Input
-                  id="ttName"
-                  value={draft.name}
-                  onChange={(e) => setDraft({ ...draft, name: e.target.value })}
-                  placeholder="General Admission"
-                />
-              </Field>
+              <FormField<TicketTypeValues, "name"> name="name" label="Name" required>
+                {(field) => <Input {...field} placeholder="General Admission" />}
+              </FormField>
 
-              <Field label="Description" htmlFor="ttDescription">
-                <Textarea
-                  id="ttDescription"
-                  rows={2}
-                  value={draft.description}
-                  onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-                />
-              </Field>
+              <FormField<TicketTypeValues, "description"> name="description" label="Description">
+                {(field) => <Textarea {...field} rows={2} />}
+              </FormField>
 
               <div className="grid gap-4 sm:grid-cols-2">
-                <Field label="Price" htmlFor="ttPrice" hint="Use 0 for a free ticket.">
-                  <AffixInput
-                    id="ttPrice"
-                    prefix={currency}
-                    inputMode="decimal"
-                    value={draft.priceMajor}
-                    onChange={(e) => setDraft({ ...draft, priceMajor: e.target.value })}
-                  />
-                </Field>
-                <Field label="Quantity" htmlFor="ttQuantity">
-                  <Input
-                    id="ttQuantity"
-                    type="number"
-                    min={0}
-                    value={draft.quantityTotal}
-                    onChange={(e) => setDraft({ ...draft, quantityTotal: e.target.value })}
-                  />
-                </Field>
-                <Field label="Min per order" htmlFor="ttMin">
-                  <Input
-                    id="ttMin"
-                    type="number"
-                    min={1}
-                    value={draft.minPerOrder}
-                    onChange={(e) => setDraft({ ...draft, minPerOrder: e.target.value })}
-                  />
-                </Field>
-                <Field label="Max per order" htmlFor="ttMax" error={error}>
-                  <Input
-                    id="ttMax"
-                    type="number"
-                    min={1}
-                    value={draft.maxPerOrder}
-                    onChange={(e) => setDraft({ ...draft, maxPerOrder: e.target.value })}
-                    aria-invalid={Boolean(error)}
-                  />
-                </Field>
+                <FormField<TicketTypeValues, "price"> name="price" label="Price" hint="Use 0 for a free ticket.">
+                  {(field) => <AffixInput {...field} prefix={currency} inputMode="decimal" />}
+                </FormField>
+                <FormField<TicketTypeValues, "quantityTotal"> name="quantityTotal" label="Quantity">
+                  {(field) => <Input {...field} type="number" min={0} />}
+                </FormField>
+                <FormField<TicketTypeValues, "minPerOrder"> name="minPerOrder" label="Min per order">
+                  {(field) => <Input {...field} type="number" min={1} />}
+                </FormField>
+                <FormField<TicketTypeValues, "maxPerOrder"> name="maxPerOrder" label="Max per order">
+                  {(field) => <Input {...field} type="number" min={1} />}
+                </FormField>
               </div>
 
               <div className="flex items-center justify-between gap-4 rounded-lg border border-hairline bg-sunken px-3.5 py-3">
                 <div>
-                  <Label htmlFor="ttHidden">Hidden</Label>
+                  <Label>Hidden</Label>
                   <p className="mt-0.5 text-[12px] text-ink-3">
                     Keeps this tier off the public event page.
                   </p>
                 </div>
                 <Switch
-                  checked={draft.isHidden}
-                  onCheckedChange={(next) => setDraft({ ...draft, isHidden: next })}
+                  checked={useWatch({ control: form.control, name: "isHidden" })}
+                  onCheckedChange={(next) => form.setValue("isHidden", next)}
                   label="Hidden"
                 />
               </div>
-            </DialogBody>
-          )}
 
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setDraft(null)}>Cancel</Button>
-            <Button variant="solid" loading={saving} onClick={save}>
-              {draft?.id ? "Save changes" : "Add ticket type"}
-            </Button>
-          </DialogFooter>
+              <FormError message={save.error} />
+            </DialogBody>
+
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={() => setEditing(null)}>Cancel</Button>
+              <Button type="submit" variant="solid" loading={form.formState.isSubmitting}>
+                {editing && editing !== "new" ? "Save changes" : "Add ticket type"}
+              </Button>
+            </DialogFooter>
+          </Form>
         </DialogContent>
       </Dialog>
     </>

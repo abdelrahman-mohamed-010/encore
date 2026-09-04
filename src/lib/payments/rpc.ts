@@ -35,10 +35,14 @@ export async function finalizeOrderPayment(
   if (error) throw new Error(error.message);
   return data as {
     order_id: string;
-    order_number: string;
-    status: string;
-    already_finalized: boolean;
-    ticket_count: number;
+    order_number?: string;
+    /** "paid", or "failed" when the hold expired before payment landed. */
+    status: "paid" | "failed";
+    already_finalized?: boolean;
+    ticket_count?: number;
+    /** Machine-readable reason when status is "failed". */
+    error?: "hold_expired";
+    message?: string;
   };
 }
 

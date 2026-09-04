@@ -40,6 +40,11 @@ export async function POST(
       order.payment_intent_id,
       order.connected_account_id,
     );
+
+    if (result.status === "failed") {
+      return fail(result.message ?? "The ticket hold expired.", 409, { code: result.error });
+    }
+
     return ok(result);
   } catch (error) {
     const message = (error as Error).message;

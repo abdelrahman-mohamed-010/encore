@@ -53,6 +53,14 @@ export async function POST(
 
   try {
     const result = await finalizeOrderPayment(orderId, `sbx_${orderId.slice(0, 8)}`);
+
+    // The hold can time out between creating the order and paying for it. The
+    // RPC records the failure and reports it rather than raising, so the order
+    // does not linger as "pending".
+    if (result.status === "failed") {
+      return fail(result.message ?? "The ticket hold expired.", 409, { code: result.error });
+    }
+
     return ok(result);
   } catch (error) {
     const message = (error as Error).message;

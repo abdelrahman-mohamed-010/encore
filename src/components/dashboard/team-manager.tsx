@@ -2,15 +2,20 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { UserPlus, X } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction } from "@/hooks";
+import { teamMemberSchema, type TeamMemberData, type TeamMemberValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { Card, SectionHeader } from "@/components/ui/surface";
 import {
   Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { Field, Input, Select } from "@/components/ui/input";
+import { Input, Select } from "@/components/ui/input";
+import { Form, FormError, FormField } from "@/components/ui/form";
 import { Avatar } from "@/components/ui/misc";
 import type { OrgMemberRole } from "@/lib/types";
 
@@ -40,55 +45,50 @@ export function TeamManager({
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [email, setEmail] = useState("");
-  const [role, setRole] = useState<OrgMemberRole>("staff");
-  const [error, setError] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
   const [, startTransition] = useTransition();
 
   const canManageOwners = viewerRole === "owner";
 
-  async function addMember() {
-    setError(null);
-    const trimmed = email.trim().toLowerCase();
-    if (!/^\S+@\S+\.\S+$/.test(trimmed)) return setError("Enter a valid email address.");
+  const form = useForm<TeamMemberValues, unknown, TeamMemberData>({
+    resolver: zodResolver(teamMemberSchema),
+    defaultValues: { email: "", role: "staff" },
+  });
 
-    setSaving(true);
+  const selectedRole = useWatch({ control: form.control, name: "role" });
+
+  const addMember = useAsyncAction(async (values: TeamMemberData) => {
     const supabase = createClient();
 
-    // Profiles are publicly readable, so we can resolve an existing account by
+    // Profiles are publicly readable, so an existing account can be resolved by
     // email. There is no invite email in this build — the person must already
     // have signed up.
     const { data: profile } = await supabase
       .from("profiles")
       .select("id")
-      .ilike("email", trimmed)
+      .ilike("email", values.email)
       .maybeSingle();
 
     if (!profile) {
-      setSaving(false);
-      setError("Nobody with that email has a Tazkarti account yet. Ask them to sign up first.");
-      return;
+      throw new Error(
+        "Nobody with that email has a Tazkarti account yet. Ask them to sign up first.",
+      );
     }
 
-    const { error: writeError } = await supabase
+    const { error } = await supabase
       .from("organizer_members")
-      .insert({ organizer_id: organizerId, user_id: profile.id, role });
+      .insert({ organizer_id: organizerId, user_id: profile.id, role: values.role });
 
-    setSaving(false);
-
-    if (writeError) {
-      setError(
-        writeError.code === "23505" ? "That person is already on the team." : writeError.message,
+    if (error) {
+      throw new Error(
+        error.code === "23505" ? "That person is already on the team." : error.message,
       );
-      return;
     }
 
     toast.success("Team member added");
     setOpen(false);
-    setEmail("");
+    form.reset();
     router.refresh();
-  }
+  });
 
   function changeRole(member: Member, next: OrgMemberRole) {
     startTransition(async () => {
@@ -200,35 +200,33 @@ export function TeamManager({
             </DialogDescription>
           </DialogHeader>
 
-          <DialogBody className="space-y-4">
-            <Field label="Email" htmlFor="memberEmail" required>
-              <Input
-                id="memberEmail"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="teammate@example.com"
-              />
-            </Field>
+          <Form form={form} onSubmit={addMember.run}>
+            <DialogBody className="space-y-4">
+              <FormField<TeamMemberValues, "email"> name="email" label="Email" required>
+                {(field) => <Input {...field} type="email" placeholder="teammate@example.com" />}
+              </FormField>
 
-            <Field label="Role" htmlFor="memberRole" hint={ROLE_HELP[role]} error={error}>
-              <Select
-                id="memberRole"
-                value={role}
-                onChange={(e) => setRole(e.target.value as OrgMemberRole)}
-              >
-                <option value="scanner">Scanner</option>
-                <option value="staff">Staff</option>
-                <option value="admin">Admin</option>
-                {canManageOwners && <option value="owner">Owner</option>}
-              </Select>
-            </Field>
-          </DialogBody>
+              <FormField<TeamMemberValues, "role"> name="role" label="Role" hint={ROLE_HELP[selectedRole]}>
+                {(field) => (
+                  <Select {...field}>
+                    <option value="scanner">Scanner</option>
+                    <option value="staff">Staff</option>
+                    <option value="admin">Admin</option>
+                    {canManageOwners && <option value="owner">Owner</option>}
+                  </Select>
+                )}
+              </FormField>
 
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-            <Button variant="solid" loading={saving} onClick={addMember}>Add member</Button>
-          </DialogFooter>
+              <FormError message={addMember.error} />
+            </DialogBody>
+
+            <DialogFooter>
+              <Button type="button" variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+              <Button type="submit" variant="solid" loading={form.formState.isSubmitting}>
+                Add member
+              </Button>
+            </DialogFooter>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>

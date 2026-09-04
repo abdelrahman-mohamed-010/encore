@@ -1,51 +1,53 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useForm, useWatch } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAsyncAction } from "@/hooks";
+import { profileSchema, type ProfileData, type ProfileValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
-import { Card, CardBody, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/surface";
-import { Field, Input, Textarea } from "@/components/ui/input";
+import { Card, CardBody, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/surface";
+import { Form, FormError, FormField } from "@/components/ui/form";
+import { Input, Textarea } from "@/components/ui/input";
 import { Avatar } from "@/components/ui/misc";
 import type { Profile } from "@/lib/types";
 
 export function SettingsForm({ profile }: { profile: Profile }) {
   const router = useRouter();
-  const [fullName, setFullName] = useState(profile.full_name ?? "");
-  const [phone, setPhone] = useState(profile.phone ?? "");
-  const [bio, setBio] = useState(profile.bio ?? "");
-  const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? "");
-  const [saving, setSaving] = useState(false);
 
-  async function save(event: React.FormEvent) {
-    event.preventDefault();
-    setSaving(true);
+  const form = useForm<ProfileValues, unknown, ProfileData>({
+    resolver: zodResolver(profileSchema),
+    defaultValues: {
+      fullName: profile.full_name ?? "",
+      phone: profile.phone ?? "",
+      bio: profile.bio ?? "",
+      avatarUrl: profile.avatar_url ?? "",
+    },
+  });
 
-    const supabase = createClient();
-    const { error } = await supabase
+  const avatarUrl = useWatch({ control: form.control, name: "avatarUrl" });
+  const fullName = useWatch({ control: form.control, name: "fullName" });
+
+  const save = useAsyncAction(async (values: ProfileData) => {
+    const { error } = await createClient()
       .from("profiles")
       .update({
-        full_name: fullName.trim() || null,
-        phone: phone.trim() || null,
-        bio: bio.trim() || null,
-        avatar_url: avatarUrl.trim() || null,
+        full_name: values.fullName || null,
+        phone: values.phone || null,
+        bio: values.bio || null,
+        avatar_url: values.avatarUrl || null,
       })
       .eq("id", profile.id);
 
-    setSaving(false);
-
-    if (error) {
-      toast.error("Could not save your profile", { description: error.message });
-      return;
-    }
-
+    if (error) throw new Error(error.message);
     toast.success("Profile saved");
     router.refresh();
-  }
+  });
 
   return (
-    <form onSubmit={save}>
+    <Form form={form} onSubmit={save.run}>
       <Card>
         <CardHeader bordered className="flex-col items-start">
           <CardTitle>Profile</CardTitle>
@@ -55,39 +57,37 @@ export function SettingsForm({ profile }: { profile: Profile }) {
         <CardBody className="space-y-5">
           <div className="flex items-center gap-4">
             <Avatar src={avatarUrl || null} name={fullName || profile.email} size="xl" />
-            <Field label="Avatar URL" htmlFor="avatarUrl" className="flex-1" hint="Paste a link to an image.">
-              <Input
-                id="avatarUrl"
-                value={avatarUrl}
-                onChange={(e) => setAvatarUrl(e.target.value)}
-                placeholder="https://…"
-              />
-            </Field>
+            <FormField<ProfileValues, "avatarUrl"> name="avatarUrl" label="Avatar URL" className="flex-1" hint="Paste a link to an image.">
+              {(field) => <Input {...field} placeholder="https://…" />}
+            </FormField>
           </div>
 
-          <Field label="Full name" htmlFor="fullName">
-            <Input id="fullName" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-          </Field>
+          <FormField<ProfileValues, "fullName"> name="fullName" label="Full name">
+            {(field) => <Input {...field} />}
+          </FormField>
 
-          <Field label="Email" htmlFor="email" hint="Change your email from the security section of Supabase Auth.">
-            <Input id="email" value={profile.email} disabled />
-          </Field>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[13px] font-medium text-ink-2">Email</span>
+            <Input value={profile.email} disabled readOnly />
+          </div>
 
-          <Field label="Phone" htmlFor="phone" hint="Optional. Used only for order support.">
-            <Input id="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} />
-          </Field>
+          <FormField<ProfileValues, "phone"> name="phone" label="Phone" hint="Optional. Used only for order support.">
+            {(field) => <Input {...field} type="tel" />}
+          </FormField>
 
-          <Field label="Bio" htmlFor="bio">
-            <Textarea id="bio" value={bio} onChange={(e) => setBio(e.target.value)} rows={3} />
-          </Field>
+          <FormField<ProfileValues, "bio"> name="bio" label="Bio">
+            {(field) => <Textarea {...field} rows={3} />}
+          </FormField>
+
+          <FormError message={save.error} />
         </CardBody>
 
         <CardFooter className="justify-end">
-          <Button type="submit" variant="solid" loading={saving}>
+          <Button type="submit" variant="solid" loading={form.formState.isSubmitting}>
             Save changes
           </Button>
         </CardFooter>
       </Card>
-    </form>
+    </Form>
   );
 }

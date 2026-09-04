@@ -38,7 +38,14 @@ export async function POST(request: Request) {
         const intent = event.data.object;
         const orderId = intent.metadata?.order_id;
         if (orderId) {
-          await finalizeOrderPayment(orderId, intent.id, event.account ?? null);
+          const result = await finalizeOrderPayment(orderId, intent.id, event.account ?? null);
+          // The customer paid but their hold had already expired — the money is
+          // captured with nothing to allocate it to, so surface it loudly.
+          if (result.status === "failed") {
+            console.error(
+              `[stripe] order ${orderId} paid via ${intent.id} but its hold had expired; a refund is required.`,
+            );
+          }
         }
         break;
       }

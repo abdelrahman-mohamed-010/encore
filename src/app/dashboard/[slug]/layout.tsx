@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
-import { requireOrganizer, getMyOrganizers } from "@/lib/auth";
+import { requireOrganizer, getMyOrganizers, getProfile } from "@/lib/auth";
+import { SessionProvider } from "@/contexts";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { DashboardSidebar } from "@/components/dashboard/sidebar";
@@ -16,12 +17,14 @@ export default async function DashboardLayout({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const [{ organizer, role }, memberships] = await Promise.all([
+  const [{ organizer, role }, memberships, profile] = await Promise.all([
     requireOrganizer(slug),
     getMyOrganizers(),
+    getProfile(),
   ]);
 
   return (
+    <SessionProvider profile={profile} memberships={memberships}>
     <div className="flex min-h-dvh flex-col bg-paper">
       <header className="sticky top-0 z-30 border-b border-hairline bg-paper/85 backdrop-blur-xl">
         <div className="container-page flex h-14 items-center gap-3">
@@ -50,5 +53,6 @@ export default async function DashboardLayout({
         <main className="min-w-0 flex-1">{children}</main>
       </div>
     </div>
+    </SessionProvider>
   );
 }
