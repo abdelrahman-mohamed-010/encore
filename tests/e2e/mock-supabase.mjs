@@ -124,8 +124,8 @@ export const AVAILABILITY = [
 ];
 
 const ORGANIZERS = [
-  { id: "o1", owner_id: "u1", name: "Cairo Live Nation", slug: "cairo-live-nation", description: "Egypt's biggest promoter of live music.", logo_url: null, banner_url: null, website: "https://cairolivenation.example", support_email: "hello@cairolivenation.example", support_phone: null, country: "EG", social_links: {}, verification_status: "verified", is_suspended: false, created_at: days(-200), updated_at: days(-10), events: [{ count: 6 }] },
-  { id: "o2", owner_id: "u2", name: "Nile Arts Collective", slug: "nile-arts-collective", description: "Independent theatre and classical performance.", logo_url: null, banner_url: null, website: null, support_email: null, support_phone: null, country: "EG", social_links: {}, verification_status: "verified", is_suspended: false, created_at: days(-180), updated_at: days(-10), events: [{ count: 3 }] },
+  { id: "o1", owner_id: "11111111-1111-4111-8111-111111111111", name: "Cairo Live Nation", slug: "cairo-live-nation", description: "Egypt's biggest promoter of live music.", logo_url: null, banner_url: null, website: "https://cairolivenation.example", support_email: "hello@cairolivenation.example", support_phone: null, country: "EG", social_links: {}, verification_status: "verified", is_suspended: false, created_at: days(-200), updated_at: days(-10), events: [{ count: 6 }] },
+  { id: "o2", owner_id: "22222222-2222-4222-8222-222222222222", name: "Nile Arts Collective", slug: "nile-arts-collective", description: "Independent theatre and classical performance.", logo_url: null, banner_url: null, website: null, support_email: null, support_phone: null, country: "EG", social_links: {}, verification_status: "verified", is_suspended: false, created_at: days(-180), updated_at: days(-10), events: [{ count: 3 }] },
 ];
 
 const PLATFORM_SETTINGS = {
@@ -135,8 +135,47 @@ const PLATFORM_SETTINGS = {
 };
 
 const VENUES = [
-  { id: "v1", city: "Cairo", name: "Cairo International Stadium", country: "EG" },
-  { id: "v2", city: "Marsa Matrouh", name: "Sahel Beach Arena", country: "EG" },
+  { id: "v1", city: "Cairo", name: "Cairo International Stadium", country: "EG",
+    slug: "cairo-international-stadium", description: "Egypt's largest stadium.",
+    address_line1: "Nasr City", address_line2: null, state: null, postal_code: null,
+    latitude: 30.0688, longitude: 31.3122, capacity: 75000, image_url: null, is_active: true },
+  { id: "v2", city: "Marsa Matrouh", name: "Sahel Beach Arena", country: "EG",
+    slug: "sahel-beach-arena", description: null,
+    address_line1: null, address_line2: null, state: null, postal_code: null,
+    latitude: 31.3543, longitude: 27.2373, capacity: 8000, image_url: null, is_active: true },
+];
+
+/** The public, email-free projection of `profiles`. */
+const PUBLIC_PROFILES = [
+  { id: "11111111-1111-4111-8111-111111111111", full_name: "Karim Fouad", avatar_url: null,
+    bio: "Booking live music in Cairo since 2011.", created_at: days(-900) },
+  { id: "22222222-2222-4222-8222-222222222222", full_name: "Mona Adel", avatar_url: null, bio: null, created_at: days(-500) },
+];
+
+const HOST_PROFILE = {
+  id: "11111111-1111-4111-8111-111111111111", full_name: "Karim Fouad", avatar_url: null,
+  bio: "Booking live music in Cairo since 2011.", created_at: days(-900),
+  hosted_count: 6, attended_count: 12,
+  organizers: [{ slug: "cairo-live-nation", name: "Cairo Live Nation", logo_url: null }],
+};
+
+const hostEvent = (over) => ({
+  id: "e1", slug: "cairokee-roots-live", title: "Cairokee — Roots Live",
+  starts_at: days(24), ends_at: days(24), timezone: "Africa/Cairo",
+  cover_image_url: null, city: "Cairo", venue_name: "Cairo International Stadium",
+  organizer_name: "Cairo Live Nation", organizer_slug: "cairo-live-nation",
+  min_price_cents: 4500, currency: "USD", ...over,
+});
+
+const HOST_EVENTS_UPCOMING = [
+  hostEvent({}),
+  hostEvent({ id: "e3", slug: "riseup-summit-2026", title: "RiseUp Summit 2026",
+              starts_at: days(38), ends_at: days(40), min_price_cents: 0 }),
+];
+
+const HOST_EVENTS_PAST = [
+  hostEvent({ id: "e9", slug: "cairo-jazz-nights", title: "Cairo Jazz Nights",
+              starts_at: days(-40), ends_at: days(-40) }),
 ];
 
 function json(res, body, status = 200, headers = {}) {
@@ -241,6 +280,14 @@ export function createMockSupabase(port = 54321) {
       return json(res, rows.slice(0, body.p_limit ?? 200));
     }
 
+    if (pathname === "/rest/v1/rpc/host_profile") {
+      return json(res, body.p_id === "11111111-1111-4111-8111-111111111111" ? [HOST_PROFILE] : []);
+    }
+    if (pathname === "/rest/v1/rpc/host_events") {
+      if (body.p_id !== "11111111-1111-4111-8111-111111111111") return json(res, []);
+      return json(res, body.p_past ? HOST_EVENTS_PAST : HOST_EVENTS_UPCOMING);
+    }
+
     if (pathname === "/rest/v1/rpc/event_availability") return json(res, AVAILABILITY);
     if (pathname === "/rest/v1/rpc/increment_event_views") return json(res, null);
     if (pathname === "/rest/v1/rpc/validate_promo_code") {
@@ -275,7 +322,14 @@ export function createMockSupabase(port = 54321) {
     }
 
     if (pathname === "/rest/v1/platform_settings") return respond(req, res, [PLATFORM_SETTINGS]);
-    if (pathname === "/rest/v1/venues") return respond(req, res, VENUES);
+    if (pathname === "/rest/v1/venues") {
+      const slug = eqValue(searchParams, "slug");
+      return respond(req, res, slug ? VENUES.filter((v) => v.slug === slug) : VENUES);
+    }
+    if (pathname === "/rest/v1/public_profiles") {
+      const id = eqValue(searchParams, "id");
+      return respond(req, res, id ? PUBLIC_PROFILES.filter((p) => p.id === id) : PUBLIC_PROFILES);
+    }
     if (pathname === "/rest/v1/event_seats") return respond(req, res, []);
 
     // Anything else an anonymous visitor touches is legitimately empty.

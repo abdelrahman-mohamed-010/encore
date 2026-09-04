@@ -13,6 +13,7 @@ import { Form, FormError, FormField } from "@/components/ui/form";
 import { Input, Textarea, Switch, Label } from "@/components/ui/input";
 import { Combobox } from "@/components/ui/combobox";
 import { DateTimeField, formatLocalDateTime } from "@/components/ui/date-picker";
+import { ImageUpload } from "@/components/ui/image-upload";
 import type { EventRow } from "@/lib/types";
 
 type Option = { id: string; name: string; city?: string | null };
@@ -213,8 +214,17 @@ export function EventForm({
             </FormField>
           </div>
 
-          <FormField<EventValues, "coverImageUrl"> name="coverImageUrl" label="Cover image URL" hint="A wide image works best (16:10).">
-            {(field) => <Input {...field} placeholder="https://…" />}
+          <FormField<EventValues, "coverImageUrl"> name="coverImageUrl" label="Cover image">
+            {({ value, onChange }) => (
+              <ImageUpload
+                value={value ?? ""}
+                onChange={onChange}
+                folder="events"
+                ownerId={organizerId}
+                label="Cover image"
+                hint="A wide image works best (16:10). Up to 5 MB."
+              />
+            )}
           </FormField>
 
           <FormField<EventValues, "tags"> name="tags" label="Tags" hint="Comma separated. Helps people find the event.">

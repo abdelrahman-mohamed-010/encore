@@ -10,6 +10,7 @@ import { organizerSchema, type OrganizerData, type OrganizerValues } from "@/lib
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/surface";
 import { Form, FormError, FormField } from "@/components/ui/form";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { Input, Textarea } from "@/components/ui/input";
 import { Avatar } from "@/components/ui/misc";
 import type { Organizer } from "@/lib/types";
@@ -60,8 +61,18 @@ export function OrganizerSettingsForm({ organizer }: { organizer: Organizer }) {
         <CardBody className="space-y-5">
           <div className="flex items-center gap-4">
             <Avatar src={logoUrl || null} name={name} size="xl" />
-            <FormField<OrganizerValues, "logoUrl"> name="logoUrl" label="Logo URL" className="flex-1">
-              {(field) => <Input {...field} placeholder="https://…" />}
+            <FormField<OrganizerValues, "logoUrl"> name="logoUrl" label="Logo" className="flex-1">
+              {({ value, onChange }) => (
+                <ImageUpload
+                  value={value ?? ""}
+                  onChange={onChange}
+                  folder="organizers"
+                  ownerId={organizer.id}
+                  label="Logo"
+                  aspect="aspect-[3/1]"
+                  hint="A wide logo reads best in the header. Up to 5 MB."
+                />
+              )}
             </FormField>
           </div>
 

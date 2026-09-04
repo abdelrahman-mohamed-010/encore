@@ -1,3 +1,4 @@
+import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -41,12 +42,15 @@ export default async function OrganizerPage({ params }: { params: Promise<{ slug
   if (!organizer) notFound();
 
   const supabase = await createClient();
-  const { data: events } = await supabase.rpc("search_events", {
-    p_organizer_slug: slug,
-    p_limit: 50,
-  });
+  const [{ data: events }, { data: ownerRows }] = await Promise.all([
+    supabase.rpc("search_events", { p_organizer_slug: slug, p_limit: 50 }),
+    // The safe public projection, not `profiles`: that table holds emails and
+    // is no longer world-readable.
+    supabase.from("public_profiles").select("id, full_name").eq("id", organizer.owner_id).limit(1),
+  ]);
 
   const rows = (events ?? []) as EventSearchResult[];
+  const owner = ownerRows?.[0] ?? null;
 
   return (
     <>
@@ -73,6 +77,14 @@ export default async function OrganizerPage({ params }: { params: Promise<{ slug
                 </Badge>
               )}
             </h1>
+            {owner?.full_name && (
+              <p className="mt-1 text-sm text-ink-3">
+                Run by{" "}
+                <Link href={`/u/${organizer.owner_id}`} className="font-medium text-ink-2 hover:underline">
+                  {owner.full_name}
+                </Link>
+              </p>
+            )}
           </div>
         </div>
 

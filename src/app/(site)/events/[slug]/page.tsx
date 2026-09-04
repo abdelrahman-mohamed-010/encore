@@ -150,7 +150,12 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                 <Divider />
                 <div>
                   <p className="eyebrow mb-2.5">Venue</p>
-                  <p className="text-base font-medium text-ink">{event.venue.name}</p>
+                  <Link
+                    href={`/venues/${event.venue.slug}`}
+                    className="text-base font-medium text-ink hover:underline"
+                  >
+                    {event.venue.name}
+                  </Link>
                   <p className="mt-1 text-sm leading-relaxed text-ink-3">
                     {[event.venue.address_line1, event.venue.city, event.venue.country]
                       .filter(Boolean)

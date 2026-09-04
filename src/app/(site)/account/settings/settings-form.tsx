@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardFooter, CardHeader, CardTitle, CardDescription } from "@/components/ui/surface";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Input, Textarea } from "@/components/ui/input";
+import { ImageUpload } from "@/components/ui/image-upload";
 import { Avatar } from "@/components/ui/misc";
 import type { Profile } from "@/lib/types";
 
@@ -57,8 +58,18 @@ export function SettingsForm({ profile }: { profile: Profile }) {
         <CardBody className="space-y-5">
           <div className="flex items-center gap-4">
             <Avatar src={avatarUrl || null} name={fullName || profile.email} size="xl" />
-            <FormField<ProfileValues, "avatarUrl"> name="avatarUrl" label="Avatar URL" className="flex-1" hint="Paste a link to an image.">
-              {(field) => <Input {...field} placeholder="https://…" />}
+            <FormField<ProfileValues, "avatarUrl"> name="avatarUrl" label="Photo" className="flex-1">
+              {({ value, onChange }) => (
+                <ImageUpload
+                  value={value ?? ""}
+                  onChange={onChange}
+                  folder="avatars"
+                  ownerId={profile.id}
+                  label="Photo"
+                  aspect="aspect-[3/1]"
+                  hint="A square image works best. Up to 5 MB."
+                />
+              )}
             </FormField>
           </div>
 
