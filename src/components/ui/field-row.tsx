@@ -33,7 +33,7 @@ export function FieldRow({
       {Icon && (
         <span
           className={cn(
-            "grid size-9 shrink-0 place-items-center rounded-lg border border-hairline bg-sunken text-ink-2",
+            "grid size-9 shrink-0 place-items-center rounded-lg bg-sunken text-ink-2",
             align === "start" && "mt-0.5",
           )}
         >
@@ -58,8 +58,8 @@ export function FieldRow({
  * just because the colour looks right.
  */
 export const CHIP_TONES = {
-  neutral: "border-hairline bg-sunken text-ink-2",
-  accent: "border-transparent bg-primary-soft text-brand-700 dark:text-brand-200",
+  neutral: "border-transparent bg-sunken text-ink-2",
+  accent: "border-transparent bg-tint-purple text-tint-purple-fg",
   positive: "border-transparent bg-positive-bg text-positive",
   caution: "border-transparent bg-caution-bg text-caution",
   critical: "border-transparent bg-critical-bg text-critical",
@@ -122,16 +122,14 @@ export function DateBlock({
   return (
     <div
       className={cn(
-        "grid size-12 shrink-0 place-content-center overflow-hidden rounded-lg border border-hairline bg-card text-center",
+        "grid size-12 shrink-0 place-content-center rounded-lg bg-sunken px-1 text-center",
         className,
       )}
     >
-      <span className="block bg-sunken px-2 pb-px pt-1 text-2xs font-semibold leading-none tracking-[0.08em] text-ink-3">
+      <span className="block text-2xs font-semibold leading-none tracking-[0.08em] text-ink-3">
         {month}
       </span>
-      <span className="block px-2 pb-1 pt-1 text-lg font-semibold leading-none tabular text-ink">
-        {day}
-      </span>
+      <span className="mt-1 block text-xl font-semibold leading-none tabular text-ink">{day}</span>
     </div>
   );
 }

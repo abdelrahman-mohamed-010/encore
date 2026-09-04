@@ -5,9 +5,10 @@ import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { SearchField } from "./search-field";
+import { PrimaryNav } from "./primary-nav";
+import { NavClock } from "./nav-clock";
 import { UserMenu } from "./user-menu";
 import { MobileNav } from "./mobile-nav";
-import { PRIMARY_NAV } from "./nav-links";
 
 export async function SiteHeader() {
   const [profile, memberships] = await Promise.all([getProfile(), getMyOrganizers()]);
@@ -15,46 +16,49 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-hairline bg-paper/85 backdrop-blur-xl supports-[backdrop-filter]:bg-paper/70">
       <div className="container-page">
-        <div className="flex h-14 items-center gap-4">
-          <div className="flex items-center gap-6">
+        {/*
+          Three tracks rather than a flex row: the outer columns are always
+          equal, so the nav stays optically centred on the page even as the
+          right-hand group changes width between signed-out, signed-in and
+          organizer states. The `max-content` floor is what keeps that from
+          squeezing the wider side — with a plain `1fr` the two columns split
+          the leftover space evenly and the actions wrap.
+        */}
+        <div className="grid h-(--size-nav) grid-cols-[auto_1fr] items-center gap-4 md:grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)]">
+          <div className="flex min-w-0 items-center">
             <Logo />
-            <nav className="hidden items-center gap-1 md:flex">
-              {PRIMARY_NAV.slice(0, 3).map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="rounded-lg px-2.5 py-1.5 text-sm font-medium text-ink-2 transition-colors hover:bg-sunken hover:text-ink"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </nav>
           </div>
 
-          <div className="mx-auto hidden w-full max-w-sm lg:block">
-            <Suspense fallback={<div className="h-9 rounded-lg bg-sunken" />}>
-              <SearchField />
+          <PrimaryNav className="hidden md:flex" />
+
+          <div className="flex items-center justify-end gap-3 whitespace-nowrap lg:gap-5">
+            <Suspense fallback={<div className="hidden h-9 w-56 rounded-md bg-sunken xl:block" />}>
+              <SearchField className="hidden w-56 xl:block" size="sm" placeholder="Search events" />
             </Suspense>
-          </div>
 
-          <div className="ml-auto flex items-center gap-1.5 lg:ml-0">
-            <ThemeToggle />
+            <NavClock className="hidden 2xl:inline" />
 
             {profile ? (
               <>
-                <Button asChild variant="soft" size="sm" className="hidden sm:inline-flex">
-                  <Link href={memberships.length ? `/dashboard/${memberships[0].organizer.slug}` : "/dashboard/new"}>
-                    {memberships.length ? "Dashboard" : "Sell tickets"}
-                  </Link>
-                </Button>
+                <Link
+                  href={memberships.length ? `/dashboard/${memberships[0].organizer.slug}` : "/dashboard/new"}
+                  className="hidden text-md font-medium text-ink transition-colors hover:text-ink-2 sm:inline"
+                >
+                  {memberships.length ? "Dashboard" : "Sell tickets"}
+                </Link>
+                <ThemeToggle />
                 <UserMenu profile={profile} memberships={memberships} />
               </>
             ) : (
               <>
-                <Button asChild variant="ghost" size="sm" className="hidden sm:inline-flex">
-                  <Link href="/auth/login">Sign in</Link>
-                </Button>
-                <Button asChild variant="primary" size="sm">
+                <Link
+                  href="/auth/login"
+                  className="hidden text-md font-medium text-ink-2 transition-colors hover:text-ink sm:inline"
+                >
+                  Sign in
+                </Link>
+                <ThemeToggle />
+                <Button asChild variant="solid" size="sm">
                   <Link href="/auth/register">Get started</Link>
                 </Button>
               </>
@@ -63,7 +67,7 @@ export async function SiteHeader() {
             <MobileNav
               action={
                 profile ? null : (
-                  <Button asChild variant="primary" size="lg" block>
+                  <Button asChild variant="solid" size="lg" block>
                     <Link href="/auth/register">Get started</Link>
                   </Button>
                 )

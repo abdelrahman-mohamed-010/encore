@@ -37,37 +37,41 @@ export default async function HomePage() {
   return (
     <>
       {/* ---- Hero ---------------------------------------------------------- */}
-      <section className="border-b border-hairline bg-card">
+      <section>
         <div className="container-page py-16 md:py-24">
           <div className="mx-auto max-w-3xl text-center">
             <Link
               href="/events?featured=1"
-              className="inline-flex items-center gap-2 rounded-lg border border-hairline bg-sunken px-3 py-1.5 text-xs font-medium text-ink-2 transition-colors hover:text-ink"
+              className="inline-flex items-center gap-2 rounded-full bg-sunken px-3.5 py-2 text-sm font-medium text-ink-2 transition-colors hover:bg-sunken-2 hover:text-ink"
             >
-              <Sparkles className="size-3.5" />
+              <Sparkles className="size-4" />
               {formatNumber(Number(totalEvents))} events on sale right now
               <ArrowRight className="size-3.5" />
             </Link>
 
-            <h1 className="display-1 mt-6 text-ink">
-              Find your next
-              <br />
-              night out.
+            {/*
+              The serif carries the line the page is actually about; the rest of
+              the sentence stays in the UI sans so the flourish reads as emphasis
+              rather than as a different typeface bolted on.
+            */}
+            <h1 className="display-1 mt-7 text-ink">
+              Find your next{" "}
+              <span className="font-flourish italic">night out</span>.
             </h1>
 
-            <p className="mx-auto mt-5 max-w-xl text-md leading-relaxed text-ink-2">
+            <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-2">
               Concerts, theatre, conferences and festivals — booked in seconds, with your tickets
               waiting in your pocket.
             </p>
 
-            <div className="mx-auto mt-8 max-w-xl">
-              <Suspense fallback={<div className="h-12 rounded-lg bg-sunken" />}>
+            <div className="mx-auto mt-9 max-w-xl">
+              <Suspense fallback={<div className="h-(--size-field-lg) rounded-md bg-sunken" />}>
                 <SearchField size="lg" autoFocus={false} />
               </Suspense>
             </div>
           </div>
 
-          <div className="mt-10">
+          <div className="mt-12">
             <CategoryRail categories={categories} className="justify-center" />
           </div>
         </div>
@@ -137,13 +141,14 @@ export default async function HomePage() {
       </section>
 
       {/* ---- Organizer pitch ------------------------------------------------ */}
-      <section className="border-t border-hairline bg-card">
+      <section className="border-t border-hairline">
         <div className="container-page py-16 md:py-20">
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
               <p className="eyebrow">For organizers</p>
               <h2 className="display-2 mt-3 text-ink">
-                Sell tickets on your own Stripe account.
+                Sell tickets on your{" "}
+                <span className="font-flourish italic">own</span> Stripe account.
               </h2>
               <p className="mt-4 max-w-lg text-md leading-relaxed text-ink-2">
                 Connect Stripe once and money from every sale lands directly in your account —
@@ -167,12 +172,12 @@ export default async function HomePage() {
                 { icon: QrCode, title: "Check-in that works", body: "Scan QR codes at the door from any phone, online or off." },
                 { icon: ShieldCheck, title: "Never oversold", body: "Inventory is held under a database lock, so two buyers can't take one seat." },
               ].map((feature) => (
-                <div key={feature.title} className="rounded-xl border border-hairline bg-paper p-4">
-                  <span className="grid size-9 place-items-center rounded-lg border border-hairline bg-card text-ink-2">
-                    <feature.icon className="size-4" />
+                <div key={feature.title} className="rounded-2xl bg-card p-5 shadow-e1">
+                  <span className="grid size-10 place-items-center rounded-xl bg-sunken text-ink-2">
+                    <feature.icon className="size-[18px]" />
                   </span>
-                  <p className="mt-3 text-base font-semibold text-ink">{feature.title}</p>
-                  <p className="mt-1 text-xs leading-relaxed text-ink-3">{feature.body}</p>
+                  <p className="mt-4 text-md font-semibold text-ink">{feature.title}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-3">{feature.body}</p>
                 </div>
               ))}
             </div>

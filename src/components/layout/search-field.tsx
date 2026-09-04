@@ -12,7 +12,7 @@ export function SearchField({
 }: {
   className?: string;
   placeholder?: string;
-  size?: "md" | "lg";
+  size?: "sm" | "md" | "lg";
   autoFocus?: boolean;
 }) {
   const router = useRouter();
@@ -38,8 +38,8 @@ export function SearchField({
     >
       <Search
         className={cn(
-          "pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-ink-3",
-          size === "lg" ? "size-[18px]" : "size-4",
+          "pointer-events-none absolute top-1/2 -translate-y-1/2 text-ink-3",
+          size === "lg" ? "left-4 size-[18px]" : "left-3 size-4",
         )}
       />
       {/*
@@ -56,11 +56,13 @@ export function SearchField({
         placeholder={placeholder}
         aria-label="Search events"
         className={cn(
-          "w-full rounded-lg border border-hairline bg-card text-ink placeholder:text-ink-3",
-          "transition-colors hover:border-n-300 dark:hover:border-n-700",
-          "focus-visible:border-accent-500 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-accent-500/18",
+          "w-full rounded-md border-0 bg-sunken text-ink placeholder:text-ink-3",
+          "transition-[background-color,box-shadow] duration-150 hover:bg-sunken-2",
+          "focus:bg-card focus:outline-none focus:shadow-[0_0_0_2px_var(--color-focus)]",
           "[&::-webkit-search-cancel-button]:appearance-none",
-          size === "lg" ? "h-12 pl-11 pr-4 text-md" : "h-9 pl-9 pr-3.5 text-sm",
+          size === "lg" && "h-(--size-field-lg) pl-11 pr-4 text-lg",
+          size === "md" && "h-(--size-field) pl-10 pr-3.5 text-md",
+          size === "sm" && "h-(--size-field-sm) pl-9 pr-3 text-base",
         )}
       />
     </form>

@@ -67,7 +67,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   // Pushing the result onto <html> is a genuine external-system sync.
   React.useEffect(() => {
-    document.documentElement.classList.toggle("dark", resolved === "dark");
+    // An attribute rather than a class: it is the same switch the design kit
+    // uses, and it reads unambiguously in devtools next to app classes.
+    document.documentElement.dataset.theme = resolved;
     document.documentElement.style.colorScheme = resolved;
   }, [resolved]);
 
@@ -89,7 +91,7 @@ export const themeScript = `
 (function(){try{
   var t = localStorage.getItem('${STORAGE_KEY}') || 'system';
   var d = t === 'dark' || (t === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-  document.documentElement.classList.toggle('dark', d);
+  document.documentElement.dataset.theme = d ? 'dark' : 'light';
   document.documentElement.style.colorScheme = d ? 'dark' : 'light';
 }catch(e){}})();
 `;

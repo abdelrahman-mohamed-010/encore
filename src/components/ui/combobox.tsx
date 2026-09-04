@@ -76,7 +76,7 @@ export function Combobox({
     >
       <Check
         className={cn(
-          "size-4 shrink-0 text-brand-600",
+          "size-4 shrink-0 text-ink",
           option.value === value ? "opacity-100" : "opacity-0",
         )}
         aria-hidden
@@ -113,12 +113,12 @@ export function Combobox({
           aria-describedby={describedBy}
           disabled={disabled}
           className={cn(
-            "flex h-(--size-field) w-full items-center justify-between gap-2 rounded-xl border border-hairline bg-card px-3 text-base text-ink",
-            "transition-[border-color,box-shadow] duration-150 hover:border-n-300 dark:hover:border-n-700",
-            "focus-visible:border-brand-500 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20",
-            "data-[state=open]:border-brand-500 data-[state=open]:ring-[3px] data-[state=open]:ring-brand-500/20",
-            "aria-[invalid=true]:border-critical aria-[invalid=true]:ring-critical/20",
-            "disabled:cursor-not-allowed disabled:bg-sunken disabled:opacity-60",
+            "flex h-(--size-field) w-full items-center justify-between gap-2 rounded-md bg-sunken px-3.5 text-md font-medium text-ink",
+            "transition-[background-color,box-shadow] duration-150 hover:bg-sunken-2",
+            "focus-visible:bg-card focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--color-focus)]",
+            "data-[state=open]:bg-card data-[state=open]:shadow-[0_0_0_2px_var(--color-focus)]",
+            "aria-[invalid=true]:bg-card aria-[invalid=true]:shadow-[0_0_0_2px_var(--color-critical)]",
+            "disabled:cursor-not-allowed disabled:opacity-55",
             className,
           )}
         >
@@ -134,11 +134,11 @@ export function Combobox({
         className={cn("w-(--radix-popover-trigger-width) min-w-56", contentClassName)}
       >
         <CommandPrimitive loop>
-          <div className="flex items-center gap-2 border-b border-hairline-soft px-3">
+          <div className="flex items-center gap-2 border-b border-hairline px-3.5">
             <Search className="size-4 shrink-0 text-ink-3" aria-hidden />
             <CommandPrimitive.Input
               placeholder={searchPlaceholder}
-              className="h-11 w-full bg-transparent text-base text-ink placeholder:text-ink-3 focus:outline-none"
+              className="h-12 w-full bg-transparent text-md text-ink placeholder:text-ink-3 focus:outline-none"
             />
           </div>
           <CommandPrimitive.List

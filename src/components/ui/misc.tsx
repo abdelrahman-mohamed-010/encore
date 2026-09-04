@@ -33,7 +33,7 @@ export function Avatar({
     <span
       className={cn(
         "inline-flex shrink-0 select-none items-center justify-center overflow-hidden rounded-full",
-        "border border-hairline bg-sunken font-semibold text-ink-2",
+        "bg-sunken font-semibold text-ink-2",
         sizes[size],
         className,
       )}
@@ -108,7 +108,7 @@ export function EmptyState({
       )}
     >
       {Icon && (
-        <span className="grid size-12 place-items-center rounded-xl border border-hairline bg-sunken text-ink-3">
+        <span className="grid size-12 place-items-center rounded-xl bg-sunken text-ink-3">
           <Icon className="size-5" />
         </span>
       )}
@@ -143,7 +143,7 @@ export function StatTile({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col justify-between rounded-xl border border-hairline bg-card p-4", className)}>
+    <div className={cn("flex flex-col justify-between rounded-xl bg-card shadow-e1 p-4", className)}>
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-ink-3">{label}</p>
         {Icon && (

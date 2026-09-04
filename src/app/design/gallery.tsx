@@ -16,7 +16,8 @@ import { DateField, DateTimeField, formatLocalDateTime } from "@/components/ui/d
 import { ColorPicker } from "@/components/ui/color-picker";
 import { EmptyState, Meter, StatTile } from "@/components/ui/misc";
 import { Table, TBody, TD, TH, THead, TR, TableWrap } from "@/components/ui/table";
-import { Kbd, Pagination, Steps } from "@/components/ui/nav";
+import { Pagination, Steps } from "@/components/ui/nav";
+import { Kbd } from "@/components/ui/button";
 import {
   Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -192,7 +193,7 @@ export function DesignGallery() {
             <Button variant="ghost">Ghost</Button>
             <Button variant="accent">Accent</Button>
             <Button variant="danger">Danger</Button>
-            <Button variant="danger-soft">Danger soft</Button>
+            <Button variant="danger">Danger soft</Button>
             <Button variant="link">Link</Button>
           </Row>
           <Row title="Sizes">

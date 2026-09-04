@@ -29,7 +29,7 @@ export function SkeletonText({ lines = 3, className }: { lines?: number; classNa
 
 export function EventCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-xl border border-hairline bg-card">
+    <div className="overflow-hidden rounded-xl bg-card shadow-e1">
       <Shimmer className="aspect-[16/10] rounded-none" />
       <div className="space-y-3 p-4">
         <div className="flex gap-3">
@@ -60,7 +60,7 @@ export function EventGridSkeleton({ count = 6, className }: { count?: number; cl
 
 export function EventRowSkeleton() {
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-hairline bg-card p-3">
+    <div className="flex items-center gap-4 rounded-xl bg-card shadow-e1 p-3">
       <Shimmer className="size-16 shrink-0" />
       <div className="flex-1 space-y-2">
         <Shimmer className="h-2.5 w-24" />
@@ -74,7 +74,7 @@ export function EventRowSkeleton() {
 
 export function StatTileSkeleton() {
   return (
-    <div className="rounded-xl border border-hairline bg-card p-4">
+    <div className="rounded-xl bg-card shadow-e1 p-4">
       <div className="flex items-center justify-between">
         <Shimmer className="h-3 w-24" />
         <Shimmer className="size-7 rounded-md" />
@@ -97,7 +97,7 @@ export function StatRowSkeleton({ count = 4 }: { count?: number }) {
 
 export function ChartSkeleton({ title }: { title?: boolean }) {
   return (
-    <div className="rounded-xl border border-hairline bg-card">
+    <div className="rounded-xl bg-card shadow-e1">
       {title && (
         <div className="border-b border-hairline-soft px-5 py-4">
           <Shimmer className="h-3.5 w-24" />
@@ -122,7 +122,7 @@ export function ChartSkeleton({ title }: { title?: boolean }) {
 
 export function TableSkeleton({ rows = 8, columns = 5 }: { rows?: number; columns?: number }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-hairline bg-card">
+    <div className="overflow-hidden rounded-xl bg-card shadow-e1">
       <div className="flex gap-4 border-b border-hairline px-4 py-3">
         {Array.from({ length: columns }).map((_, i) => (
           <Shimmer key={i} className="h-2.5 flex-1" />
@@ -141,7 +141,7 @@ export function TableSkeleton({ rows = 8, columns = 5 }: { rows?: number; column
 
 export function ListSkeleton({ rows = 6 }: { rows?: number }) {
   return (
-    <div className="overflow-hidden rounded-xl border border-hairline bg-card">
+    <div className="overflow-hidden rounded-xl bg-card shadow-e1">
       {Array.from({ length: rows }).map((_, i) => (
         <div key={i} className="flex items-center gap-4 border-b border-hairline-soft px-4 py-4 last:border-b-0">
           <Shimmer className="size-12 shrink-0" />
@@ -158,7 +158,7 @@ export function ListSkeleton({ rows = 6 }: { rows?: number }) {
 
 export function FormSkeleton({ fields = 4 }: { fields?: number }) {
   return (
-    <div className="rounded-xl border border-hairline bg-card">
+    <div className="rounded-xl bg-card shadow-e1">
       <div className="border-b border-hairline-soft px-5 py-4">
         <Shimmer className="h-3.5 w-28" />
         <Shimmer className="mt-2 h-2.5 w-56" />

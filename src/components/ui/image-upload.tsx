@@ -109,7 +109,7 @@ export function ImageUpload({
         className={cn(
           "relative overflow-hidden rounded-lg border border-dashed border-hairline bg-sunken transition-colors",
           aspect,
-          dragging && "border-brand-500 bg-primary-soft",
+          dragging && "border-focus bg-sunken-2",
           disabled && "opacity-60",
         )}
       >

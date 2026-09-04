@@ -25,7 +25,7 @@ export function SheetContent({
       <Drawer.Content
         className={cn(
           "fixed inset-x-0 bottom-0 z-50 mt-24 flex max-h-[92dvh] flex-col",
-          "rounded-t-3xl border-t border-hairline bg-card outline-none",
+          "rounded-t-2xl bg-card shadow-pop outline-none",
           className,
         )}
         {...props}

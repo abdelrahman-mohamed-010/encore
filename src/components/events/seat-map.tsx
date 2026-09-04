@@ -189,7 +189,7 @@ export function SeatMap({
                                 isSelected
                                   ? "scale-110 border-transparent bg-solid"
                                   : available
-                                    ? "border-hairline bg-card hover:border-accent-500 hover:bg-accent-100 dark:hover:bg-accent-950"
+                                    ? "border-hairline bg-card hover:bg-sunken-2"
                                     : "cursor-not-allowed border-transparent bg-n-200 dark:bg-n-800",
                               )}
                               style={

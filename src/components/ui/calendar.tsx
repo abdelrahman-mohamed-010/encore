@@ -23,7 +23,7 @@ export function Calendar({ className, classNames, showOutsideDays = true, ...pro
 
         // The caption row: month name left, arrows right.
         month_caption: "flex h-8 items-center px-1",
-        caption_label: "text-base font-semibold tracking-[-0.01em] text-ink",
+        caption_label: "text-md font-semibold text-ink",
         nav: "absolute right-2 top-3 flex items-center gap-0.5",
         button_previous: cn(
           "inline-flex size-7 items-center justify-center rounded-lg text-ink-3",
@@ -36,25 +36,27 @@ export function Calendar({ className, classNames, showOutsideDays = true, ...pro
 
         month_grid: "w-full border-collapse",
         weekdays: "flex",
-        weekday: "w-9 text-2xs font-medium uppercase tracking-wide text-ink-3",
+        weekday: "w-9 text-2xs font-medium text-ink-3",
         weeks: "",
         week: "mt-1 flex w-full",
 
         day: cn(
           "relative size-9 p-0 text-center",
           // Range fills bleed to the cell edge so consecutive days join up.
-          "[&:has([data-range-middle])]:bg-brand-50 dark:[&:has([data-range-middle])]:bg-brand-950/50",
+          "[&:has([data-range-middle])]:bg-btn",
           "[&:has([data-range-start])]:rounded-l-lg [&:has([data-range-end])]:rounded-r-lg",
         ),
         day_button: cn(
-          "inline-flex size-9 items-center justify-center rounded-lg text-sm tnum text-ink",
+          "inline-flex size-9 items-center justify-center rounded-lg text-base font-medium tnum text-ink",
           "transition-colors duration-100 hover:bg-sunken",
-          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-1",
           "disabled:pointer-events-none disabled:text-ink-3 disabled:line-through disabled:opacity-40",
         ),
 
         selected: "[&>button]:bg-solid [&>button]:font-semibold [&>button]:text-on-solid [&>button]:hover:bg-solid",
-        today: "[&>button]:font-semibold [&>button]:text-brand-600 dark:[&>button]:text-brand-400",
+        // Today is a dot beneath the numeral, not a colour change: it stays
+        // legible when today is also the selected day.
+        today: "after:absolute after:bottom-1 after:left-1/2 after:size-1 after:-translate-x-1/2 after:rounded-full after:bg-pink",
         outside: "[&>button]:text-ink-3 [&>button]:opacity-45",
         disabled: "[&>button]:opacity-40",
         hidden: "invisible",

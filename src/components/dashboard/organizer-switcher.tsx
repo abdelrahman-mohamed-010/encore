@@ -18,7 +18,7 @@ export function OrganizerSwitcher({
 }) {
   return (
     <Dropdown>
-      <DropdownTrigger className="flex min-w-0 items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-sunken focus-visible:outline-2 focus-visible:outline-accent-500">
+      <DropdownTrigger className="flex min-w-0 items-center gap-2 rounded-lg px-2 py-1.5 transition-colors hover:bg-sunken focus-visible:outline-2 focus-visible:outline-focus">
         <Avatar src={current.logo_url} name={current.name} size="xs" />
         <span className="max-w-40 truncate text-sm font-medium text-ink">{current.name}</span>
         <ChevronsUpDown className="size-3.5 shrink-0 text-ink-3" />

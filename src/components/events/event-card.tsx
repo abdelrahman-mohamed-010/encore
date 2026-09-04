@@ -26,12 +26,12 @@ export function EventCard({
     <Link
       href={`/events/${event.slug}`}
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-xl border border-hairline bg-card",
-        "transition-[border-color,transform] duration-200 hover:-translate-y-0.5 hover:border-n-300 dark:hover:border-n-700",
+        "group flex h-full flex-col overflow-hidden rounded-2xl bg-card shadow-e1",
+        "transition-[box-shadow,transform] duration-200 hover:-translate-y-1 hover:shadow-e2",
         className,
       )}
     >
-      <div className="relative aspect-[16/10] overflow-hidden bg-sunken">
+      <div className="relative aspect-[4/3] overflow-hidden bg-sunken">
         {event.cover_image_url ? (
           <Image
             src={event.cover_image_url}
@@ -55,29 +55,29 @@ export function EventCard({
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col gap-3 p-4">
-        <div className="flex items-start gap-3">
+      <div className="flex flex-1 flex-col gap-3 p-5">
+        <div className="flex items-start gap-3.5">
           <DateBlock date={event.starts_at} timeZone={event.timezone ?? undefined} />
           <div className="min-w-0 flex-1">
-            <h3 className="line-clamp-2 text-md font-semibold leading-snug tracking-[-0.015em] text-ink">
+            <h3 className="line-clamp-2 font-flourish text-xl leading-tight text-ink">
               {event.title}
             </h3>
-            <p className="mt-1 truncate text-xs text-ink-3">
+            <p className="mt-1.5 truncate text-sm text-ink-3">
               {formatEventStamp(event.starts_at, event.timezone ?? undefined)}
             </p>
           </div>
         </div>
 
-        <div className="mt-auto flex items-end justify-between gap-3 border-t border-hairline-soft pt-3">
-          <span className="flex min-w-0 items-center gap-1.5 text-xs text-ink-3">
+        <div className="mt-auto flex items-end justify-between gap-3 pt-1">
+          <span className="flex min-w-0 items-center gap-1.5 text-sm text-ink-3">
             {event.is_online ? (
-              <Video className="size-3.5 shrink-0" />
+              <Video className="size-4 shrink-0" />
             ) : (
-              <MapPin className="size-3.5 shrink-0" />
+              <MapPin className="size-4 shrink-0" />
             )}
             <span className="truncate">{placeLabel(event)}</span>
           </span>
-          <span className="shrink-0 text-sm font-semibold tabular text-ink">
+          <span className="shrink-0 text-base font-semibold tabular text-ink">
             {priceRange(event.min_price_cents, event.max_price_cents, event.currency)}
           </span>
         </div>
@@ -98,17 +98,17 @@ export function EventRow({
     <Link
       href={`/events/${event.slug}`}
       className={cn(
-        "group flex items-center gap-4 rounded-xl border border-hairline bg-card p-3 transition-colors hover:bg-sunken",
+        "group flex items-center gap-4 rounded-xl p-2.5 transition-colors hover:bg-sunken",
         className,
       )}
     >
-      <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-sunken">
+      <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-sunken">
         {event.cover_image_url && (
           <Image
             src={event.cover_image_url}
             alt=""
             fill
-            sizes="64px"
+            sizes="56px"
             className="object-cover"
           />
         )}
@@ -118,7 +118,7 @@ export function EventRow({
         <p className="text-xs font-medium text-ink-3">
           {formatEventStamp(event.starts_at, event.timezone ?? undefined)}
         </p>
-        <h3 className="mt-0.5 truncate text-base font-semibold text-ink">{event.title}</h3>
+        <h3 className="mt-0.5 truncate font-flourish text-lg text-ink">{event.title}</h3>
         <p className="mt-0.5 truncate text-xs text-ink-3">{placeLabel(event)}</p>
       </div>
 
@@ -133,9 +133,9 @@ export function EventRow({
 
 export function EventCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-xl border border-hairline bg-card">
-      <div className="aspect-[16/10] animate-pulse bg-sunken" />
-      <div className="space-y-3 p-4">
+    <div className="overflow-hidden rounded-2xl bg-card shadow-e1">
+      <div className="aspect-[4/3] animate-pulse bg-sunken" />
+      <div className="space-y-3 p-5">
         <div className="flex gap-3">
           <div className="size-12 shrink-0 animate-pulse rounded-lg bg-sunken" />
           <div className="flex-1 space-y-2">
