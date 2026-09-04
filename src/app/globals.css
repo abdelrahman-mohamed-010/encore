@@ -349,16 +349,103 @@
   .pop-item:hover:not([data-disabled]) { background-color: var(--color-btn); }
   .pop-item[data-disabled] { opacity: 0.45; cursor: not-allowed; }
 
+  /* A destructive row tints its own hover, so the colour is a property of the
+     action rather than something each call site remembers to add. */
+  .pop-item-danger { color: var(--color-critical); }
+  .pop-item-danger svg { color: var(--color-critical); }
+  .pop-item-danger[data-highlighted],
+  .pop-item-danger:hover:not([data-disabled]) { background-color: var(--color-critical-bg); }
+
+  /* A two-line row: the item grows to fit rather than clipping the sub-label. */
+  .pop-item-sub { height: auto; padding-block: 0.375rem; }
+  .pop-item-sub .sub {
+    display: block;
+    margin-top: -1px;
+    font-size: var(--text-xs);
+    font-weight: 400;
+    color: var(--color-ink-2);
+  }
+
   .shimmer {
     background: linear-gradient(90deg, var(--color-sunken) 25%, var(--color-sunken-2) 50%, var(--color-sunken) 75%);
     background-size: 400% 100%;
     animation: shimmer 1.4s ease infinite;
+  }
+
+  /* The toast slab. Sonner renders the structure; this owns the surface. */
+  .tz-toast {
+    position: relative;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    width: 22.5rem;
+    max-width: 100%;
+    overflow: hidden;
+    padding: 0.8125rem 0.875rem;
+    border-radius: var(--radius-lg);
+    background-color: var(--color-solid);
+    color: var(--color-on-solid);
+    box-shadow: var(--shadow-e3);
+    font-family: var(--font-sans);
+  }
+  /* Sonner's default dismiss is 4s, and nothing in the app overrides it, so
+     the bar and the timer stay in step. */
+  .tz-toast::after {
+    content: "";
+    position: absolute;
+    left: 0.75rem;
+    right: 0.75rem;
+    bottom: 0;
+    height: 2px;
+    border-radius: 2px;
+    background-color: color-mix(in srgb, var(--color-on-solid) 35%, transparent);
+    transform-origin: left;
+    animation: toast-timer 4s linear forwards;
+  }
+  /* A toast that waits on the user must not show a countdown it will not honour. */
+  .tz-toast:has([data-button])::after,
+  .tz-toast[data-type="loading"]::after { display: none; }
+
+  .tz-toast-action {
+    margin-left: auto;
+    white-space: nowrap;
+    border-radius: var(--radius-xs);
+    padding: 0.125rem 0.375rem;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    opacity: 0.9;
+    transition: background-color 0.1s linear;
+  }
+  .tz-toast-action:hover {
+    background-color: color-mix(in srgb, var(--color-on-solid) 12%, transparent);
+  }
+
+  /* Scattered confetti for the closing panel: two offset dot grids, masked
+     down to a few soft blobs so it never reads as a uniform screen. */
+  .dot-field {
+    background-image:
+      radial-gradient(circle, rgb(229 56 107 / 0.30) 1.6px, transparent 2.2px),
+      radial-gradient(circle, rgb(243 133 58 / 0.28) 1.6px, transparent 2.2px);
+    background-size: 20px 20px, 28px 28px;
+    background-position: 0 0, 10px 10px;
+    /* Circles, not ellipses: a percentage radius on a box this wide would
+       stretch each blob into a band and the clusters would merge back into
+       the rectangle they are meant to break up. */
+    mask-image:
+      radial-gradient(circle 120px at 14% 62%, #000 30%, transparent 100%),
+      radial-gradient(circle 108px at 31% 26%, #000 30%, transparent 100%),
+      radial-gradient(circle 92px at 61% 20%, #000 30%, transparent 100%),
+      radial-gradient(circle 132px at 86% 48%, #000 30%, transparent 100%),
+      radial-gradient(circle 96px at 72% 82%, #000 30%, transparent 100%),
+      radial-gradient(circle 88px at 24% 90%, #000 30%, transparent 100%);
+    mask-repeat: no-repeat;
   }
 }
 
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+@keyframes toast-timer { from { transform: scaleX(1); } to { transform: scaleX(0); } }
 @keyframes pop-in  { from { opacity: 0; transform: scale(0.98) translateY(-4px); } }
 @keyframes pop-out { to { opacity: 0; transform: scale(0.98); } }
 

@@ -6,7 +6,6 @@ import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { SearchField } from "./search-field";
 import { PrimaryNav } from "./primary-nav";
-import { NavClock } from "./nav-clock";
 import { UserMenu } from "./user-menu";
 import { MobileNav } from "./mobile-nav";
 
@@ -35,8 +34,6 @@ export async function SiteHeader() {
             <Suspense fallback={<div className="hidden h-9 w-56 rounded-md bg-sunken xl:block" />}>
               <SearchField className="hidden w-56 xl:block" size="sm" placeholder="Search events" />
             </Suspense>
-
-            <NavClock className="hidden 2xl:inline" />
 
             {profile ? (
               <>

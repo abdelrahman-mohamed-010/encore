@@ -61,7 +61,13 @@ export default async function OrganizerPage({ params }: { params: Promise<{ slug
       </div>
 
       <div className="container-page">
-        <div className="-mt-10 flex flex-wrap items-end gap-4 md:-mt-12">
+        {/*
+          `relative` is load-bearing: the banner's <Image fill> is absolutely
+          positioned, and a positioned element paints above a static one no
+          matter the DOM order. Without a positioned context here the avatar
+          that overlaps the banner is painted underneath it.
+        */}
+        <div className="relative -mt-10 flex flex-wrap items-end gap-4 md:-mt-12">
           <Avatar
             src={organizer.logo_url}
             name={organizer.name}

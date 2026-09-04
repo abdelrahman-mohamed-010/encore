@@ -5,7 +5,7 @@ export default function OrganizerLoading() {
     <>
       <Shimmer className="h-40 rounded-none md:h-56" />
       <div className="container-page">
-        <div className="-mt-10 flex items-end gap-4 md:-mt-12">
+        <div className="relative -mt-10 flex items-end gap-4 md:-mt-12">
           <Shimmer className="size-20 rounded-full border-4 border-paper md:size-24" />
           <Shimmer className="mb-2 h-8 w-56" />
         </div>

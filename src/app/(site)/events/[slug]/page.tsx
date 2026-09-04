@@ -3,14 +3,14 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import {
-  CalendarDays, Clock, Globe, MapPin, ShieldCheck, Tag, Ticket, Users, Video,
+  Clock, MapPin, ShieldCheck, Tag, Ticket, Users, Video,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/misc";
 import { Card, Divider } from "@/components/ui/surface";
-import { FieldRow } from "@/components/ui/field-row";
+import { FieldRow, InfoRow } from "@/components/ui/field-row";
 import { TicketPicker } from "@/components/events/ticket-picker";
 import { SeatMap } from "@/components/events/seat-map";
 import { FavoriteButton } from "@/components/events/favorite-button";
@@ -207,39 +207,49 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             <p className="mt-4 text-lg leading-relaxed text-ink-2">{event.subtitle}</p>
           )}
 
-          <Card className="mt-7 overflow-hidden">
-            <FieldRow
-              icon={CalendarDays}
-              label={formatDate(event.starts_at, "full", tz)}
-              value={`${formatTime(event.starts_at, tz)} – ${formatTime(event.ends_at, tz)}`}
+          <div className="mt-8 space-y-6">
+            <InfoRow
+              date={event.starts_at}
+              timeZone={tz}
+              main={formatDate(event.starts_at, "full", tz)}
+              sub={`${formatTime(event.starts_at, tz)} – ${formatTime(event.ends_at, tz)}${
+                tz ? ` · ${tz.replace("_", " ")}` : ""
+              }`}
             />
             {event.doors_open_at && (
-              <FieldRow
+              <InfoRow
                 icon={Clock}
-                label="Doors open"
-                value={formatTime(event.doors_open_at, tz)}
+                main="Doors open"
+                sub={formatTime(event.doors_open_at, tz)}
               />
             )}
-            <FieldRow
+            <InfoRow
               icon={event.is_online ? Video : MapPin}
-              label={event.is_online ? "Online event" : event.venue?.name ?? "Venue to be announced"}
-              value={
+              main={
+                event.is_online ? (
+                  "Online event"
+                ) : event.venue ? (
+                  <Link href={`/venues/${event.venue.slug}`} className="hover:underline">
+                    {event.venue.name}
+                  </Link>
+                ) : (
+                  "Venue to be announced"
+                )
+              }
+              sub={
                 event.is_online
                   ? "A joining link is sent with your ticket"
                   : [event.venue?.city, event.venue?.country].filter(Boolean).join(", ") || undefined
               }
             />
-            {tz && (
-              <FieldRow icon={Globe} label="Timezone" value={tz.replace("_", " ")} />
-            )}
             {(attendeeCount ?? 0) > 0 && (
-              <FieldRow
+              <InfoRow
                 icon={Users}
-                label="Going"
-                value={pluralize(attendeeCount ?? 0, "person", "people")}
+                main="Going"
+                sub={pluralize(attendeeCount ?? 0, "person", "people")}
               />
             )}
-          </Card>
+          </div>
 
           {/* ---- Tickets ---------------------------------------------------- */}
           <section className="mt-10 scroll-mt-20" id="tickets">
