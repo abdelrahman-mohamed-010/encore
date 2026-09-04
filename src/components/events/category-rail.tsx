@@ -56,13 +56,13 @@ function CategoryChip({
     <Link
       href={href}
       className={cn(
-        "inline-flex shrink-0 items-center gap-2 rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors",
+        "inline-flex h-(--size-btn) shrink-0 items-center gap-2 rounded-full px-4 text-base font-medium transition-colors",
         active
-          ? "border-transparent bg-solid text-on-solid"
-          : "border-hairline bg-card text-ink-2 hover:bg-sunken hover:text-ink",
+          ? "bg-solid text-on-solid"
+          : "bg-btn text-ink-2 hover:bg-btn-h hover:text-ink",
       )}
     >
-      <Icon className="size-3.5" />
+      <Icon className="size-4" />
       {label}
     </Link>
   );

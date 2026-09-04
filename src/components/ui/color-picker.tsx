@@ -56,12 +56,12 @@ export function ColorPicker({
           aria-describedby={describedBy}
           aria-label={`Colour: ${value}`}
           className={cn(
-            "flex h-(--size-field) items-center gap-2 rounded-xl border border-hairline bg-card px-2.5",
-            "transition-[border-color,box-shadow] duration-150 hover:border-n-300 dark:hover:border-n-700",
-            "focus-visible:border-brand-500 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20",
-            "data-[state=open]:border-brand-500 data-[state=open]:ring-[3px] data-[state=open]:ring-brand-500/20",
-            "data-invalid:border-critical data-invalid:ring-critical/20",
-            "disabled:cursor-not-allowed disabled:bg-sunken disabled:opacity-60",
+            "flex h-(--size-field) items-center gap-2.5 rounded-md bg-sunken px-3",
+            "transition-[background-color,box-shadow] duration-150 hover:bg-sunken-2",
+            "focus-visible:bg-card focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--color-focus)]",
+            "data-[state=open]:bg-card data-[state=open]:shadow-[0_0_0_2px_var(--color-focus)]",
+            "data-invalid:shadow-[0_0_0_2px_var(--color-critical)]",
+            "disabled:cursor-not-allowed disabled:opacity-55",
             className,
           )}
         >
@@ -92,7 +92,7 @@ export function ColorPicker({
                 }}
                 className={cn(
                   "grid size-8 place-items-center rounded-lg ring-1 ring-inset ring-black/10 transition-transform",
-                  "hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2",
+                  "hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2",
                 )}
                 style={{ backgroundColor: swatch }}
               >

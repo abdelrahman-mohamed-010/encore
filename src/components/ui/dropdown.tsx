@@ -19,10 +19,7 @@ export function DropdownContent({
       <Primitive.Content
         align={align}
         sideOffset={sideOffset}
-        className={cn(
-          "animate-fade z-50 min-w-52 overflow-hidden rounded-xl border border-hairline bg-card p-1 shadow-e3",
-          className,
-        )}
+        className={cn("surface-pop motion-pop z-50 min-w-52 p-1.5", className)}
         {...props}
       />
     </Primitive.Portal>
@@ -36,9 +33,8 @@ export function DropdownItem({
   return (
     <Primitive.Item
       className={cn(
-        "flex cursor-pointer select-none items-center gap-2.5 rounded-lg px-2.5 py-2 text-sm text-ink-2 outline-none",
-        "transition-colors focus:bg-sunken focus:text-ink",
-        "data-[disabled]:pointer-events-none data-[disabled]:opacity-45",
+        "pop-item",
+        "data-[disabled]:pointer-events-none",
         "[&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-ink-3",
         className,
       )}

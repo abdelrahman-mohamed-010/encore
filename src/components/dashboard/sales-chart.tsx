@@ -27,7 +27,7 @@ function ChartTooltip({
 }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="rounded-lg border border-hairline bg-card px-3 py-2 shadow-e2">
+    <div className="rounded-lg bg-card shadow-e1 px-3 py-2 shadow-e2">
       <p className="text-2xs text-ink-3">
         {label ? new Intl.DateTimeFormat("en-US", { weekday: "short", day: "numeric", month: "short" }).format(new Date(label)) : ""}
       </p>

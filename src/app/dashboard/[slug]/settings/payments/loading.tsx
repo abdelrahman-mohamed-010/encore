@@ -4,7 +4,7 @@ export default function PaymentsLoading() {
   return (
     <div className="max-w-2xl space-y-6">
       <PageHeaderSkeleton withAction={false} />
-      <div className="overflow-hidden rounded-xl border border-hairline bg-card">
+      <div className="overflow-hidden rounded-xl bg-card shadow-e1">
         <div className="flex items-center justify-between border-b border-hairline-soft px-5 py-4">
           <Shimmer className="h-3.5 w-20" />
           <Shimmer className="h-6 w-24 rounded-lg" />

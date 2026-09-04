@@ -31,21 +31,21 @@ export function MobileNav({ action }: { action?: React.ReactNode }) {
 
       {open && (
         <div className="fixed inset-0 z-50 bg-paper md:hidden">
-          <div className="flex h-14 items-center justify-between border-b border-hairline px-5">
+          <div className="flex h-(--size-nav) items-center justify-between border-b border-hairline px-5">
             <Logo />
             <Button variant="ghost" size="icon-sm" aria-label="Close menu" onClick={() => setOpen(false)}>
               <X />
             </Button>
           </div>
-          <nav className="flex flex-col p-2">
+          <nav className="flex flex-col p-3">
             {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-3 rounded-lg px-3 py-3 text-md font-medium text-ink transition-colors hover:bg-sunken"
+                className="flex items-center gap-3.5 rounded-lg px-3 py-3.5 text-lg font-medium text-ink transition-colors hover:bg-sunken"
               >
-                {link.icon && <link.icon className="size-[18px] text-ink-3" />}
+                {link.icon && <link.icon className="size-5 text-ink-3" />}
                 {link.label}
               </Link>
             ))}

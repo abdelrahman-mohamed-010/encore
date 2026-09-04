@@ -112,7 +112,7 @@ export function EventFilters({
 
         <Button
           type="button"
-          variant={params.get("free") ? "solid" : "outline"}
+          variant={params.get("free") ? "solid" : "soft"}
           size="sm"
           onClick={() => setParam("free", params.get("free") ? "" : "1")}
         >
@@ -144,7 +144,7 @@ export function EventFilters({
               className="group"
               aria-label={`Remove filter ${chip.label}`}
             >
-              <Badge tone="neutral" size="md" className="gap-1.5 pr-1.5 transition-colors group-hover:bg-n-150 dark:group-hover:bg-n-800">
+              <Badge tone="neutral" size="md" className="gap-1.5 pr-1.5 transition-colors group-hover:bg-sunken-2">
                 {chip.label}
                 <X className="size-3 text-ink-3" />
               </Badge>

@@ -133,7 +133,7 @@ export function SeatMap({
     <div className="space-y-4">
       <Card className="overflow-hidden">
         <div className="border-b border-hairline-soft bg-sunken px-4 py-3">
-          <div className="mx-auto mb-1 h-1 w-2/3 rounded-full bg-n-300 dark:bg-n-700" />
+          <div className="mx-auto mb-1 h-1 w-2/3 rounded-full bg-line-2" />
           <p className="text-center text-2xs font-semibold uppercase tracking-[0.14em] text-ink-3">
             Stage
           </p>
@@ -189,7 +189,7 @@ export function SeatMap({
                                 isSelected
                                   ? "scale-110 border-transparent bg-solid"
                                   : available
-                                    ? "border-hairline bg-card hover:border-accent-500 hover:bg-accent-100 dark:hover:bg-accent-950"
+                                    ? "border-hairline bg-card hover:bg-sunken-2"
                                     : "cursor-not-allowed border-transparent bg-n-200 dark:bg-n-800",
                               )}
                               style={
@@ -218,7 +218,7 @@ export function SeatMap({
         </div>
       </Card>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-hairline bg-card px-4 py-3.5">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl bg-card shadow-e1 px-4 py-3.5">
         <div className="min-w-0">
           <p className="text-xs text-ink-3">
             {selection.count > 0

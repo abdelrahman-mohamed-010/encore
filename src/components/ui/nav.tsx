@@ -133,8 +133,8 @@ export function Steps({
             <span
               className={cn(
                 "grid size-6 shrink-0 place-items-center rounded-full text-2xs font-semibold tnum",
-                state === "done" && "bg-brand-600 text-white",
-                state === "active" && "bg-brand-600 text-white ring-4 ring-brand-500/20",
+                state === "done" && "bg-solid text-on-solid",
+                state === "active" && "bg-solid text-on-solid ring-4 ring-solid/15",
                 state === "todo" && "bg-sunken text-ink-3",
               )}
               aria-hidden
@@ -154,7 +154,7 @@ export function Steps({
               <span
                 className={cn(
                   "hidden h-px flex-1 sm:block",
-                  index < current ? "bg-brand-500" : "bg-hairline",
+                  index < current ? "bg-solid" : "bg-hairline",
                 )}
                 aria-hidden
               />
@@ -163,19 +163,5 @@ export function Steps({
         );
       })}
     </ol>
-  );
-}
-
-export function Kbd({ children, className }: { children: React.ReactNode; className?: string }) {
-  return (
-    <kbd
-      className={cn(
-        "inline-flex h-5 min-w-5 items-center justify-center rounded-md border border-hairline",
-        "bg-sunken px-1.5 font-mono text-2xs font-medium text-ink-2",
-        className,
-      )}
-    >
-      {children}
-    </kbd>
   );
 }

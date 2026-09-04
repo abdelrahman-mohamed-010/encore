@@ -23,7 +23,7 @@ export function DialogContent({
       <DialogPrimitive.Content
         className={cn(
           "animate-rise fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2",
-          "max-h-[calc(100dvh-3rem)] overflow-y-auto rounded-2xl border border-hairline bg-card shadow-e3",
+          "max-h-[calc(100dvh-3rem)] overflow-y-auto rounded-xl bg-card shadow-pop",
           "focus:outline-none",
           sizes[size],
           className,

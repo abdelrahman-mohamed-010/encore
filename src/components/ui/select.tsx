@@ -20,9 +20,9 @@ export const SelectGroup = SelectPrimitive.Group;
 export const SelectValue = SelectPrimitive.Value;
 
 const TRIGGER_SIZES = {
-  sm: "h-(--size-field-sm) rounded-lg px-2.5 text-sm",
-  md: "h-(--size-field) rounded-xl px-3 text-base",
-  lg: "h-(--size-field-lg) rounded-xl px-3.5 text-md",
+  sm: "h-(--size-field-sm) rounded-lg px-3 text-base",
+  md: "h-(--size-field) rounded-md px-3.5 text-md",
+  lg: "h-(--size-field-lg) rounded-lg px-4 text-lg",
 } as const;
 
 export const SelectTrigger = React.forwardRef<
@@ -34,14 +34,13 @@ export const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "group flex w-full items-center justify-between gap-2 border border-hairline bg-card text-ink",
-      "transition-[border-color,box-shadow] duration-150",
-      "hover:border-n-300 dark:hover:border-n-700",
-      "focus:outline-none focus-visible:border-brand-500 focus-visible:ring-[3px] focus-visible:ring-brand-500/20",
-      "data-[state=open]:border-brand-500 data-[state=open]:ring-[3px] data-[state=open]:ring-brand-500/20",
-      "data-[placeholder]:text-ink-3",
-      "disabled:cursor-not-allowed disabled:bg-sunken disabled:opacity-60",
-      "aria-[invalid=true]:border-critical aria-[invalid=true]:ring-critical/20",
+      "group flex w-full items-center justify-between gap-2.5 bg-sunken font-medium text-ink",
+      "transition-[background-color,box-shadow] duration-150 hover:bg-sunken-2",
+      "focus:outline-none focus-visible:bg-card focus-visible:shadow-[0_0_0_2px_var(--color-focus)]",
+      "data-[state=open]:bg-card data-[state=open]:shadow-[0_0_0_2px_var(--color-focus)]",
+      "data-[placeholder]:font-normal data-[placeholder]:text-ink-3",
+      "disabled:cursor-not-allowed disabled:opacity-55",
+      "aria-[invalid=true]:bg-card aria-[invalid=true]:shadow-[0_0_0_2px_var(--color-critical)]",
       TRIGGER_SIZES[size],
       className,
     )}
@@ -50,7 +49,7 @@ export const SelectTrigger = React.forwardRef<
     <span className="min-w-0 flex-1 truncate text-left">{children}</span>
     <SelectPrimitive.Icon asChild>
       <ChevronDown
-        className="size-4 shrink-0 text-ink-3 transition-transform duration-200 group-data-[state=open]:rotate-180"
+        className="size-[18px] shrink-0 text-ink-2 transition-transform duration-150 group-data-[state=open]:rotate-180"
         aria-hidden
       />
     </SelectPrimitive.Icon>
@@ -101,7 +100,7 @@ export const SelectItem = React.forwardRef<
   <SelectPrimitive.Item ref={ref} className={cn("pop-item pr-2", className)} {...props}>
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
     {hint && <span className="ml-auto shrink-0 text-xs tnum text-ink-3">{hint}</span>}
-    <SelectPrimitive.ItemIndicator className={cn("shrink-0 text-brand-600", !hint && "ml-auto")}>
+    <SelectPrimitive.ItemIndicator className={cn("shrink-0 text-ink", !hint && "ml-auto")}>
       <Check className="size-4" aria-hidden />
     </SelectPrimitive.ItemIndicator>
   </SelectPrimitive.Item>

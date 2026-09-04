@@ -1,56 +1,65 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+/* The reference kit keys dark mode off an attribute on <html>, and so do we:
+   an attribute is easier to read in devtools than a class among many. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ===========================================================================
-   Tazkarti design system
+   Tazkarti design system — "Convene"
    ---------------------------------------------------------------------------
    Three layers, in order. Never reach past a layer:
 
-     1. RAMPS      raw colour scales. Never used directly in a component.
-     2. SEMANTIC   what a colour MEANS here (paper, ink, brand, danger). This is
-                   the only layer components are allowed to name.
-     3. COMPONENT  a handful of control-specific tokens (field height, ring).
+     1. RAMPS      raw scales. Never named by a component.
+     2. SEMANTIC   what a colour MEANS here (paper, card, ink, field, line).
+                   This is the only layer components may name.
+     3. COMPONENT  a few control-specific tokens (field height, nav height).
 
-   Dark mode re-points layer 2 only, so every component inherits it for free.
+   Dark mode re-points layer 2 only, so every component follows for free.
+
+   The visual language: soft neutral paper, white cards lifted by a hairline
+   shadow rather than a border, FILLED form fields that only show a ring on
+   focus, near-black solid buttons, and one pink→orange gradient reserved for
+   the brand mark and a single primary action.
    =========================================================================== */
 @theme {
   /* == 1. RAMPS ============================================================ */
 
-  /* Neutral — very slightly cool, so brand violet sits on it without clashing */
-  --color-n-0:   oklch(1 0 0);
-  --color-n-25:  oklch(0.992 0.002 286);
-  --color-n-50:  oklch(0.980 0.003 286);
-  --color-n-100: oklch(0.962 0.004 286);
-  --color-n-150: oklch(0.942 0.005 286);
-  --color-n-200: oklch(0.920 0.006 286);
-  --color-n-300: oklch(0.862 0.008 286);
-  --color-n-400: oklch(0.718 0.012 286);
-  --color-n-500: oklch(0.606 0.015 286);
-  --color-n-600: oklch(0.506 0.016 286);
-  --color-n-700: oklch(0.398 0.016 286);
-  --color-n-800: oklch(0.290 0.015 286);
-  --color-n-850: oklch(0.240 0.014 286);
-  --color-n-900: oklch(0.195 0.012 286);
-  --color-n-950: oklch(0.154 0.010 286);
-  --color-n-1000:oklch(0.120 0.008 286);
+  /* Neutral — very slightly cool, matching the reference's paper. */
+  --color-n-0:   #ffffff;
+  --color-n-25:  #fcfcfd;
+  --color-n-50:  #f9f9fa;
+  --color-n-100: #f2f2f4;
+  --color-n-150: #efeff1;
+  --color-n-200: #e5e6ea;
+  --color-n-300: #d9dbe0;
+  --color-n-400: #a3a5aa;
+  --color-n-500: #7d7f85;
+  --color-n-600: #5f6167;
+  --color-n-700: #48494f;
+  --color-n-800: #3c3c40;
+  --color-n-850: #2f2f33;
+  --color-n-900: #26262b;
+  --color-n-950: #1c1c20;
+  --color-n-1000:#131316;
 
-  /* Brand — violet. Carries primary actions, links, focus and selection.
-     500 is the UI anchor; 600 is the resting fill (4.6:1 on white). */
-  --color-brand-50:  oklch(0.976 0.014 296);
-  --color-brand-100: oklch(0.946 0.033 296);
-  --color-brand-200: oklch(0.898 0.066 296);
-  --color-brand-300: oklch(0.822 0.118 295);
-  --color-brand-400: oklch(0.728 0.176 294);
-  --color-brand-500: oklch(0.646 0.216 293);
-  --color-brand-600: oklch(0.572 0.232 292);
-  --color-brand-700: oklch(0.498 0.212 292);
-  --color-brand-800: oklch(0.424 0.174 292);
-  --color-brand-900: oklch(0.360 0.136 293);
-  --color-brand-950: oklch(0.248 0.096 294);
+  /* Brand ramp — the violet the reference uses for its accent surfaces.
+     Note it is NOT the primary-action colour: in this system the emphatic
+     button is near-black, and violet appears only on accents, selection and
+     the occasional tinted surface. */
+  --color-brand-50:  #f5f1fe;
+  --color-brand-100: #eee7fb;
+  --color-brand-200: #ddcefa;
+  --color-brand-300: #c4aaf5;
+  --color-brand-400: #a680ee;
+  --color-brand-500: #8b5fe6;
+  --color-brand-600: #7b4fe0;
+  --color-brand-700: #6a3ecb;
+  --color-brand-800: #5733a6;
+  --color-brand-900: #472c85;
+  --color-brand-950: #281e43;
 
-  /* `accent-*` is a permanent alias of the brand ramp. Older components name
-     it; both spellings resolve to the same colour, so neither can drift. */
+  /* `accent-*` is a permanent alias of the brand ramp; older components name
+     it and both spellings must resolve to the same colour. */
   --color-accent-50:  var(--color-brand-50);
   --color-accent-100: var(--color-brand-100);
   --color-accent-200: var(--color-brand-200);
@@ -63,185 +72,173 @@
   --color-accent-900: var(--color-brand-900);
   --color-accent-950: var(--color-brand-950);
 
+  /* Accents. Flat, confident hues — no gradients except the brand mark. */
+  --color-green:  #1b9a4f;
+  --color-amber:  #d38a2e;
+  --color-red:    #d9403f;
+  --color-blue:   #2f6fed;
+  --color-purple: #7b4fe0;
+  --color-pink:   #e5386b;
+  --color-orange: #f3853a;
+  --color-violet: #6d5df6;
+
   /* == 2. SEMANTIC ========================================================= */
 
-  /* Status. Held to one lightness band so badges never jitter in a row. */
-  --color-positive:   oklch(0.582 0.146 152);
-  --color-positive-bg:oklch(0.950 0.038 152);
-  --color-caution:    oklch(0.626 0.142 70);
-  --color-caution-bg: oklch(0.956 0.050 82);
-  --color-critical:   oklch(0.578 0.203 25);
-  --color-critical-bg:oklch(0.950 0.032 25);
-  --color-info:       oklch(0.574 0.140 245);
-  --color-info-bg:    oklch(0.950 0.034 245);
+  --color-paper:    #f9f9fa;   /* page background                       */
+  --color-card:     #ffffff;   /* raised surface                        */
+  --color-sunken:   #efeff1;   /* filled fields, inset rows             */
+  --color-sunken-2: #e3e3e6;   /* the same, one step deeper (hover)     */
+  --color-btn:      #eceef0;   /* default button face                   */
+  --color-btn-h:    #e2e4e8;
+  --color-hairline: #e5e6ea;   /* 1px separators                        */
+  --color-hairline-soft: #eeeff2;
+  --color-line-2:   #d9dbe0;   /* stronger rule, checkbox outlines      */
+  --color-overlay:  rgb(20 20 26 / 0.45);
 
-  /* Tints — the six families behind icon tiles, category chips and empty
-     states. Each is one fill + one foreground that clears 4.5:1 on it. */
-  --color-tint-violet:    oklch(0.948 0.038 295);
-  --color-tint-violet-fg: oklch(0.520 0.216 293);
-  --color-tint-blue:      oklch(0.946 0.038 250);
-  --color-tint-blue-fg:   oklch(0.522 0.176 252);
-  --color-tint-cyan:      oklch(0.948 0.042 210);
-  --color-tint-cyan-fg:   oklch(0.508 0.108 220);
-  --color-tint-emerald:   oklch(0.950 0.042 160);
-  --color-tint-emerald-fg:oklch(0.505 0.122 158);
-  --color-tint-amber:     oklch(0.958 0.050 84);
-  --color-tint-amber-fg:  oklch(0.530 0.132 62);
-  --color-tint-pink:      oklch(0.948 0.038 350);
-  --color-tint-pink-fg:   oklch(0.542 0.204 358);
+  --color-ink:   #1a1a1c;      /* primary text                          */
+  --color-ink-2: #7d7f85;      /* secondary text                        */
+  --color-ink-3: #a3a5aa;      /* tertiary / placeholder                */
 
-  /* Surfaces (light). Dark mode re-points these in @layer base. */
-  --color-paper:    oklch(0.983 0.003 286);  /* page background            */
-  --color-card:     oklch(1 0 0);            /* raised surface             */
-  --color-sunken:   oklch(0.962 0.004 286);  /* inset rows, grouped panels */
-  --color-hairline: oklch(0.908 0.006 286);  /* 1px separators             */
-  --color-hairline-soft: oklch(0.945 0.005 286);
-  --color-overlay:  oklch(0.195 0.012 286 / 0.45);  /* modal scrim         */
+  /* The high-emphasis action is near-black, not brand-coloured. Colour is
+     reserved for meaning; weight carries hierarchy. */
+  --color-solid:       #3c3c40;
+  --color-solid-hover: #2f2f33;
+  --color-on-solid:    #ffffff;
 
-  --color-ink:      oklch(0.198 0.012 286);  /* primary text               */
-  --color-ink-2:    oklch(0.452 0.014 286);  /* secondary text             */
-  --color-ink-3:    oklch(0.606 0.015 286);  /* tertiary / placeholder     */
+  /* Focus is the one indigo in the system, so a focus ring is never mistaken
+     for a status or a brand element. */
+  --color-focus: #6d5df6;
 
-  /* Primary action: brand-filled. */
-  --color-primary:       var(--color-brand-600);
-  --color-primary-hover: var(--color-brand-700);
-  --color-on-primary:    oklch(1 0 0);
-  --color-primary-soft:  oklch(0.948 0.038 295);  /* tinted/ghost primary  */
+  /* The primary action IS the neutral solid — colour is reserved for meaning,
+     and weight carries hierarchy. These aliases exist so a component can say
+     "primary" where it means the page's main action. */
+  --color-primary:       var(--color-solid);
+  --color-primary-hover: var(--color-solid-hover);
+  --color-on-primary:    var(--color-on-solid);
+  --color-primary-soft:  var(--color-brand-100);
 
-  /* Neutral action: near-black in light, near-white in dark. */
-  --color-solid:    oklch(0.198 0.012 286);
-  --color-solid-hover: oklch(0.290 0.015 286);
-  --color-on-solid: oklch(1 0 0);
+  /* Status: a saturated foreground on a pale wash of the same hue. */
+  --color-positive:    #1b9a4f;
+  --color-positive-bg: #e4f5ea;
+  --color-caution:     #d38a2e;
+  --color-caution-bg:  #fbeedb;
+  --color-critical:    #d9403f;
+  --color-critical-bg: #fbe5e5;
+  --color-info:        #2f6fed;
+  --color-info-bg:     #e4ecfd;
+  --color-brandish:    #7b4fe0;
+  --color-brandish-bg: #eee7fb;
+
+  /* Decorative tints for shortcut tiles and category chips — never meaning.
+     The reference leans on exactly these five for its quick-action row. */
+  --color-tint-blue:      #e2eafd;  --color-tint-blue-fg:    #3b82f6;
+  --color-tint-purple:    #eee4fc;  --color-tint-purple-fg:  #a855f7;
+  --color-tint-pink:      #fce4ef;  --color-tint-pink-fg:    #ec4899;
+  --color-tint-green:     #dcf5e5;  --color-tint-green-fg:   #22c55e;
+  --color-tint-orange:    #fde9d8;  --color-tint-orange-fg:  #f97316;
+  /* Aliases so components written against the previous naming keep working. */
+  --color-tint-violet:    var(--color-tint-purple);
+  --color-tint-violet-fg: var(--color-tint-purple-fg);
+  --color-tint-emerald:   var(--color-tint-green);
+  --color-tint-emerald-fg:var(--color-tint-green-fg);
+  --color-tint-amber:     #fbeedb;  --color-tint-amber-fg:   #d38a2e;
+  --color-tint-cyan:      #dcf1fb;  --color-tint-cyan-fg:    #0e93c4;
 
   /* == 3. COMPONENT ======================================================== */
-  --size-field:    2.5rem;   /* 40px — the one control height   */
-  --size-field-lg: 2.875rem; /* 46px — hero/auth forms          */
-  --size-field-sm: 2rem;     /* 32px — toolbars, table filters  */
+  --size-field:    2.75rem;  /* 44px — the one control height  */
+  --size-field-sm: 2.25rem;  /* 36px                           */
+  --size-field-lg: 3.25rem;  /* 52px                           */
+  --size-btn:      2.5rem;   /* 40px — buttons sit below fields */
+  --size-nav:      4.25rem;  /* 68px                           */
 
-  /* ---- Radii ------------------------------------------------------------
-     Deliberately tight. Large radii read as soft and consumer; a small,
-     consistent corner reads as precise, and lets edges line up across a
-     dense screen instead of each control bulging on its own. Anything that
-     must read as a token — badge pill, avatar, switch — stays fully round. */
-  --radius-xs: 3px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 7px;
-  --radius-xl: 9px;
-  --radius-2xl: 12px;
-  --radius-3xl: 16px;
+  /* ---- Radii: softer than a dashboard, tighter than a toy --------------- */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 9px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 22px;
+  --radius-3xl: 28px;
 
-  /* ---- Elevation: barely there, then decisive for popovers -------------- */
-  --shadow-e1: 0 1px 2px oklch(0.15 0.010 286 / 0.05);
-  --shadow-e2: 0 1px 2px oklch(0.15 0.010 286 / 0.05), 0 4px 12px oklch(0.15 0.010 286 / 0.05);
-  --shadow-e3: 0 2px 6px oklch(0.15 0.010 286 / 0.07), 0 16px 40px oklch(0.15 0.010 286 / 0.10);
-  --shadow-pop: 0 0 0 1px oklch(0.15 0.010 286 / 0.06), 0 8px 24px oklch(0.15 0.010 286 / 0.10),
-                0 2px 6px oklch(0.15 0.010 286 / 0.06);
+  /* ---- Elevation --------------------------------------------------------
+     Every shadow carries its own hairline ring, which is why cards in this
+     system need no border: the ring IS the border, and it stays crisp on a
+     coloured background where a real border would band. */
+  --shadow-e1: 0 1px 2px rgb(20 20 30 / 0.04), 0 0 0 1px rgb(20 20 30 / 0.05);
+  --shadow-e2: 0 6px 18px rgb(20 20 30 / 0.08), 0 0 0 1px rgb(20 20 30 / 0.05);
+  --shadow-pop: 0 14px 40px rgb(20 20 30 / 0.16), 0 0 0 1px rgb(20 20 30 / 0.06);
+  --shadow-e3: 0 30px 80px rgb(20 20 30 / 0.28), 0 0 0 1px rgb(20 20 30 / 0.06);
 
   /* ---- Type -------------------------------------------------------------
-     Two families, three roles. `display` is for headlines only — using it for
-     UI text is what makes an interface look like a poster instead of a tool. */
-  --font-sans: var(--font-sans-family), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-display: var(--font-display-family), var(--font-sans-family), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-mono-family), ui-monospace, "SF Mono", Menlo, monospace;
+     Inter runs the interface. Averia Serif Libre is the brand's one
+     flourish — event titles and hero words only, never UI text. */
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-averia), Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 
-  /* A real scale, so no component reaches for an arbitrary `text-[13.5px]`.
-     Line-height loosens as size drops (small text needs air to stay readable)
-     and tracking tightens as size rises (large text looks loose untouched). */
-  --text-2xs: 0.6875rem;   /* 11 — eyebrows, table headers            */
-  --text-2xs--line-height: 1.36;
-  --text-2xs--letter-spacing: 0.055em;
+  /* The reference sets UI text a notch larger than a typical dashboard —
+     16px body, 14–15px controls — which is much of why it feels calm. */
+  --text-2xs: 0.6875rem;  --text-2xs--line-height: 1.4;  --text-2xs--letter-spacing: 0.04em;
+  --text-xs: 0.78125rem;  --text-xs--line-height: 1.45;
+  --text-sm: 0.875rem;    --text-sm--line-height: 1.45;
+  --text-base: 0.9375rem; --text-base--line-height: 1.5;
+  --text-md: 1rem;        --text-md--line-height: 1.5;
+  --text-lg: 1.0625rem;   --text-lg--line-height: 1.4;
+  --text-xl: 1.1875rem;   --text-xl--line-height: 1.35;  --text-xl--letter-spacing: -0.01em;
+  --text-2xl: 1.5rem;     --text-2xl--line-height: 1.2;  --text-2xl--letter-spacing: -0.015em;
+  --text-3xl: 2rem;       --text-3xl--line-height: 1.1;  --text-3xl--letter-spacing: -0.02em;
 
-  --text-xs: 0.75rem;      /* 12 — hints, meta, badges                */
-  --text-xs--line-height: 1.45;
-  --text-xs--letter-spacing: 0.004em;
-
-  --text-sm: 0.8125rem;    /* 13 — secondary UI, dense rows           */
-  --text-sm--line-height: 1.5;
-  --text-sm--letter-spacing: 0em;
-
-  --text-base: 0.875rem;   /* 14 — the default control and label size */
-  --text-base--line-height: 1.5;
-  --text-base--letter-spacing: -0.005em;
-
-  --text-md: 0.9375rem;    /* 15 — reading copy                       */
-  --text-md--line-height: 1.62;
-  --text-md--letter-spacing: -0.008em;
-
-  --text-lg: 1.0625rem;    /* 17 — card titles, sheet titles          */
-  --text-lg--line-height: 1.38;
-  --text-lg--letter-spacing: -0.017em;
-
-  --text-xl: 1.25rem;      /* 20 — section headings                   */
-  --text-xl--line-height: 1.28;
-  --text-xl--letter-spacing: -0.022em;
-
-  --text-2xl: 1.5rem;      /* 24 — page headings                      */
-  --text-2xl--line-height: 1.2;
-  --text-2xl--letter-spacing: -0.026em;
-
-  --text-3xl: 1.875rem;    /* 30                                      */
-  --text-3xl--line-height: 1.14;
-  --text-3xl--letter-spacing: -0.03em;
-
-  /* ---- Motion ----------------------------------------------------------- */
-  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-quint: cubic-bezier(0.2, 0.8, 0.2, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
 @layer base {
-  /* Dark mode re-points the SEMANTIC layer only. Ramps are absolute, so a
-     component that named `bg-card` or `text-ink` needs no dark: variant. */
-  .dark {
-    --color-paper:    oklch(0.148 0.010 286);
-    --color-card:     oklch(0.190 0.012 286);
-    --color-sunken:   oklch(0.228 0.013 286);
-    --color-hairline: oklch(0.284 0.014 286);
-    --color-hairline-soft: oklch(0.242 0.013 286);
-    --color-overlay:  oklch(0.100 0.008 286 / 0.66);
+  /* Dark mode re-points the SEMANTIC layer only. */
+  [data-theme="dark"] {
+    --color-paper:    #131316;
+    --color-card:     #1c1c20;
+    --color-sunken:   #26262b;
+    --color-sunken-2: #30303a;
+    --color-btn:      #2a2a30;
+    --color-btn-h:    #34343b;
+    --color-hairline: #2b2b31;
+    --color-hairline-soft: #242429;
+    --color-line-2:   #36363d;
+    --color-overlay:  rgb(10 10 14 / 0.6);
 
-    --color-ink:      oklch(0.970 0.004 286);
-    --color-ink-2:    oklch(0.742 0.012 286);
-    --color-ink-3:    oklch(0.586 0.014 286);
+    --color-ink:   #f2f2f4;
+    --color-ink-2: #9a9ca3;
+    --color-ink-3: #6d6f76;
 
-    /* Brand lifts on a dark surface: 600 is too dense to read at 14px. */
-    --color-primary:       var(--color-brand-500);
-    --color-primary-hover: var(--color-brand-400);
-    --color-on-primary:    oklch(0.152 0.010 286);
-    --color-primary-soft:  oklch(0.300 0.088 294);
+    /* Inverted: the emphatic button is near-white on a dark page. */
+    --color-solid:       #f2f2f4;
+    --color-solid-hover: #e2e2e6;
+    --color-on-solid:    #17171a;
 
-    --color-solid:    oklch(0.970 0.004 286);
-    --color-solid-hover: oklch(0.880 0.008 286);
-    --color-on-solid: oklch(0.166 0.010 286);
+    --color-positive-bg: #173424;
+    --color-caution-bg:  #3a2b13;
+    --color-critical-bg: #3c1d1d;
+    --color-info-bg:     #182642;
+    --color-brandish-bg: #281e43;
 
-    /* Status foregrounds lighten; their fills become low-chroma washes. */
-    --color-positive:    oklch(0.760 0.148 152);
-    --color-positive-bg: oklch(0.288 0.062 152);
-    --color-caution:     oklch(0.812 0.140 82);
-    --color-caution-bg:  oklch(0.306 0.062 78);
-    --color-critical:    oklch(0.740 0.166 25);
-    --color-critical-bg: oklch(0.302 0.080 25);
-    --color-info:        oklch(0.760 0.126 245);
-    --color-info-bg:     oklch(0.296 0.064 245);
+    --color-tint-blue:   #182642;  --color-tint-blue-fg:   #7aa6f8;
+    --color-tint-purple: #281e43;  --color-tint-purple-fg: #b98ef5;
+    --color-tint-pink:   #3a1e2a;  --color-tint-pink-fg:   #f07ab0;
+    --color-tint-green:  #173424;  --color-tint-green-fg:  #5fd08c;
+    --color-tint-orange: #3b2a1c;  --color-tint-orange-fg: #f6a463;
+    --color-tint-amber:  #3a2b13;  --color-tint-amber-fg:  #e0a94f;
+    --color-tint-cyan:   #10303c;  --color-tint-cyan-fg:   #56c2e6;
 
-    --color-tint-violet:    oklch(0.298 0.080 295);
-    --color-tint-violet-fg: oklch(0.816 0.126 295);
-    --color-tint-blue:      oklch(0.296 0.078 250);
-    --color-tint-blue-fg:   oklch(0.812 0.106 252);
-    --color-tint-cyan:      oklch(0.294 0.062 215);
-    --color-tint-cyan-fg:   oklch(0.818 0.088 215);
-    --color-tint-emerald:   oklch(0.292 0.066 158);
-    --color-tint-emerald-fg:oklch(0.816 0.104 158);
-    --color-tint-amber:     oklch(0.302 0.062 74);
-    --color-tint-amber-fg:  oklch(0.836 0.116 78);
-    --color-tint-pink:      oklch(0.300 0.080 352);
-    --color-tint-pink-fg:   oklch(0.818 0.112 352);
+    /* The brand ramp lifts on a dark surface; 600 is too dense to read. */
+    --color-brand-100: #281e43;
+    --color-brand-500: #a680ee;
+    --color-brand-600: #8b5fe6;
+    --color-primary-soft: #281e43;
 
-    --shadow-e1: 0 1px 2px oklch(0 0 0 / 0.35);
-    --shadow-e2: 0 1px 2px oklch(0 0 0 / 0.30), 0 4px 12px oklch(0 0 0 / 0.30);
-    --shadow-e3: 0 2px 6px oklch(0 0 0 / 0.40), 0 16px 40px oklch(0 0 0 / 0.45);
-    --shadow-pop: 0 0 0 1px oklch(1 0 0 / 0.07), 0 8px 24px oklch(0 0 0 / 0.50),
-                  0 2px 6px oklch(0 0 0 / 0.40);
+    --shadow-e1: 0 1px 2px rgb(0 0 0 / 0.4), 0 0 0 1px rgb(255 255 255 / 0.06);
+    --shadow-e2: 0 6px 18px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.06);
+    --shadow-pop: 0 14px 40px rgb(0 0 0 / 0.6), 0 0 0 1px rgb(255 255 255 / 0.08);
+    --shadow-e3: 0 30px 80px rgb(0 0 0 / 0.7), 0 0 0 1px rgb(255 255 255 / 0.08);
   }
 
   * { border-color: var(--color-hairline); }
@@ -256,62 +253,41 @@
     background-color: var(--color-paper);
     color: var(--color-ink);
     font-family: var(--font-sans);
-    font-size: var(--text-base);
-    /* cv05/cv11: single-storey l and straight-tailed a/g — Inter's own
-       "more geometric" alternates. ss03 tightens the ampersand. */
-    font-feature-settings: "cv05", "cv11", "ss03";
-    font-optical-sizing: auto;
+    font-size: var(--text-md);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-accent-500);
+    outline: 2px solid var(--color-focus);
     outline-offset: 2px;
-    border-radius: var(--radius-sm);
+    border-radius: var(--radius-xs);
   }
 
-  ::selection { background: var(--color-accent-200); color: var(--color-accent-950); }
-  .dark ::selection { background: var(--color-accent-800); color: var(--color-accent-50); }
+  ::selection { background: #fbd5e1; color: #1a1a1c; }
 
-  /* Headlines use the display family and are never left to wrap into a
-     one-word last line. Tracking tightens as size rises. */
-  h1, h2, h3, h4, h5 {
-    font-family: var(--font-display);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    text-wrap: balance;
-  }
-  h1 { letter-spacing: -0.032em; }
-  h2 { letter-spacing: -0.026em; }
-
+  h1, h2, h3, h4, h5 { letter-spacing: -0.02em; text-wrap: balance; font-weight: 600; }
+  h1 { letter-spacing: -0.028em; }
   p { text-wrap: pretty; }
-
-  /* Wide-tracked lowercase looks accidental; wide-tracked uppercase looks
-     intentional. Small caps labels get the space they need to read. */
-  small { font-size: var(--text-xs); }
-
-  /* Numerals line up in tables and money columns. */
-  .tabular, table { font-variant-numeric: tabular-nums; }
 
   input, textarea, select, button { font: inherit; }
 }
 
 @layer utilities {
-  /* One page gutter, used by every route so columns line up across the app. */
   .container-page {
     margin-inline: auto;
     width: 100%;
-    max-width: 76rem;
+    max-width: 74rem;
     padding-inline: 1.25rem;
   }
-  @media (min-width: 768px)  { .container-page { padding-inline: 2rem; } }
-  @media (min-width: 1280px) { .container-page { padding-inline: 2.5rem; } }
+  @media (min-width: 768px) { .container-page { padding-inline: 2rem; } }
 
+  /* The reference's own measure: a 984px column that keeps event pages
+     readable instead of stretching to the viewport. */
   .container-narrow {
     margin-inline: auto;
     width: 100%;
-    max-width: 56rem;
+    max-width: 61.5rem;
     padding-inline: 1.25rem;
   }
   @media (min-width: 768px) { .container-narrow { padding-inline: 2rem; } }
@@ -319,187 +295,118 @@
   .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
 
-  /* Hairline that survives fractional device pixels. */
-  .hairline-t { box-shadow: inset 0 1px 0 var(--color-hairline-soft); }
-  .hairline-b { box-shadow: inset 0 -1px 0 var(--color-hairline-soft); }
+  /* Display type. The serif variant is opt-in per element. */
+  .display-1 { font-size: clamp(2.5rem, 1.6rem + 3.6vw, 4rem); line-height: 1.02; letter-spacing: -0.03em; font-weight: 700; text-wrap: balance; }
+  .display-2 { font-size: clamp(2rem, 1.4rem + 2.2vw, 2.75rem); line-height: 1.08; letter-spacing: -0.025em; font-weight: 700; text-wrap: balance; }
+  .display-3 { font-size: clamp(1.5rem, 1.2rem + 1.1vw, 2rem); line-height: 1.15; letter-spacing: -0.02em; font-weight: 600; text-wrap: balance; }
 
-  /* Display sizes. Optical tracking: the bigger the type, the tighter it is
-     set, because letter-spacing that looks right at 15px looks slack at 60px. */
-  .display-1 {
-    font-family: var(--font-display);
-    font-size: clamp(2.75rem, 1.7rem + 4.2vw, 4.75rem);
-    line-height: 0.98;
-    letter-spacing: -0.042em;
-    font-weight: 600;
-    text-wrap: balance;
-  }
-  .display-2 {
-    font-family: var(--font-display);
-    font-size: clamp(2.125rem, 1.45rem + 2.7vw, 3.25rem);
-    line-height: 1.04;
-    letter-spacing: -0.036em;
-    font-weight: 600;
-    text-wrap: balance;
-  }
-  .display-3 {
-    font-family: var(--font-display);
-    font-size: clamp(1.5rem, 1.2rem + 1.3vw, 2.125rem);
-    line-height: 1.12;
-    letter-spacing: -0.028em;
-    font-weight: 600;
-    text-wrap: balance;
-  }
-
-  /* Opt a run of text into the display family without changing its size. */
-  .font-display { font-family: var(--font-display); }
+  /* The brand's flourish. Used on event titles and hero words only. */
+  .font-flourish { font-family: var(--font-serif); font-weight: 400; letter-spacing: 0; }
 
   .eyebrow {
     font-size: var(--text-2xs);
     font-weight: 600;
-    letter-spacing: 0.09em;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: var(--color-ink-3);
   }
 
-  /* Money and counts that need to feel weighed rather than typed. */
-  .numeral {
-    font-variant-numeric: tabular-nums;
-    letter-spacing: -0.02em;
-    font-feature-settings: "ss03";
+  .tnum, .tabular { font-variant-numeric: tabular-nums; }
+
+  /* The one gradient in the system. */
+  .bg-brand { background-image: linear-gradient(90deg, var(--color-pink), var(--color-orange)); }
+  .text-brand {
+    background-image: linear-gradient(90deg, var(--color-pink), var(--color-orange));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
   }
 
   .animate-rise { animation: rise 0.4s var(--ease-out-quint) both; }
   .animate-fade { animation: fade 0.25s var(--ease-out-quint) both; }
 
-  /* ---- Layered surfaces -------------------------------------------------
-     One class for every floating panel — select menu, combobox, calendar,
-     date picker, dropdown. Keeping it here (rather than repeated per
-     component) is what makes them all read as the same object. */
+  /* One class for every floating panel, so a menu, a calendar and a search
+     list read as the same physical object. */
   .surface-pop {
     background-color: var(--color-card);
-    border-radius: var(--radius-xl);
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow-pop);
     overflow: hidden;
   }
+  .motion-pop { transform-origin: var(--radix-popper-transform-origin, center); }
+  .motion-pop[data-state="open"]   { animation: pop-in 0.14s var(--ease-out-quint); }
+  .motion-pop[data-state="closed"] { animation: pop-out 0.1s ease-in forwards; }
 
-  /* Radix sets data-state / data-side on its content; drive motion off those
-     so a popover animates out of the edge it is anchored to. */
-  .motion-pop {
-    transform-origin: var(--radix-popover-content-transform-origin,
-                      var(--radix-select-content-transform-origin,
-                      var(--radix-dropdown-menu-content-transform-origin, center)));
-  }
-  .motion-pop[data-state="open"]   { animation: pop-in  0.16s var(--ease-out-quint); }
-  .motion-pop[data-state="closed"] { animation: pop-out 0.11s ease-in forwards; }
-
-  /* A row inside any floating panel: menu item, option, command result. */
+  /* A row inside any floating panel. */
   .pop-item {
-    display: flex;
-    align-items: center;
-    gap: 0.625rem;
-    width: 100%;
-    padding: 0.5rem 0.625rem;
-    border-radius: var(--radius-md);
-    font-size: 13.5px;
-    color: var(--color-ink);
-    cursor: pointer;
-    user-select: none;
-    outline: none;
+    display: flex; align-items: center; gap: 0.625rem;
+    width: 100%; height: 2.25rem; padding: 0 0.625rem;
+    border-radius: var(--radius-sm);
+    font-size: var(--text-sm); font-weight: 500; color: var(--color-ink);
+    cursor: pointer; user-select: none; outline: none;
     transition: background-color 0.1s linear;
   }
   .pop-item[data-highlighted],
   .pop-item[data-selected="true"]:not([data-disabled]),
-  .pop-item:hover:not([data-disabled]) { background-color: var(--color-sunken); }
+  .pop-item:hover:not([data-disabled]) { background-color: var(--color-btn); }
   .pop-item[data-disabled] { opacity: 0.45; cursor: not-allowed; }
 
-  /* Numeric UI — clock times, money, seat numbers — must not shift width. */
-  .tnum { font-variant-numeric: tabular-nums; }
-
-  /* ---- Map markers ------------------------------------------------------
-     Created imperatively by MapLibre, so they are styled here rather than
-     with utility classes. They still read from the same tokens as everything
-     else, which is what keeps the map from looking like a foreign widget. */
-  .tz-marker {
-    display: grid;
-    place-items: center;
-    min-width: 1.25rem;
-    height: 1.25rem;
-    padding-inline: 0.25rem;
-    border: 2px solid var(--color-card);
-    border-radius: 999px;
-    background-color: var(--color-brand-600);
-    color: #fff;
-    font-family: var(--font-sans);
-    font-size: 11px;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-    cursor: pointer;
-    box-shadow: 0 1px 4px oklch(0.15 0.01 286 / 0.35);
-    transition: transform 0.12s var(--ease-out-quint), background-color 0.12s linear;
+  .shimmer {
+    background: linear-gradient(90deg, var(--color-sunken) 25%, var(--color-sunken-2) 50%, var(--color-sunken) 75%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease infinite;
   }
-  .tz-marker:hover { transform: scale(1.18); }
-  .tz-marker:focus-visible {
-    outline: 2px solid var(--color-brand-500);
-    outline-offset: 2px;
-  }
-  .tz-marker[data-selected="true"] {
-    background-color: var(--color-ink);
-    transform: scale(1.35);
-    z-index: 2;
-  }
-
-  /* "You are here". Distinct from an event pin: a soft halo, not a token. */
-  .tz-viewer-dot {
-    width: 0.875rem;
-    height: 0.875rem;
-    border: 2.5px solid var(--color-card);
-    border-radius: 999px;
-    background-color: var(--color-info);
-    box-shadow: 0 0 0 6px oklch(from var(--color-info) l c h / 0.22);
-  }
-
-  /* MapLibre's own chrome, pulled onto our surface tokens. */
-  .maplibregl-ctrl-attrib {
-    background-color: oklch(from var(--color-card) l c h / 0.82) !important;
-    color: var(--color-ink-3);
-    font-size: 10px;
-    border-radius: var(--radius-sm) 0 0 0;
-  }
-  .maplibregl-ctrl-attrib a { color: var(--color-ink-2); }
-  .maplibregl-ctrl-attrib-button { filter: none; }
-  .dark .maplibregl-ctrl-attrib-button { filter: invert(1); }
-
-  /* Perforation between a ticket's stub and body. */
-  .perforation {
-    background-image: repeating-linear-gradient(
-      to bottom, var(--color-hairline) 0 5px, transparent 5px 11px
-    );
-  }
-}
-
-/* ---------------------------------------------------------------------------
-   Chart palette. Both modes are selected against their own surface and pass
-   scripts/validate_palette.js (lightness band, chroma floor, CVD separation,
-   normal-vision floor). Aqua sits just under 3:1 on the light surface, so the
-   charts using it always carry visible value labels.
-   --------------------------------------------------------------------------- */
-.viz {
-  --series-1: #2a78d6;
-  --series-2: #1baf7a;
-  --viz-grid: var(--color-hairline-soft);
-  --viz-axis: var(--color-ink-3);
-}
-.dark .viz {
-  --series-1: #3987e5;
-  --series-2: #199e70;
 }
 
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
-@keyframes sweep { 100% { transform: translateX(100%); } }
-@keyframes pop-in  { from { opacity: 0; transform: scale(0.965) translateY(-3px); } }
-@keyframes pop-out { to   { opacity: 0; transform: scale(0.975); } }
+@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+@keyframes pop-in  { from { opacity: 0; transform: scale(0.98) translateY(-4px); } }
+@keyframes pop-out { to { opacity: 0; transform: scale(0.98); } }
+
+/* ---------------------------------------------------------------------------
+   Chart palette, retuned to the new accents.
+   --------------------------------------------------------------------------- */
+.viz {
+  --series-1: #2f6fed;
+  --series-2: #1b9a4f;
+  --viz-grid: var(--color-hairline);
+  --viz-axis: var(--color-ink-3);
+}
+[data-theme="dark"] .viz {
+  --series-1: #6d9ff6;
+  --series-2: #4fc07f;
+}
+
+/* Map markers are created imperatively by MapLibre, so they are styled here
+   rather than with utility classes — from the same tokens as everything else. */
+.tz-marker {
+  display: grid; place-items: center;
+  min-width: 1.25rem; height: 1.25rem; padding-inline: 0.25rem;
+  border: 2px solid var(--color-card); border-radius: 999px;
+  background-color: var(--color-pink); color: #fff;
+  font-family: var(--font-sans); font-size: 11px; font-weight: 600;
+  font-variant-numeric: tabular-nums; line-height: 1; cursor: pointer;
+  box-shadow: 0 1px 4px rgb(20 20 30 / 0.35);
+  transition: transform 0.12s var(--ease-out-quint), background-color 0.12s linear;
+}
+.tz-marker:hover { transform: scale(1.18); }
+.tz-marker:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+.tz-marker[data-selected="true"] { background-color: var(--color-ink); transform: scale(1.35); z-index: 2; }
+
+.tz-viewer-dot {
+  width: 0.875rem; height: 0.875rem;
+  border: 2.5px solid var(--color-card); border-radius: 999px;
+  background-color: var(--color-blue);
+  box-shadow: 0 0 0 6px rgb(47 111 237 / 0.22);
+}
+
+.maplibregl-ctrl-attrib {
+  background-color: color-mix(in srgb, var(--color-card) 82%, transparent) !important;
+  color: var(--color-ink-3);
+  font-size: 10px;
+  border-radius: var(--radius-xs) 0 0 0;
+}
+.maplibregl-ctrl-attrib a { color: var(--color-ink-2); }
+[data-theme="dark"] .maplibregl-ctrl-attrib-button { filter: invert(1); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

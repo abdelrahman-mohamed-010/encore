@@ -6,16 +6,16 @@ test.describe("theme", () => {
 
     await page.getByRole("button", { name: "Change theme" }).click();
     await page.getByRole("menuitem", { name: "Dark" }).click();
-    await expect(page.locator("html")).toHaveClass(/dark/);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 
     await page.reload();
-    await expect(page.locator("html")).toHaveClass(/dark/);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   });
 
   test("respects the operating system preference by default", async ({ page }) => {
     await page.emulateMedia({ colorScheme: "dark" });
     await page.goto("/");
-    await expect(page.locator("html")).toHaveClass(/dark/);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   });
 });
 

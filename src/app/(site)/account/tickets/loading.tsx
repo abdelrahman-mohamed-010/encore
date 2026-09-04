@@ -6,7 +6,7 @@ export default function TicketsLoading() {
       <Shimmer className="h-3.5 w-24" />
       <div className="grid gap-4 md:grid-cols-2">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="overflow-hidden rounded-xl border border-hairline bg-card">
+          <div key={i} className="overflow-hidden rounded-xl bg-card shadow-e1">
             <div className="flex gap-4 p-4">
               <Shimmer className="size-16 shrink-0" />
               <div className="flex-1 space-y-2">

@@ -2,18 +2,25 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 /**
- * The one raised surface in the product. Hairline border, no shadow by default —
- * elevation is reserved for things that genuinely float (menus, dialogs).
+ * The raised surface.
+ *
+ * Lifted by a shadow whose first layer IS a hairline ring — not by a border.
+ * That ring stays crisp over a coloured or gradient background where a real
+ * 1px border would band, and it lets a card sit on the page as an object with
+ * weight rather than an outlined region. `flat` opts back into a plain border
+ * for the rare case where a card sits inside another card.
  */
 export function Card({
   className,
   inset = false,
+  flat = false,
   ...props
-}: React.HTMLAttributes<HTMLDivElement> & { inset?: boolean }) {
+}: React.HTMLAttributes<HTMLDivElement> & { inset?: boolean; flat?: boolean }) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-hairline",
+        "rounded-xl",
+        flat ? "border border-hairline" : "shadow-e1",
         inset ? "bg-sunken" : "bg-card",
         className,
       )}
@@ -40,11 +47,11 @@ export function CardHeader({
 }
 
 export function CardTitle({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) {
-  return <h3 className={cn("text-md font-semibold text-ink", className)} {...props} />;
+  return <h3 className={cn("text-lg font-semibold text-ink", className)} {...props} />;
 }
 
 export function CardDescription({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) {
-  return <p className={cn("mt-0.5 text-sm leading-relaxed text-ink-3", className)} {...props} />;
+  return <p className={cn("mt-0.5 text-sm leading-relaxed text-ink-2", className)} {...props} />;
 }
 
 export function CardBody({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {

@@ -7,7 +7,7 @@ export default function AuthLoading() {
         <Shimmer className="mx-auto h-7 w-48" />
         <Shimmer className="mx-auto h-3.5 w-64" />
       </div>
-      <div className="space-y-4 rounded-2xl border border-hairline bg-card p-6">
+      <div className="space-y-4 rounded-2xl bg-card shadow-e1 p-6">
         <Shimmer className="h-11 w-full" />
         <Shimmer className="h-11 w-full" />
         <Shimmer className="h-px w-full" />

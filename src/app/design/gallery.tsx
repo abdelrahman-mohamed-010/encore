@@ -16,7 +16,8 @@ import { DateField, DateTimeField, formatLocalDateTime } from "@/components/ui/d
 import { ColorPicker } from "@/components/ui/color-picker";
 import { EmptyState, Meter, StatTile } from "@/components/ui/misc";
 import { Table, TBody, TD, TH, THead, TR, TableWrap } from "@/components/ui/table";
-import { Kbd, Pagination, Steps } from "@/components/ui/nav";
+import { Pagination, Steps } from "@/components/ui/nav";
+import { Kbd } from "@/components/ui/button";
 import {
   Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -24,6 +25,7 @@ import {
   Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle,
 } from "@/components/ui/sheet";
 import { EventCardSkeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 /**
  * A living inventory of the design system: every token and component rendered
@@ -128,6 +130,45 @@ export function DesignGallery() {
               ))}
             </div>
           </div>
+
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-ink-2">
+              Surfaces — three planes, and a lift that carries its own hairline
+            </p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {(
+                [
+                  ["bg-paper", "paper", "The page itself."],
+                  ["bg-card", "card", "Anything raised off it."],
+                  ["bg-sunken", "sunken", "Fields, chips, wells — pressed in."],
+                ] as const
+              ).map(([token, name, note]) => (
+                <div key={name} className={cn("rounded-xl p-4 shadow-e1", token)}>
+                  <p className="font-mono text-2xs text-ink-3">{name}</p>
+                  <p className="mt-1 text-sm text-ink-2">{note}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              {(
+                [
+                  ["shadow-e1", "e1", "Resting cards."],
+                  ["shadow-e2", "e2", "Hover, and cards that matter more."],
+                  ["shadow-pop", "pop", "Menus, popovers, dialogs."],
+                ] as const
+              ).map(([token, name, note]) => (
+                <div key={name} className={cn("rounded-xl bg-card p-4", token)}>
+                  <p className="font-mono text-2xs text-ink-3">{name}</p>
+                  <p className="mt-1 text-sm text-ink-2">{note}</p>
+                </div>
+              ))}
+            </div>
+            <p className="pt-1 text-sm leading-relaxed text-ink-3">
+              Each shadow&rsquo;s first layer is a 1px ring rather than a border:
+              it stays crisp over a photo or gradient where a real border bands,
+              and it lets a card sit on the page as an object with weight.
+            </p>
+          </div>
         </CardBody>
       </Card>
 
@@ -137,11 +178,23 @@ export function DesignGallery() {
         <CardBody className="space-y-8">
           <div className="space-y-3">
             <p className="text-sm font-medium text-ink-2">
-              Display — Instrument Sans. Headlines only; never UI text.
+              Display — Inter, tightened. Headlines only; never UI text.
             </p>
             <p className="display-1">Find your next night out</p>
             <p className="display-2">Find your next night out</p>
             <p className="display-3">Find your next night out</p>
+          </div>
+
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-ink-2">
+              Flourish — Averia Serif Libre. Event titles and the one emphasised
+              word in a headline. Never UI text, where its irregular letterforms
+              would read as noise.
+            </p>
+            <p className="display-2 font-flourish">Cairokee — Roots Live</p>
+            <p className="display-3">
+              Find your next <span className="font-flourish italic">night out</span>
+            </p>
           </div>
 
           <div className="space-y-2">
@@ -192,7 +245,7 @@ export function DesignGallery() {
             <Button variant="ghost">Ghost</Button>
             <Button variant="accent">Accent</Button>
             <Button variant="danger">Danger</Button>
-            <Button variant="danger-soft">Danger soft</Button>
+            <Button variant="danger">Danger soft</Button>
             <Button variant="link">Link</Button>
           </Row>
           <Row title="Sizes">
@@ -354,7 +407,7 @@ export function DesignGallery() {
               <button
                 key={label}
                 type="button"
-                className="flex flex-1 items-center gap-3 rounded-2xl border border-hairline bg-card p-4 text-left transition-colors hover:bg-sunken"
+                className="flex flex-1 items-center gap-3 rounded-2xl bg-card shadow-e1 p-4 text-left transition-colors hover:bg-sunken"
               >
                 <IconChip icon={icon} tone={tone as "blue"} size="xl" />
                 <span className="text-base font-medium text-ink">{label}</span>

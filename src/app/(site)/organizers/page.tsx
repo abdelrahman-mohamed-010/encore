@@ -36,7 +36,7 @@ export default async function OrganizersPage() {
               <Link
                 key={organizer.id}
                 href={`/organizers/${organizer.slug}`}
-                className="rounded-xl border border-hairline bg-card p-5 transition-colors hover:bg-sunken"
+                className="rounded-xl bg-card shadow-e1 p-5 transition-colors hover:bg-sunken"
               >
                 <Avatar src={organizer.logo_url} name={organizer.name} size="lg" />
                 <p className="mt-3 flex items-center gap-1.5 text-md font-semibold text-ink">

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Building2, ChevronDown, Heart, LogOut, Plus, Settings, ShieldCheck, Ticket, Receipt,
+  Building2, Heart, LogOut, Plus, Settings, ShieldCheck, Ticket, Receipt,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -35,9 +35,8 @@ export function UserMenu({
 
   return (
     <Dropdown>
-      <DropdownTrigger className="flex items-center gap-1 rounded-full p-0.5 transition-colors hover:bg-sunken focus-visible:outline-2 focus-visible:outline-accent-500">
-        <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="sm" />
-        <ChevronDown className="mr-0.5 size-3.5 text-ink-3" />
+      <DropdownTrigger className="flex items-center rounded-full transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
+        <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="md" />
       </DropdownTrigger>
 
       <DropdownContent className="min-w-60">

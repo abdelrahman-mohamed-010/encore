@@ -77,12 +77,12 @@ test.describe("design system", () => {
   });
 
   test("every control repaints in dark mode", async ({ page }) => {
-    // The theme provider owns the `dark` class and re-asserts it after
-    // hydration, so the switch has to come from the preference it reads —
-    // adding the class by hand is undone on the next render.
+    // The theme provider owns `data-theme` and re-asserts it after hydration,
+    // so the switch has to come from the preference it reads — setting the
+    // attribute by hand is undone on the next render.
     await page.emulateMedia({ colorScheme: "dark" });
     await page.reload();
-    await expect(page.locator("html")).toHaveClass(/dark/);
+    await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 
     // The body must repaint from the token, not sit on a light default.
     const background = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);

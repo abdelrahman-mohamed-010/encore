@@ -106,11 +106,11 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const soldOut = totalLeft <= 0;
 
   return (
-    <div className="container-page py-8 md:py-12">
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)] lg:gap-14">
+    <div className="container-narrow py-8 md:py-14">
+      <div className="grid gap-10 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-14">
         {/* ---- Left rail: poster, organizer, venue ------------------------- */}
-        <div className="lg:sticky lg:top-20 lg:self-start">
-          <div className="relative aspect-square overflow-hidden rounded-2xl border border-hairline bg-sunken">
+        <div className="lg:sticky lg:top-24 lg:self-start">
+          <div className="relative aspect-square overflow-hidden rounded-2xl bg-sunken shadow-e1">
             {event.cover_image_url ? (
               <Image
                 src={event.cover_image_url}
@@ -121,7 +121,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                 className="object-cover"
               />
             ) : (
-              <div className="size-full bg-gradient-to-br from-n-100 to-n-200 dark:from-n-800 dark:to-n-900" />
+              <div className="size-full bg-gradient-to-br from-sunken to-sunken-2" />
             )}
           </div>
 
@@ -140,7 +140,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                       <ShieldCheck className="size-3.5 shrink-0 text-info" />
                     )}
                   </p>
-                  <p className="truncate text-xs text-ink-3">View all events</p>
+                  <p className="truncate text-sm text-ink-3">View all events</p>
                 </div>
               </Link>
             </div>
@@ -166,7 +166,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                       href={`https://www.google.com/maps/search/?api=1&query=${event.venue.latitude},${event.venue.longitude}`}
                       target="_blank"
                       rel="noreferrer noopener"
-                      className="mt-2 inline-block text-sm font-medium text-accent-600 hover:underline dark:text-accent-400"
+                      className="mt-2.5 inline-block text-sm font-medium text-ink underline decoration-line-2 underline-offset-4 hover:decoration-ink"
                     >
                       Open in Maps
                     </a>
@@ -202,9 +202,9 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             {event.min_age ? <Badge tone="outline" size="md">{event.min_age}+</Badge> : null}
           </div>
 
-          <h1 className="display-1 mt-4 text-ink">{event.title}</h1>
+          <h1 className="display-2 font-flourish mt-5 text-ink">{event.title}</h1>
           {event.subtitle && (
-            <p className="mt-3 text-lg leading-relaxed text-ink-2">{event.subtitle}</p>
+            <p className="mt-4 text-lg leading-relaxed text-ink-2">{event.subtitle}</p>
           )}
 
           <Card className="mt-7 overflow-hidden">
@@ -298,7 +298,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             <div className="mt-8 flex flex-wrap gap-2">
               {event.tags.map((tag) => (
                 <Link key={tag} href={`/events?q=${encodeURIComponent(tag)}`}>
-                  <Badge tone="neutral" size="md" className="transition-colors hover:bg-n-150 dark:hover:bg-n-800">
+                  <Badge tone="neutral" size="md" className="transition-colors hover:bg-sunken-2">
                     #{tag}
                   </Badge>
                 </Link>

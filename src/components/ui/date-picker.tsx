@@ -46,9 +46,9 @@ const TIME_OPTIONS = Array.from({ length: 96 }, (_, i) => {
 });
 
 const segment = cn(
-  "flex items-center gap-2 rounded-lg px-2.5 py-1.5 text-base text-ink transition-colors",
-  "hover:bg-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
-  "data-[state=open]:bg-sunken disabled:cursor-not-allowed disabled:opacity-60",
+  "flex h-9 items-center gap-2 rounded-lg bg-card px-2.5 text-md font-medium text-ink shadow-e1 transition-colors",
+  "hover:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus",
+  "data-[state=open]:bg-paper disabled:cursor-not-allowed disabled:opacity-60",
 );
 
 function TimeList({ value, onSelect }: { value: string; onSelect: (next: string) => void }) {
@@ -136,11 +136,11 @@ export function DateTimeField({
       aria-invalid={ariaInvalid}
       aria-describedby={describedBy}
       className={cn(
-        "flex w-full items-center gap-1 rounded-xl border border-hairline bg-card p-1",
-        "transition-[border-color,box-shadow] duration-150",
-        "focus-within:border-brand-500 focus-within:ring-[3px] focus-within:ring-brand-500/20",
-        "aria-[invalid=true]:border-critical aria-[invalid=true]:ring-critical/20",
-        disabled && "cursor-not-allowed bg-sunken opacity-60",
+        "flex w-full items-center gap-1 rounded-md bg-sunken p-1",
+        "transition-[background-color,box-shadow] duration-150",
+        "focus-within:bg-card focus-within:shadow-[0_0_0_2px_var(--color-focus)]",
+        "aria-[invalid=true]:shadow-[0_0_0_2px_var(--color-critical)]",
+        disabled && "cursor-not-allowed opacity-55",
         className,
       )}
     >
@@ -165,7 +165,7 @@ export function DateTimeField({
         </PopoverContent>
       </Popover>
 
-      <span className="h-5 w-px shrink-0 bg-hairline" aria-hidden />
+      <span className="h-5 w-px shrink-0 bg-line-2" aria-hidden />
 
       <Popover open={timeOpen} onOpenChange={setTimeOpen}>
         <PopoverTrigger asChild>
@@ -226,12 +226,12 @@ export function DateField({
           data-invalid={ariaInvalid || undefined}
           aria-describedby={describedBy}
           className={cn(
-            "flex h-(--size-field) w-full items-center gap-2 rounded-xl border border-hairline bg-card px-3 text-base text-ink",
-            "transition-[border-color,box-shadow] duration-150 hover:border-n-300 dark:hover:border-n-700",
-            "focus-visible:border-brand-500 focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-brand-500/20",
-            "data-[state=open]:border-brand-500 data-[state=open]:ring-[3px] data-[state=open]:ring-brand-500/20",
-            "data-invalid:border-critical data-invalid:ring-critical/20",
-            "disabled:cursor-not-allowed disabled:bg-sunken disabled:opacity-60",
+            "flex h-(--size-field) w-full items-center gap-2 rounded-md bg-sunken px-3.5 text-md font-medium text-ink",
+            "transition-[background-color,box-shadow] duration-150 hover:bg-sunken-2",
+            "focus-visible:bg-card focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--color-focus)]",
+            "data-[state=open]:bg-card data-[state=open]:shadow-[0_0_0_2px_var(--color-focus)]",
+            "data-invalid:bg-card data-invalid:shadow-[0_0_0_2px_var(--color-critical)]",
+            "disabled:cursor-not-allowed disabled:opacity-55",
             className,
           )}
         >
