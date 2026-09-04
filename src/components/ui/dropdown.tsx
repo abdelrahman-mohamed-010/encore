@@ -19,7 +19,7 @@ export function DropdownContent({
       <Primitive.Content
         align={align}
         sideOffset={sideOffset}
-        className={cn("surface-pop motion-pop z-50 min-w-52 p-1.5", className)}
+        className={cn("surface-pop motion-pop z-50 min-w-[13.75rem] p-1.5", className)}
         {...props}
       />
     </Primitive.Portal>
@@ -28,14 +28,16 @@ export function DropdownContent({
 
 export function DropdownItem({
   className,
+  tone,
   ...props
-}: React.ComponentProps<typeof Primitive.Item>) {
+}: React.ComponentProps<typeof Primitive.Item> & { tone?: "danger" }) {
   return (
     <Primitive.Item
       className={cn(
         "pop-item",
+        tone === "danger" && "pop-item-danger",
         "data-[disabled]:pointer-events-none",
-        "[&_svg]:size-4 [&_svg]:shrink-0 [&_svg]:text-ink-3",
+        "[&_svg]:size-[17px] [&_svg]:shrink-0 [&_svg]:text-ink-2",
         className,
       )}
       {...props}

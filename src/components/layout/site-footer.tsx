@@ -1,73 +1,71 @@
 import Link from "next/link";
+import { AtSign, Mail, MessageCircle } from "lucide-react";
 import { Logo } from "@/components/logo";
 
-const COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
-  {
-    title: "Discover",
-    links: [
-      { href: "/events", label: "All events" },
-      { href: "/categories", label: "Categories" },
-      { href: "/organizers", label: "Organizers" },
-      { href: "/events?free=1", label: "Free events" },
-    ],
-  },
-  {
-    title: "Organizers",
-    links: [
-      { href: "/dashboard/new", label: "Start selling" },
-      { href: "/pricing", label: "Pricing" },
-      { href: "/dashboard", label: "Dashboard" },
-    ],
-  },
-  {
-    title: "Account",
-    links: [
-      { href: "/account/tickets", label: "My tickets" },
-      { href: "/account/orders", label: "Orders" },
-      { href: "/auth/login", label: "Sign in" },
-    ],
-  },
+/**
+ * One row of links beside the wordmark, then a legal line — the reference's
+ * shape. A four-column sitemap is for products with more surface area than
+ * this one; here it padded the bottom of every page with links the header
+ * already carries.
+ */
+const LINKS = [
+  { href: "/events", label: "Discover" },
+  { href: "/categories", label: "Categories" },
+  { href: "/organizers", label: "Organizers" },
+  { href: "/pricing", label: "Pricing" },
+  { href: "/dashboard/new", label: "Start selling" },
+];
+
+const LEGAL = [
+  { href: "/legal/terms", label: "Terms" },
+  { href: "/legal/privacy", label: "Privacy" },
 ];
 
 export function SiteFooter() {
   return (
-    <footer className="mt-24 border-t border-hairline bg-card">
-      <div className="container-page py-12">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
-          <div className="max-w-xs">
+    <footer className="mt-24">
+      <div className="container-page">
+        <div className="flex flex-col gap-6 border-t border-hairline py-8 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
             <Logo />
-            <p className="mt-3.5 text-sm leading-relaxed text-ink-3">
-              A modern ticketing platform. Discover what is on, buy in seconds, and run your own
-              events with real-time sales and check-in.
-            </p>
+            {LINKS.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-md text-ink-2 transition-colors hover:text-ink"
+              >
+                {link.label}
+              </Link>
+            ))}
           </div>
 
-          {COLUMNS.map((column) => (
-            <div key={column.title}>
-              <p className="eyebrow mb-3">{column.title}</p>
-              <ul className="space-y-2.5">
-                {column.links.map((link) => (
-                  <li key={link.href + link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-ink-2 transition-colors hover:text-ink"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          <div className="flex items-center gap-5 text-ink-3">
+            <a
+              href="mailto:hello@tazkarti.app"
+              aria-label="Email us"
+              className="transition-colors hover:text-ink"
+            >
+              <Mail className="size-[18px]" />
+            </a>
+            <Link href="/help" aria-label="Help" className="transition-colors hover:text-ink">
+              <MessageCircle className="size-[18px]" />
+            </Link>
+            <Link href="/" aria-label="Tazkarti home" className="transition-colors hover:text-ink">
+              <AtSign className="size-[18px]" />
+            </Link>
+          </div>
         </div>
 
-        <div className="mt-10 flex flex-col gap-3 border-t border-hairline-soft pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-xs text-ink-3">
+        <div className="flex flex-col gap-2 pb-10 sm:flex-row sm:items-center sm:justify-between">
+          <p className="text-sm text-ink-3">
             © {new Date().getFullYear()} Tazkarti. Built with Next.js, Supabase and Stripe.
           </p>
-          <div className="flex items-center gap-5 text-xs text-ink-3">
-            <Link href="/legal/terms" className="transition-colors hover:text-ink-2">Terms</Link>
-            <Link href="/legal/privacy" className="transition-colors hover:text-ink-2">Privacy</Link>
+          <div className="flex items-center gap-5 text-sm text-ink-3">
+            {LEGAL.map((link) => (
+              <Link key={link.href} href={link.href} className="transition-colors hover:text-ink-2">
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
       </div>

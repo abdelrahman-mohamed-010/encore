@@ -5,7 +5,9 @@ test.describe("home page", () => {
     await page.goto("/");
 
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Find your next");
-    await expect(page.getByRole("link", { name: /events on sale right now/i })).toBeVisible();
+    // The live count is a kicker above the headline, not a link.
+    await expect(page.getByText(/events on sale right now/i)).toBeVisible();
+    await expect(page.getByRole("link", { name: "Discover events" }).first()).toBeVisible();
 
     // Categories come from the database, not a hardcoded list.
     await expect(page.getByRole("link", { name: "Music", exact: true })).toBeVisible();

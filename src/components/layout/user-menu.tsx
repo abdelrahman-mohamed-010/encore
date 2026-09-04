@@ -40,13 +40,13 @@ export function UserMenu({
       </DropdownTrigger>
 
       <DropdownContent className="min-w-60">
-        <div className="flex items-center gap-3 px-2.5 py-2.5">
-          <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="md" />
+        <div className="flex items-center gap-2.5 px-2.5 py-2">
+          <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="sm" />
           <div className="min-w-0">
             <p className="truncate text-sm font-medium text-ink">
               {profile.full_name ?? "Your account"}
             </p>
-            <p className="truncate text-xs text-ink-3">{profile.email}</p>
+            <p className="truncate text-xs text-ink-2">{profile.email}</p>
           </div>
         </div>
         <DropdownSeparator />
@@ -92,7 +92,7 @@ export function UserMenu({
           </DropdownItem>
         )}
         <DropdownSeparator />
-        <DropdownItem onSelect={signOut} className="text-critical focus:text-critical [&_svg]:text-critical">
+        <DropdownItem tone="danger" onSelect={signOut}>
           <LogOut /> Sign out
         </DropdownItem>
       </DropdownContent>

@@ -184,27 +184,35 @@ export function NearbyEvents({
         }
         action={browseAll}
       />
-      <Card className="overflow-hidden">
+      {/*
+        The map is its own object and each result is its own row, rather than a
+        map with a bordered list welded to its bottom edge: it matches how every
+        other list on the site is built, and the rows keep their hover.
+      */}
+      <div className="overflow-hidden rounded-2xl bg-card shadow-e1">
         <EventMap pins={state.pins} viewer={state.viewer} className="h-80" />
-        <ul className="divide-y divide-hairline-soft">
-          {state.pins.slice(0, 3).map((pin) => (
-            <li key={pin.id}>
-              <Link
-                href={`/events/${pin.slug}`}
-                className="flex items-center gap-3 px-4 py-3 transition-colors hover:bg-sunken"
-              >
-                <MapPin className="size-4 shrink-0 text-ink-3" aria-hidden />
-                <span className="min-w-0 flex-1 truncate text-base font-medium text-ink">
-                  {pin.title}
-                </span>
-                <span className="shrink-0 text-xs tnum text-ink-3">
-                  {formatDistance(pin.distance_km)}
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </Card>
+      </div>
+
+      <ul className="space-y-1">
+        {state.pins.slice(0, 3).map((pin) => (
+          <li key={pin.id}>
+            <Link
+              href={`/events/${pin.slug}`}
+              className="flex items-center gap-3 rounded-xl px-3 py-2.5 transition-colors hover:bg-sunken"
+            >
+              <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-sunken text-ink-2">
+                <MapPin className="size-4" aria-hidden />
+              </span>
+              <span className="min-w-0 flex-1 truncate font-flourish text-lg text-ink">
+                {pin.title}
+              </span>
+              <span className="shrink-0 text-sm tnum text-ink-3">
+                {formatDistance(pin.distance_km)}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

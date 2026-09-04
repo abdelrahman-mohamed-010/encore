@@ -52,6 +52,47 @@ export function FieldRow({
 }
 
 /**
+ * The detail-page fact: a 46px box, then a headline and a sub-line.
+ *
+ * Unlike `FieldRow` these sit bare on the page rather than stacking inside a
+ * card. A card draws a box around facts that are already legible as a list,
+ * and on the event page it competed with the ticket panel — the one thing
+ * there that should look like an object.
+ */
+export function InfoRow({
+  icon: Icon,
+  date,
+  timeZone,
+  main,
+  sub,
+  className,
+}: {
+  icon?: React.ComponentType<{ className?: string }>;
+  /** Renders a month-over-day box instead of an icon. */
+  date?: string | Date;
+  timeZone?: string;
+  main: React.ReactNode;
+  sub?: React.ReactNode;
+  className?: string;
+}) {
+  return (
+    <div className={cn("flex items-center gap-4", className)}>
+      {date ? (
+        <DateBlock date={date} timeZone={timeZone} className="size-[46px]" />
+      ) : Icon ? (
+        <span className="grid size-[46px] shrink-0 place-items-center rounded-md bg-sunken text-ink-2">
+          <Icon className="size-[22px]" />
+        </span>
+      ) : null}
+      <div className="min-w-0">
+        <div className="flex items-center gap-2 text-md font-medium text-ink">{main}</div>
+        {sub !== undefined && <div className="mt-0.5 text-base text-ink-2">{sub}</div>}
+      </div>
+    </div>
+  );
+}
+
+/**
  * Tones for the icon tile. The six named hues are decorative, not semantic —
  * use them to tell one shortcut or category apart from another. The status
  * tones (positive/caution/critical) do carry meaning, so never pick those

@@ -73,13 +73,28 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       <body className="antialiased">
         <ThemeProvider>
           {children}
+          {/*
+            The reference's toast is a dark slab in light mode — deliberately
+            the inverse of the page, so it reads as a system message rather
+            than another card. `solid`/`on-solid` already invert with the
+            theme, so the same two tokens give a light slab in dark mode.
+          */}
           <Toaster
-            position="top-center"
+            position="bottom-right"
+            offset={22}
+            gap={10}
             toastOptions={{
+              unstyled: true,
               classNames: {
-                toast:
-                  "!bg-surface !text-ink !border-border !rounded-xl !shadow-lift !font-sans",
-                description: "!text-ink-muted",
+                toast: "tz-toast",
+                title: "block text-base font-semibold",
+                description: "mt-px text-sm opacity-75",
+                actionButton: "tz-toast-action",
+                cancelButton: "tz-toast-action",
+                icon: "mt-0.5 shrink-0 [&_svg]:size-[18px]",
+                success: "[&_[data-icon]]:text-[#6be59a]",
+                error: "[&_[data-icon]]:text-[#ff8b8b]",
+                warning: "[&_[data-icon]]:text-[#ffcb70]",
               },
             }}
           />
