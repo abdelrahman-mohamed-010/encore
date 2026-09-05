@@ -11,7 +11,6 @@ import { Logo } from "@/components/logo";
 const LINKS = [
   { href: "/events", label: "Discover" },
   { href: "/categories", label: "Categories" },
-  { href: "/organizers", label: "Organizers" },
   { href: "/pricing", label: "Pricing" },
   { href: "/dashboard/new", label: "Start selling" },
 ];

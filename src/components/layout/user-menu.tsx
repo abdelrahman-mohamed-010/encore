@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -11,6 +12,7 @@ import { Avatar } from "@/components/ui/misc";
 import {
   Dropdown, DropdownContent, DropdownItem, DropdownLabel, DropdownSeparator, DropdownTrigger,
 } from "@/components/ui/dropdown";
+import { NewOrganizationModal } from "@/components/dashboard/new-organization-modal";
 import type { MembershipWithOrganizer } from "@/lib/auth";
 import type { Profile } from "@/lib/types";
 
@@ -22,6 +24,7 @@ export function UserMenu({
   memberships: MembershipWithOrganizer[];
 }) {
   const router = useRouter();
+  const [newOrgOpen, setNewOrgOpen] = React.useState(false);
 
   async function signOut() {
     const { error } = await createClient().auth.signOut();
@@ -34,7 +37,8 @@ export function UserMenu({
   }
 
   return (
-    <Dropdown>
+    <>
+      <Dropdown>
       <DropdownTrigger className="flex items-center rounded-full transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
         <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="md" />
       </DropdownTrigger>
@@ -83,8 +87,11 @@ export function UserMenu({
         )}
 
         <DropdownSeparator />
-        <DropdownItem asChild>
-          <Link href="/dashboard/new"><Plus /> {memberships.length ? "New organization" : "Start selling tickets"}</Link>
+        <DropdownItem onSelect={(e) => {
+          e.preventDefault();
+          setNewOrgOpen(true);
+        }}>
+          <Plus /> {memberships.length ? "New organization" : "Start selling tickets"}
         </DropdownItem>
         {profile.role === "admin" && (
           <DropdownItem asChild>
@@ -97,5 +104,8 @@ export function UserMenu({
         </DropdownItem>
       </DropdownContent>
     </Dropdown>
+
+    <NewOrganizationModal open={newOrgOpen} onOpenChange={setNewOrgOpen} />
+    </>
   );
 }

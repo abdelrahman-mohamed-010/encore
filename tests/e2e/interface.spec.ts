@@ -46,7 +46,7 @@ test.describe("navigation", () => {
 
 test.describe("accessibility basics", () => {
   test("every page has exactly one h1 and a document title", async ({ page }) => {
-    for (const path of ["/", "/events", "/categories", "/organizers", "/pricing"]) {
+    for (const path of ["/", "/events", "/categories", "/pricing"]) {
       await page.goto(path);
       await expect(page.locator("h1")).toHaveCount(1);
       await expect(page).toHaveTitle(/Tazkarti/);

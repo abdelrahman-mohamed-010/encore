@@ -19,6 +19,15 @@ const nextConfig: NextConfig = {
     // Keeps the initial JS small; these are used across nearly every route.
     optimizePackageImports: ["lucide-react", "recharts", "date-fns"],
   },
+  async redirects() {
+    return [
+      {
+        source: "/organizers",
+        destination: "/events",
+        permanent: false,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
