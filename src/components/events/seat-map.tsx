@@ -1,12 +1,19 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Minus, Plus, Maximize2 } from "lucide-react";
+import {
+  TransformComponent,
+  TransformWrapper,
+  type ReactZoomPanPinchContentRef,
+} from "react-zoom-pan-pinch";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { useAsyncAction, useSeatSelection } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
+import { buildSeatPlan, seatInDirection, SEAT_SIZE, type PlanSeat } from "@/lib/seat-plan";
 import { formatMoney } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { TicketAvailability } from "@/lib/types";
@@ -27,6 +34,8 @@ type SeatNode = {
 };
 
 const MAX_SEATS = 8;
+/** Below this the seat is too small to letter; above it, the number is legible. */
+const LABEL_AT_SCALE = 1.5;
 
 export function SeatMap({
   eventId,
@@ -40,51 +49,15 @@ export function SeatMap({
   signedIn: boolean;
 }) {
   const router = useRouter();
+  const zoom = useRef<ReactZoomPanPinchContentRef>(null);
+  const [scale, setScale] = useState(1);
+  const [focused, setFocused] = useState<string | null>(null);
 
   const priceByType = useMemo(
     () => new Map(availability.map((tier) => [tier.ticket_type_id, tier])),
     [availability],
   );
   const currency = availability[0]?.currency ?? "USD";
-
-  /** Group into sections, then rows, so the map renders as a real seating plan. */
-  const sections = useMemo(() => {
-    const bySection = new Map<
-      string,
-      { id: string; name: string; color: string; rows: Map<string, SeatNode[]> }
-    >();
-
-    for (const seat of seats) {
-      const section = seat.seat?.section;
-      if (!section) continue;
-      if (!bySection.has(section.id)) {
-        bySection.set(section.id, {
-          id: section.id,
-          name: section.name,
-          color: section.color,
-          rows: new Map(),
-        });
-      }
-      const rows = bySection.get(section.id)!.rows;
-      const label = seat.seat!.row_label;
-      if (!rows.has(label)) rows.set(label, []);
-      rows.get(label)!.push(seat);
-    }
-
-    return [...bySection.values()].map((section) => ({
-      ...section,
-      rows: [...section.rows.entries()]
-        .sort(([a], [b]) => a.localeCompare(b))
-        .map(([label, rowSeats]) => ({
-          label,
-          seats: rowSeats.sort(
-            (a, b) => Number(a.seat!.seat_number) - Number(b.seat!.seat_number),
-          ),
-        })),
-    }));
-  }, [seats]);
-
-  const seatById = useMemo(() => new Map(seats.map((s) => [s.id, s])), [seats]);
 
   const priceFor = useCallback(
     (seat: { price_cents: number | null; ticket_type_id: string | null }) => {
@@ -94,11 +67,66 @@ export function SeatMap({
     [priceByType],
   );
 
+  /** The stored layout, drawn at its own proportions rather than as a grid. */
+  const plan = useMemo(() => {
+    const placed: PlanSeat[] = seats.flatMap((seat) =>
+      seat.seat?.section
+        ? [{
+            id: seat.id,
+            x: Number(seat.seat.pos_x),
+            y: Number(seat.seat.pos_y),
+            status: seat.status,
+            priceCents: priceFor(seat),
+            sectionId: seat.seat.section.id,
+            sectionName: seat.seat.section.name,
+            color: seat.seat.section.color,
+            rowLabel: seat.seat.row_label,
+            seatNumber: seat.seat.seat_number,
+          }]
+        : [],
+    );
+    return buildSeatPlan(placed);
+  }, [seats, priceFor]);
+
+  /** One legend entry per section, with what a seat there costs. */
+  const sections = useMemo(() => {
+    const bySection = new Map<string, { name: string; color: string; from: number }>();
+    for (const seat of plan.points) {
+      const entry = bySection.get(seat.sectionId);
+      if (entry) entry.from = Math.min(entry.from, seat.priceCents);
+      else bySection.set(seat.sectionId, { name: seat.sectionName, color: seat.color, from: seat.priceCents });
+    }
+    return [...bySection.values()].sort((a, b) => b.from - a.from);
+  }, [plan.points]);
+
+  const seatById = useMemo(() => new Map(plan.points.map((seat) => [seat.id, seat])), [plan.points]);
   const selection = useSeatSelection(seats, priceFor, MAX_SEATS);
 
-  function toggle(seat: SeatNode) {
-    const result = selection.toggle(seat.id);
+  // One tab stop for the whole plan: arrow keys move between seats from there,
+  // which beats tabbing through several hundred of them.
+  const tabStop = focused ?? plan.points.find((seat) => seat.status === "available")?.id;
+
+  function toggle(seatId: string) {
+    const result = selection.toggle(seatId);
     if (!result.ok) toast.error(result.reason);
+  }
+
+  function handleKeyDown(event: React.KeyboardEvent, seatId: string) {
+    const directions = {
+      ArrowUp: "up", ArrowDown: "down", ArrowLeft: "left", ArrowRight: "right",
+    } as const;
+    const direction = directions[event.key as keyof typeof directions];
+    if (!direction) return;
+
+    const from = seatById.get(seatId);
+    if (!from) return;
+
+    const next = seatInDirection(from, plan.points, direction);
+    if (!next) return;
+
+    event.preventDefault();
+    setFocused(next.id);
+    document.getElementById(`seat-${next.id}`)?.focus();
   }
 
   const reserve = useAsyncAction(async () => {
@@ -129,92 +157,129 @@ export function SeatMap({
     router.push(`/checkout/${reservation.reservation_id}`);
   });
 
+  const showLabels = scale >= LABEL_AT_SCALE;
+
   return (
     <div className="space-y-4">
       <Card className="overflow-hidden">
-        <div className="border-b border-hairline-soft bg-sunken px-4 py-3">
-          <div className="mx-auto mb-1 h-1 w-2/3 rounded-full bg-line-2" />
-          <p className="text-center text-2xs font-semibold uppercase tracking-[0.14em] text-ink-3">
-            Stage
-          </p>
-        </div>
-
-        <div className="overflow-x-auto px-4 py-5">
-          <div className="mx-auto w-max space-y-6">
-            {sections.map((section) => (
-              <div key={section.id}>
-                <div className="mb-2 flex items-center gap-2">
-                  <span
-                    className="size-2.5 rounded-full"
-                    style={{ backgroundColor: section.color }}
-                    aria-hidden
-                  />
-                  <p className="text-xs font-semibold text-ink-2">{section.name}</p>
+        <TransformWrapper
+          ref={zoom}
+          minScale={0.2}
+          maxScale={5}
+          doubleClick={{ mode: "zoomIn", step: 0.7 }}
+          wheel={{ step: 0.15 }}
+          // Open on the whole plan. A venue is taller than the panel it sits
+          // in, so starting at 1:1 would drop the back rows below the fold.
+          onInit={(ref) => ref.fitToView({ maxScale: 1 })}
+          onTransform={(_, state) => setScale(state.scale)}
+        >
+          <div className="relative">
+            {/* The wrapper is the viewport; the content must keep the plan's
+                own size or there is nothing for fitToView to measure. */}
+            <TransformComponent wrapperClass="!w-full !h-[min(70vh,34rem)] bg-sunken">
+              <div
+                className="relative"
+                style={{ width: plan.width, height: plan.height }}
+              >
+                {/* The stage, drawn to the plan's own width so it scales with it. */}
+                <div
+                  className="absolute -top-2 left-1/2 -translate-x-1/2"
+                  style={{ width: plan.width * 0.55 }}
+                >
+                  <div className="h-1.5 rounded-full bg-line-2" />
+                  <p className="mt-1 text-center text-[10px] font-semibold uppercase tracking-[0.18em] text-ink-3">
+                    Stage
+                  </p>
                 </div>
 
-                <div className="space-y-1.5">
-                  {section.rows.map((row) => (
-                    <div key={row.label} className="flex items-center gap-2">
-                      <span className="w-4 shrink-0 text-right text-2xs font-medium text-ink-3">
-                        {row.label}
-                      </span>
-                      <div className="flex gap-1">
-                        {row.seats.map((seat) => {
-                          const isSelected = selection.isSelected(seat.id);
-                          const available = seat.status === "available";
-                          const tier = seat.ticket_type_id
-                            ? priceByType.get(seat.ticket_type_id)
-                            : undefined;
+                {plan.points.map((seat) => {
+                  const isSelected = selection.isSelected(seat.id);
+                  const available = seat.status === "available";
 
-                          return (
-                            <button
-                              key={seat.id}
-                              type="button"
-                              disabled={!available}
-                              onClick={() => toggle(seat)}
-                              aria-label={`${section.name} row ${row.label} seat ${seat.seat!.seat_number}${
-                                available ? "" : " (unavailable)"
-                              }`}
-                              aria-pressed={isSelected}
-                              title={
-                                available
-                                  ? `${section.name} · Row ${row.label} · Seat ${seat.seat!.seat_number} — ${formatMoney(
-                                      seat.price_cents ?? tier?.price_cents ?? 0,
-                                      currency,
-                                    )}`
-                                  : "Unavailable"
-                              }
-                              className={cn(
-                                "size-[18px] rounded-[4px] border text-[0px] transition-all",
-                                isSelected
-                                  ? "scale-110 border-transparent bg-solid"
-                                  : available
-                                    ? "border-hairline bg-card hover:bg-sunken-2"
-                                    : "cursor-not-allowed border-transparent bg-n-200 dark:bg-n-800",
-                              )}
-                              style={
-                                !isSelected && available
-                                  ? { borderColor: `${section.color}66` }
-                                  : undefined
-                              }
-                            >
-                              {seat.seat!.seat_number}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                  return (
+                    <button
+                      key={seat.id}
+                      id={`seat-${seat.id}`}
+                      type="button"
+                      // Not `disabled`: that would drop the seat out of the
+                      // focus order, stalling arrow keys on a taken row.
+                      aria-disabled={!available}
+                      tabIndex={seat.id === tabStop ? 0 : -1}
+                      onFocus={() => setFocused(seat.id)}
+                      onKeyDown={(event) => handleKeyDown(event, seat.id)}
+                      onClick={() => toggle(seat.id)}
+                      aria-label={`${seat.sectionName} row ${seat.rowLabel} seat ${seat.seatNumber}, ${
+                        available ? formatMoney(seat.priceCents, currency) : "unavailable"
+                      }`}
+                      aria-pressed={isSelected}
+                      title={
+                        available
+                          ? `${seat.sectionName} · Row ${seat.rowLabel} · Seat ${seat.seatNumber} — ${formatMoney(
+                              seat.priceCents,
+                              currency,
+                            )}`
+                          : "Unavailable"
+                      }
+                      className={cn(
+                        "absolute grid -translate-x-1/2 -translate-y-1/2 place-items-center rounded-[7px]",
+                        "text-[10px] font-semibold leading-none transition-[transform,background-color]",
+                        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus",
+                        isSelected
+                          ? "scale-110 bg-solid text-on-solid"
+                          : available
+                            ? "text-ink-2 hover:scale-110"
+                            : "cursor-not-allowed bg-n-200 text-transparent dark:bg-n-800",
+                      )}
+                      style={{
+                        left: seat.left,
+                        top: seat.top,
+                        width: SEAT_SIZE,
+                        height: SEAT_SIZE,
+                        ...(available && !isSelected
+                          ? { backgroundColor: `${seat.color}33`, boxShadow: `inset 0 0 0 1.5px ${seat.color}` }
+                          : null),
+                      }}
+                    >
+                      {showLabels && available ? seat.seatNumber : ""}
+                    </button>
+                  );
+                })}
               </div>
-            ))}
+            </TransformComponent>
+
+            <div className="absolute right-3 top-3 flex flex-col gap-1 rounded-lg bg-card p-1 shadow-e2">
+              <Button variant="ghost" size="icon-sm" aria-label="Zoom in" onClick={() => zoom.current?.zoomIn()}>
+                <Plus />
+              </Button>
+              <Button variant="ghost" size="icon-sm" aria-label="Zoom out" onClick={() => zoom.current?.zoomOut()}>
+                <Minus />
+              </Button>
+              <Button variant="ghost" size="icon-sm" aria-label="Fit the whole plan" onClick={() => zoom.current?.fitToView({ maxScale: 1 })}>
+                <Maximize2 />
+              </Button>
+            </div>
           </div>
-        </div>
+        </TransformWrapper>
 
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-hairline-soft px-4 py-3">
-          <Legend className="border-hairline bg-card" label="Available" />
-          <Legend className="border-transparent bg-solid" label="Selected" />
-          <Legend className="border-transparent bg-n-200 dark:bg-n-800" label="Taken" />
+          {sections.map((section) => (
+            <span key={section.name} className="flex items-center gap-1.5 text-xs text-ink-3">
+              <span
+                className="size-3 rounded-[3px]"
+                style={{ backgroundColor: `${section.color}33`, boxShadow: `inset 0 0 0 1.5px ${section.color}` }}
+              />
+              {section.name}
+              <span className="tabular text-ink-2">{formatMoney(section.from, currency)}</span>
+            </span>
+          ))}
+          <span className="flex items-center gap-1.5 text-xs text-ink-3">
+            <span className="size-3 rounded-[3px] bg-solid" />
+            Selected
+          </span>
+          <span className="flex items-center gap-1.5 text-xs text-ink-3">
+            <span className="size-3 rounded-[3px] bg-n-200 dark:bg-n-800" />
+            Taken
+          </span>
         </div>
       </Card>
 
@@ -224,9 +289,10 @@ export function SeatMap({
             {selection.count > 0
               ? selection.selected
                   .map((id) => {
-                    const seat = seatById.get(id)!;
-                    return `${seat.seat!.row_label}${seat.seat!.seat_number}`;
+                    const seat = seatById.get(id);
+                    return seat ? `${seat.rowLabel}${seat.seatNumber}` : "";
                   })
+                  .filter(Boolean)
                   .join(", ")
               : "No seats selected"}
           </p>
@@ -247,14 +313,5 @@ export function SeatMap({
         </Button>
       </div>
     </div>
-  );
-}
-
-function Legend({ className, label }: { className: string; label: string }) {
-  return (
-    <span className="flex items-center gap-1.5 text-xs text-ink-3">
-      <span className={cn("size-3 rounded-[3px] border", className)} />
-      {label}
-    </span>
   );
 }
