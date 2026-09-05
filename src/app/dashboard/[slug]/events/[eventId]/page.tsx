@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/surface";
 import { Meter, StatTile } from "@/components/ui/misc";
 import { TicketTypeEditor } from "@/components/dashboard/ticket-type-editor";
+import { SeatingEditor, type SeatingSection } from "@/components/dashboard/seating-editor";
 import { EventStatusControl } from "@/components/dashboard/event-status-control";
 import { formatDateTime, formatMoney, formatNumber } from "@/lib/format";
 import type { EventStats, EventStatus } from "@/lib/types";
@@ -35,19 +36,42 @@ export default async function ManageEventPage({
 
   const { data: event } = await supabase
     .from("events")
-    .select("*, venue:venues(name, city), category:categories(name)")
+    .select("*, venue:venues(id, name, city), category:categories(name)")
     .eq("id", eventId)
     .eq("organizer_id", organizer.id)
     .maybeSingle();
 
   if (!event) notFound();
 
-  const [{ data: statsData }, { data: ticketTypes }] = await Promise.all([
-    supabase.rpc("event_stats", { p_event_id: eventId }),
-    supabase.from("ticket_types").select("*").eq("event_id", eventId).order("sort_order"),
-  ]);
+  const [{ data: statsData }, { data: ticketTypes }, { data: venueSections }, { count: soldOrHeld }] =
+    await Promise.all([
+      supabase.rpc("event_stats", { p_event_id: eventId }),
+      supabase.from("ticket_types").select("*").eq("event_id", eventId).order("sort_order"),
+      // The venue's seat map, if it has one — the editor needs to know whether
+      // it is building a map or reusing one that already exists.
+      event.venue_id
+        ? supabase
+            .from("venue_sections")
+            .select("id, name, color, venue_seats(count)")
+            .eq("venue_id", event.venue_id)
+            .order("sort_order")
+        : Promise.resolve({ data: [] }),
+      supabase
+        .from("event_seats")
+        .select("id", { count: "exact", head: true })
+        .eq("event_id", eventId)
+        .neq("status", "available"),
+    ]);
 
   const stats = (statsData ?? {}) as unknown as EventStats;
+  const sections: SeatingSection[] = (
+    (venueSections ?? []) as { id: string; name: string; color: string; venue_seats: { count: number }[] }[]
+  ).map((section) => ({
+    id: section.id,
+    name: section.name,
+    color: section.color,
+    seats: section.venue_seats?.[0]?.count ?? 0,
+  }));
   const canEdit = role === "owner" || role === "admin" || role === "staff";
   const currency = ticketTypes?.[0]?.currency ?? "USD";
 
@@ -154,6 +178,20 @@ export default async function ManageEventPage({
           eventId={eventId}
           ticketTypes={ticketTypes ?? []}
           seatingType={event.seating_type}
+          sections={sections}
+        />
+      )}
+
+      {canEdit && (
+        <SeatingEditor
+          eventId={eventId}
+          eventSlug={event.slug}
+          eventStatus={event.status}
+          seatingType={event.seating_type}
+          venue={event.venue ? { id: event.venue.id, name: event.venue.name } : null}
+          sections={sections}
+          ticketTypeCount={ticketTypes?.length ?? 0}
+          soldOrHeld={soldOrHeld ?? 0}
         />
       )}
     </div>
