@@ -51,6 +51,8 @@ export const ticketTypeSchema = z
     minPerOrder: z.string().trim().refine((v) => /^\d+$/.test(v) && Number(v) >= 1, "At least 1."),
     maxPerOrder: z.string().trim().refine((v) => /^\d+$/.test(v) && Number(v) >= 1, "At least 1."),
     isHidden: z.boolean(),
+    /** Which seating section this tier prices. Empty for general admission. */
+    sectionId: z.string().optional().or(z.literal("")),
   })
   .refine((v) => Number(v.maxPerOrder) >= Number(v.minPerOrder), {
     message: "The maximum cannot be below the minimum.",
@@ -86,3 +88,38 @@ export const promoSchema = z
 
 export type PromoValues = z.input<typeof promoSchema>;
 export type PromoData = z.output<typeof promoSchema>;
+
+/** The most seats one form submission will build, to keep the writes sane. */
+export const MAX_GENERATED_SEATS = 5_000;
+
+const wholeBetween = (min: number, max: number, message: string) =>
+  z.string().trim().refine((v) => /^\d+$/.test(v) && Number(v) >= min && Number(v) <= max, message);
+
+export const seatingSectionSchema = z.object({
+  name: z.string().trim().min(1, "Name the section.").max(60),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/, "Pick a colour."),
+  rows: wholeBetween(1, 200, "Between 1 and 200 rows."),
+  seatsPerRow: wholeBetween(1, 200, "Between 1 and 200 seats."),
+  price: z
+    .string()
+    .trim()
+    .refine((v) => /^\d+(\.\d{1,2})?$/.test(v), "Enter a price like 45 or 45.50."),
+});
+
+export const seatingSchema = z
+  .object({
+    sections: z.array(seatingSectionSchema).min(1, "Add at least one section."),
+  })
+  // Every seat is a row in three tables, so the total is worth a ceiling.
+  .refine(
+    (values) =>
+      values.sections.reduce((sum, s) => sum + Number(s.rows) * Number(s.seatsPerRow), 0) <=
+      MAX_GENERATED_SEATS,
+    {
+      message: `That comes to more than ${MAX_GENERATED_SEATS.toLocaleString()} seats. Build it in smaller sections.`,
+      path: ["sections"],
+    },
+  );
+
+export type SeatingValues = z.input<typeof seatingSchema>;
+export type SeatingData = z.output<typeof seatingSchema>;

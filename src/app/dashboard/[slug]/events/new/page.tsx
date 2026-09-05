@@ -4,7 +4,6 @@ import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
 import { EventForm } from "@/components/dashboard/event-form";
-import { fetchTagSuggestions } from "@/lib/tags";
 
 export const metadata: Metadata = { title: "New event" };
 
@@ -13,7 +12,7 @@ export default async function NewEventPage({ params }: { params: Promise<{ slug:
   const { organizer } = await requireOrganizer(slug, "staff");
   const supabase = await createClient();
 
-  const [{ data: categories }, { data: venues }, tagSuggestions] = await Promise.all([
+  const [{ data: categories }, { data: venues }] = await Promise.all([
     supabase.from("categories").select("id, name").eq("is_active", true).order("sort_order"),
     supabase
       .from("venues")
@@ -21,7 +20,6 @@ export default async function NewEventPage({ params }: { params: Promise<{ slug:
       .or(`organizer_id.eq.${organizer.id},organizer_id.is.null`)
       .eq("is_active", true)
       .order("name"),
-    fetchTagSuggestions(),
   ]);
 
   return (
@@ -46,7 +44,6 @@ export default async function NewEventPage({ params }: { params: Promise<{ slug:
         organizerSlug={slug}
         categories={categories ?? []}
         venues={venues ?? []}
-        tagSuggestions={tagSuggestions}
       />
     </div>
   );

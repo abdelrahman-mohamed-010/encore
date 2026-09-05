@@ -17,6 +17,7 @@ import {
 import { AffixInput, Input, Switch, Textarea, Label } from "@/components/ui/input";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
+import { Combobox } from "@/components/ui/combobox";
 import { EmptyState, Meter } from "@/components/ui/misc";
 import { formatMoney, formatNumber } from "@/lib/format";
 import type { SeatingType, TicketType } from "@/lib/types";
@@ -29,6 +30,7 @@ const EMPTY: TicketTypeValues = {
   minPerOrder: "1",
   maxPerOrder: "10",
   isHidden: false,
+  sectionId: "",
 };
 
 function toValues(tier: TicketType): TicketTypeValues {
@@ -40,6 +42,7 @@ function toValues(tier: TicketType): TicketTypeValues {
     minPerOrder: String(tier.min_per_order),
     maxPerOrder: String(tier.max_per_order),
     isHidden: tier.is_hidden,
+    sectionId: tier.section_id ?? "",
   };
 }
 
@@ -47,10 +50,13 @@ export function TicketTypeEditor({
   eventId,
   ticketTypes,
   seatingType,
+  sections = [],
 }: {
   eventId: string;
   ticketTypes: TicketType[];
   seatingType: SeatingType;
+  /** The venue's seating sections, when it has a seat map. */
+  sections?: { id: string; name: string }[];
 }) {
   const router = useRouter();
   // `editing` holds which tier the dialog is bound to: null = closed,
@@ -95,6 +101,8 @@ export function TicketTypeEditor({
       min_per_order: Number(values.minPerOrder),
       max_per_order: Number(values.maxPerOrder),
       is_hidden: values.isHidden,
+      // A seated tier prices one section; a general-admission one prices none.
+      section_id: values.sectionId || null,
       sort_order: existing?.sort_order ?? ticketTypes.length,
     };
 
@@ -231,6 +239,29 @@ export function TicketTypeEditor({
               <FormField<TicketTypeValues, "description"> name="description" label="Description">
                 {(field) => <Textarea {...field} rows={2} />}
               </FormField>
+
+              {sections.length > 0 && (
+                <FormField<TicketTypeValues, "sectionId">
+                  name="sectionId"
+                  label="Seating section"
+                  hint="Seats in this section are sold at this price. Leave blank for a tier with no seats."
+                >
+                  {({ value, onChange, ...field }) => (
+                    <Combobox
+                      {...field}
+                      value={value ?? ""}
+                      onChange={onChange}
+                      clearable
+                      placeholder="No section"
+                      searchPlaceholder="Search sections…"
+                      options={sections.map((section) => ({
+                        value: section.id,
+                        label: section.name,
+                      }))}
+                    />
+                  )}
+                </FormField>
+              )}
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <FormField<TicketTypeValues, "price"> name="price" label="Price" hint="Use 0 for a free ticket.">
