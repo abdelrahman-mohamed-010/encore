@@ -143,7 +143,7 @@ export function StatTile({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col justify-between rounded-xl bg-card shadow-e1 p-4", className)}>
+    <div className={cn("flex flex-col justify-between rounded-xl bg-card p-4", className)}>
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-ink-3">{label}</p>
         {Icon && (

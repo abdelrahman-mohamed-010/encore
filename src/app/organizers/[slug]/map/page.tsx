@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { fetchEventPins } from "@/lib/events-map";
 import { getEdgeLocation } from "@/lib/geo-server";
 import { MapExplorer } from "@/components/map/map-explorer";
-import { Breadcrumbs } from "@/components/ui/nav";
+import { Button } from "@/components/ui/button";
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -35,9 +37,6 @@ export default async function OrganizerMapPage({ params }: Params) {
 
   if (!organizer) notFound();
 
-  // Sorting by distance is a nicety here, not a filter: with no radius the
-  // full set is returned either way, just ordered usefully when we know where
-  // the visitor is.
   const location = await getEdgeLocation();
   const pins = await fetchEventPins({
     organizerSlug: slug,
@@ -47,19 +46,25 @@ export default async function OrganizerMapPage({ params }: Params) {
   });
 
   return (
-    <div className="flex h-[calc(100dvh-var(--header-h,4rem))] flex-col">
-      <div className="shrink-0 border-b border-hairline px-4 py-3 sm:px-6">
-        <Breadcrumbs
-          items={[
-            { label: "Organizers", href: "/organizers" },
-            { label: organizer.name, href: `/organizers/${slug}` },
-            { label: "Map" },
-          ]}
-        />
-        <h1 className="mt-1 text-xl font-semibold text-ink">
-          {organizer.name} on the map
-        </h1>
-      </div>
+    <div className="flex h-dvh w-screen flex-col bg-paper overflow-hidden">
+      {/* Full-screen top navigation bar */}
+      <header className="flex h-12 shrink-0 items-center justify-between border-b border-hairline bg-card/90 px-4 backdrop-blur-md">
+        <div className="flex items-center gap-3">
+          <Button asChild variant="ghost" size="sm" className="rounded-xl gap-1.5 font-medium">
+            <Link href={`/organizers/${slug}`}>
+              <ArrowLeft className="size-4" />
+              <span>Back to {organizer.name}</span>
+            </Link>
+          </Button>
+          <span className="h-4 w-px bg-hairline" />
+          <h1 className="text-sm font-semibold text-ink truncate">
+            {organizer.name} on the map
+          </h1>
+          <span className="rounded-full bg-sunken px-2 py-0.5 text-2xs font-semibold text-ink-3">
+            {pins.length} {pins.length === 1 ? "event" : "events"}
+          </span>
+        </div>
+      </header>
 
       <MapExplorer
         pins={pins}

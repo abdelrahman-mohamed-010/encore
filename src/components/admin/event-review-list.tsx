@@ -3,19 +3,21 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
-import { Check, ExternalLink, X } from "lucide-react";
+import { useState, useTransition, useMemo } from "react";
+import { Check, ExternalLink, Search, Ticket, X } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/surface";
-import { Segmented } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
+import { SelectField } from "@/components/ui/select";
 import { EmptyState } from "@/components/ui/misc";
-import { formatDate, formatNumber } from "@/lib/format";
+import { TablePagination, useTablePagination } from "@/components/ui/table";
+import { formatDate } from "@/lib/format";
 import type { EventStatus } from "@/lib/types";
 
-type ReviewEvent = {
+export type ReviewEvent = {
   id: string;
   title: string;
   slug: string;
@@ -40,10 +42,30 @@ const TONE: Record<EventStatus, "positive" | "caution" | "neutral" | "critical">
 
 export function EventReviewList({ events }: { events: ReviewEvent[] }) {
   const router = useRouter();
-  const [filter, setFilter] = useState("pending_review");
+  const [query, setQuery] = useState("");
+  const [filter, setFilter] = useState("all");
   const [pending, startTransition] = useTransition();
 
-  const visible = filter === "all" ? events : events.filter((e) => e.status === filter);
+  const filteredEvents = useMemo(() => {
+    return events.filter((e) => {
+      const matchesFilter = filter === "all" || e.status === filter;
+      const matchesQuery =
+        !query.trim() ||
+        e.title.toLowerCase().includes(query.toLowerCase().trim()) ||
+        e.organizerName.toLowerCase().includes(query.toLowerCase().trim());
+      return matchesFilter && matchesQuery;
+    });
+  }, [events, filter, query]);
+
+  const {
+    paginatedItems,
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    setPage,
+    setPageSize,
+  } = useTablePagination(filteredEvents, 10);
 
   function setStatus(event: ReviewEvent, status: EventStatus, reason?: string) {
     startTransition(async () => {
@@ -59,108 +81,174 @@ export function EventReviewList({ events }: { events: ReviewEvent[] }) {
       }
 
       toast.success(
-        status === "published" ? `${event.title} is live` : `${event.title} moved to ${status.replace("_", " ")}`,
+        status === "published"
+          ? `${event.title} is live`
+          : status === "draft"
+            ? `${event.title} returned to draft`
+            : `${event.title} moved to ${status.replace("_", " ")}`,
       );
       router.refresh();
     });
   }
 
   return (
-    <div className="space-y-5">
-      <Segmented
-        value={filter}
-        onChange={setFilter}
-        options={[
-          { value: "pending_review", label: "Pending" },
-          { value: "published", label: "Published" },
-          { value: "draft", label: "Drafts" },
-          { value: "all", label: "All" },
-        ]}
-      />
+    <div className="space-y-4">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <form className="relative max-w-sm flex-1 min-w-48" onSubmit={(e) => e.preventDefault()}>
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by event or organizer"
+            className="pl-9"
+            aria-label="Search events"
+          />
+        </form>
 
-      {visible.length === 0 ? (
+        <SelectField
+          value={filter}
+          onChange={setFilter}
+          aria-label="Filter events by status"
+          size="sm"
+          className="w-40"
+          options={[
+            { value: "all", label: "All Statuses" },
+            { value: "pending_review", label: "Pending Review" },
+            { value: "published", label: "Published" },
+            { value: "draft", label: "Draft" },
+            { value: "paused", label: "Paused" },
+          ]}
+        />
+      </div>
+
+      {filteredEvents.length === 0 ? (
         <EmptyState
-          icon={Check}
-          title="Nothing here"
-          description={
-            filter === "pending_review"
-              ? "No events are waiting for approval."
-              : "No events match this filter."
-          }
+          icon={Search}
+          title="No events found"
+          description="Try a different search term or filter."
         />
       ) : (
-        <Card className="overflow-hidden">
-          {visible.map((event) => (
-            <div
-              key={event.id}
-              className="flex flex-wrap items-center gap-4 border-b border-hairline-soft px-4 py-4 last:border-b-0"
-            >
-              <div className="relative size-14 shrink-0 overflow-hidden rounded-lg bg-sunken">
-                {event.coverImageUrl && (
-                  <Image src={event.coverImageUrl} alt="" fill sizes="56px" className="object-cover" />
-                )}
-              </div>
+        <Card className="overflow-x-auto">
+          <table className="w-full min-w-[44rem] text-left text-sm">
+            <thead>
+              <tr className="border-b border-hairline text-2xs uppercase tracking-[0.06em] text-ink-3">
+                <th scope="col" className="px-4 py-3 font-semibold">Event</th>
+                <th scope="col" className="px-4 py-3 font-semibold">Date</th>
+                <th scope="col" className="px-4 py-3 font-semibold">Organizer</th>
+                <th scope="col" className="px-4 py-3 font-semibold">Status</th>
+                <th scope="col" className="px-4 py-3 text-right" />
+              </tr>
+            </thead>
+            <tbody>
+              {paginatedItems.map((event) => (
+                <tr key={event.id} className="border-b border-hairline-soft last:border-b-0 hover:bg-sunken">
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="relative size-10 shrink-0 overflow-hidden rounded-lg bg-sunken flex items-center justify-center">
+                        {event.coverImageUrl ? (
+                          <Image
+                            src={event.coverImageUrl}
+                            alt=""
+                            fill
+                            sizes="40px"
+                            className="object-cover"
+                          />
+                        ) : (
+                          <Ticket className="size-4 text-ink-3" />
+                        )}
+                      </div>
+                      <div className="min-w-0">
+                        <Link
+                          href={`/events/${event.slug}`}
+                          target="_blank"
+                          className="truncate text-ink font-medium hover:underline block"
+                        >
+                          {event.title}
+                        </Link>
+                        <p className="truncate text-xs text-ink-3">
+                          {event.venueLabel || "No venue"}
+                        </p>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-ink-3">
+                    {formatDate(event.startsAt, "medium")}
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-ink-3">
+                    {event.organizerName || "—"}
+                  </td>
+                  <td className="px-4 py-3">
+                    <Badge tone={TONE[event.status]} size="xs">
+                      {event.status.replace("_", " ")}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex items-center justify-end gap-1.5">
+                      {event.status === "pending_review" && (
+                        <>
+                          <Button
+                            variant="ghost"
+                            size="xs"
+                            disabled={pending}
+                            onClick={() => setStatus(event, "draft", "Returned by an administrator")}
+                          >
+                            <X className="size-3.5" /> Reject
+                          </Button>
+                          <Button
+                            variant="solid"
+                            size="xs"
+                            disabled={pending || event.tiers === 0}
+                            title={event.tiers === 0 ? "This event has no ticket types yet" : undefined}
+                            onClick={() => setStatus(event, "published")}
+                          >
+                            <Check className="size-3.5" /> Approve
+                          </Button>
+                        </>
+                      )}
 
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <p className="truncate text-base font-medium text-ink">{event.title}</p>
-                  <Badge tone={TONE[event.status]} size="xs">
-                    {event.status.replace("_", " ")}
-                  </Badge>
-                </div>
-                <p className="mt-1 truncate text-xs text-ink-3">
-                  {event.organizerName} · {formatDate(event.startsAt, "medium")}
-                  {event.venueLabel && ` · ${event.venueLabel}`}
-                </p>
-                <p className="mt-0.5 text-xs text-ink-3">
-                  {event.tiers} ticket {event.tiers === 1 ? "type" : "types"} ·{" "}
-                  {formatNumber(event.capacity)} capacity
-                </p>
-              </div>
+                      {event.status === "published" && (
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          disabled={pending}
+                          onClick={() => setStatus(event, "paused")}
+                        >
+                          Pause
+                        </Button>
+                      )}
 
-              <div className="flex shrink-0 gap-2">
-                <Button asChild variant="ghost" size="sm">
-                  <Link href={`/events/${event.slug}`} target="_blank">
-                    Preview <ExternalLink />
-                  </Link>
-                </Button>
+                      {event.status === "paused" && (
+                        <Button
+                          variant="solid"
+                          size="xs"
+                          disabled={pending}
+                          onClick={() => setStatus(event, "published")}
+                        >
+                          Resume
+                        </Button>
+                      )}
 
-                {event.status === "pending_review" && (
-                  <>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      disabled={pending}
-                      onClick={() => setStatus(event, "draft", "Returned by an administrator")}
-                    >
-                      <X /> Reject
-                    </Button>
-                    <Button
-                      variant="solid"
-                      size="sm"
-                      disabled={pending || event.tiers === 0}
-                      title={event.tiers === 0 ? "This event has no ticket types yet" : undefined}
-                      onClick={() => setStatus(event, "published")}
-                    >
-                      <Check /> Approve
-                    </Button>
-                  </>
-                )}
+                      <Button asChild variant="ghost" size="xs">
+                        <Link href={`/events/${event.slug}`} target="_blank">
+                          <ExternalLink className="size-3.5" />
+                        </Link>
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-                {event.status === "published" && (
-                  <Button variant="ghost" size="sm" disabled={pending} onClick={() => setStatus(event, "paused")}>
-                    Pause
-                  </Button>
-                )}
-
-                {event.status === "paused" && (
-                  <Button variant="solid" size="sm" disabled={pending} onClick={() => setStatus(event, "published")}>
-                    Resume
-                  </Button>
-                )}
-              </div>
-            </div>
-          ))}
+          {/* Table Pagination */}
+          <TablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
         </Card>
       )}
     </div>

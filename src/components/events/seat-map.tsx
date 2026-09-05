@@ -201,8 +201,8 @@ export function SeatMap({
           wheel={{ step: 0.15 }}
           // Open on the whole plan. A venue is taller than the panel it sits
           // in, so starting at 1:1 would drop the back rows below the fold.
-          onInit={(ref) => ref.fitToView({ maxScale: 1 })}
-          onTransform={(_, state) => setScale(state.scale)}
+          onInit={(ref: ReactZoomPanPinchContentRef) => ref.fitToView({ maxScale: 1 })}
+          onTransform={(_: unknown, state: { scale: number }) => setScale(state.scale)}
         >
           <div className="relative">
             {/* The wrapper is the viewport; the content must keep the plan's

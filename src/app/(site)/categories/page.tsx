@@ -30,10 +30,15 @@ export default async function CategoriesPage() {
     .order("sort_order");
 
   return (
-    <div className="container-page py-10 md:py-12">
-      <SectionHeader level={1} title="Categories" description="Browse by the kind of night you are after." />
+    <div className="container-page py-10 md:py-14">
+      <SectionHeader
+        level={1}
+        eyebrow="Explore Genres"
+        title="Categories"
+        description="Discover events by the kind of night you are after."
+      />
 
-      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
         {(categories ?? []).map((category) => {
           const Icon = (Icons[ICON_MAP[category.icon] ?? "Ticket"] ??
             Icons.Ticket) as React.ComponentType<{ className?: string }>;
@@ -43,21 +48,23 @@ export default async function CategoriesPage() {
             <Link
               key={category.id}
               href={`/events?category=${category.slug}`}
-              className="group rounded-xl bg-card shadow-e1 p-5 transition-colors hover:bg-sunken"
+              className="group relative flex flex-col justify-between overflow-hidden rounded-2xl bg-card p-4.5 transition-all duration-200 hover:-translate-y-1"
             >
-              <span
-                className="grid size-10 place-items-center rounded-lg"
-                style={{ backgroundColor: `${category.color}1f`, color: category.color }}
-              >
-                <Icon className="size-5" />
-              </span>
-              <p className="mt-3.5 text-md font-semibold text-ink">{category.name}</p>
-              <p className="mt-1 text-xs text-ink-3">{pluralize(count, "event")}</p>
-              {category.description && (
-                <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-ink-2">
-                  {category.description}
+              <div>
+                <span
+                  className="grid size-11 place-items-center rounded-xl transition-transform duration-200 group-hover:scale-110"
+                  style={{ backgroundColor: `${category.color}16`, color: category.color }}
+                >
+                  <Icon className="size-5 stroke-[2.2]" />
+                </span>
+
+                <h2 className="mt-3 text-sm sm:text-base font-semibold text-ink transition-colors group-hover:text-brand-600">
+                  {category.name}
+                </h2>
+                <p className="mt-0.5 text-xs text-ink-3">
+                  {pluralize(count, "event")}
                 </p>
-              )}
+              </div>
             </Link>
           );
         })}

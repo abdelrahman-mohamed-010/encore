@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getUser } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/misc";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { Card, Divider } from "@/components/ui/surface";
 import { FieldRow, InfoRow } from "@/components/ui/field-row";
 import { TicketPicker } from "@/components/events/ticket-picker";
@@ -156,7 +157,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                   <p className="flex items-center gap-1.5 truncate text-base font-medium text-ink">
                     {event.organizer?.name}
                     {event.organizer?.verification_status === "verified" && (
-                      <ShieldCheck className="size-3.5 shrink-0 text-info" />
+                      <VerifiedBadge size="xs" />
                     )}
                   </p>
                   <p className="truncate text-sm text-ink-3">View all events</p>

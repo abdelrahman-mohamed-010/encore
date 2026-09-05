@@ -1,7 +1,8 @@
 import Link from "next/link";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { ArrowLeft, CalendarDays, MapPin, Receipt } from "lucide-react";
+import { ArrowLeft, CalendarDays, Download, MapPin, Receipt, Ticket } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
@@ -40,7 +41,7 @@ export default async function OrderDetailPage({
     .from("orders")
     .select(
       `*,
-       event:events(title, slug, starts_at, timezone, is_online, venue:venues(name, city, country)),
+       event:events(title, slug, starts_at, timezone, is_online, cover_image_url, venue:venues(name, city, country)),
        items:order_items(id, ticket_type_name, seat_label, quantity, unit_price_cents, subtotal_cents),
        tickets:tickets(id, ticket_code, status, seat_label),
        refunds:refunds(id, amount_cents, reason, status, created_at)`,
@@ -62,17 +63,46 @@ export default async function OrderDetailPage({
         All orders
       </Link>
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="display-3 text-ink">{order.event?.title}</h1>
-          <p className="mt-1.5 font-mono text-sm text-ink-3">{order.order_number}</p>
+      {/* Event banner */}
+      {order.event?.cover_image_url && (
+        <div className="relative mb-6 h-32 overflow-hidden rounded-2xl bg-sunken sm:h-40">
+          <Image
+            src={order.event.cover_image_url}
+            alt=""
+            fill
+            sizes="(max-width: 768px) 100vw, 700px"
+            className="object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+          <div className="absolute bottom-0 left-0 right-0 p-5">
+            <h1 className="text-xl font-bold text-white drop-shadow-sm sm:text-2xl">
+              {order.event?.title}
+            </h1>
+            <p className="mt-1 font-mono text-xs text-white/70">{order.order_number}</p>
+          </div>
+          <div className="absolute right-4 top-4">
+            <Badge tone={TONE[order.status]} size="md" className="shadow-sm">
+              {order.status.replace("_", " ")}
+            </Badge>
+          </div>
         </div>
-        <Badge tone={TONE[order.status]} size="md">
-          {order.status.replace("_", " ")}
-        </Badge>
-      </div>
+      )}
 
-      <Card className="mt-6 overflow-hidden">
+      {/* Fallback header when no cover image */}
+      {!order.event?.cover_image_url && (
+        <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="display-3 text-ink">{order.event?.title}</h1>
+            <p className="mt-1.5 font-mono text-sm text-ink-3">{order.order_number}</p>
+          </div>
+          <Badge tone={TONE[order.status]} size="md">
+            {order.status.replace("_", " ")}
+          </Badge>
+        </div>
+      )}
+
+      {/* Event details + order date */}
+      <Card className="overflow-hidden">
         <FieldRow
           icon={CalendarDays}
           label="Event starts"
@@ -94,6 +124,7 @@ export default async function OrderDetailPage({
         <FieldRow icon={Receipt} label="Ordered" value={formatDateTime(order.created_at)} />
       </Card>
 
+      {/* Items + summary — merged into one card */}
       <Card className="mt-5 overflow-hidden">
         <div className="border-b border-hairline-soft px-4 py-3.5">
           <h2 className="text-base font-semibold text-ink">Items</h2>
@@ -140,10 +171,12 @@ export default async function OrderDetailPage({
         </div>
       </Card>
 
+      {/* Tickets */}
       {order.tickets && order.tickets.length > 0 && (
         <Card className="mt-5 overflow-hidden">
           <div className="flex items-center justify-between border-b border-hairline-soft px-4 py-3.5">
-            <h2 className="text-base font-semibold text-ink">
+            <h2 className="flex items-center gap-2 text-base font-semibold text-ink">
+              <Ticket className="size-4 text-ink-3" />
               Tickets ({order.tickets.length})
             </h2>
             <Button asChild variant="outline" size="sm">
@@ -153,11 +186,16 @@ export default async function OrderDetailPage({
           <div className="divide-y divide-hairline-soft">
             {order.tickets.map((ticket) => (
               <div key={ticket.id} className="flex items-center justify-between gap-3 px-4 py-3">
-                <div className="min-w-0">
-                  <p className="font-mono text-sm font-medium text-ink">{ticket.ticket_code}</p>
-                  {ticket.seat_label && (
-                    <p className="mt-0.5 text-xs text-ink-3">{ticket.seat_label}</p>
-                  )}
+                <div className="flex min-w-0 items-center gap-3">
+                  <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-sunken text-ink-3">
+                    <Ticket className="size-4" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="font-mono text-sm font-medium text-ink">{ticket.ticket_code}</p>
+                    {ticket.seat_label && (
+                      <p className="mt-0.5 text-xs text-ink-3">Seat {ticket.seat_label}</p>
+                    )}
+                  </div>
                 </div>
                 <Badge tone={ticket.status === "valid" ? "positive" : "neutral"} size="xs">
                   {ticket.status === "used" ? "Checked in" : ticket.status}
@@ -168,6 +206,7 @@ export default async function OrderDetailPage({
         </Card>
       )}
 
+      {/* Refunds */}
       {order.refunds && order.refunds.length > 0 && (
         <Card className="mt-5 overflow-hidden">
           <div className="border-b border-hairline-soft px-4 py-3.5">
@@ -189,6 +228,21 @@ export default async function OrderDetailPage({
             ))}
           </div>
         </Card>
+      )}
+
+      {/* Action footer */}
+      {order.event && (
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+          <Button asChild variant="ghost" size="sm" className="gap-1.5 text-ink-3">
+            <Link href={`/events/${order.event.slug}`}>
+              View event page <ArrowLeft className="size-3 rotate-180" />
+            </Link>
+          </Button>
+          <Button variant="outline" size="sm" className="gap-1.5">
+            <Download className="size-3.5" />
+            Download receipt
+          </Button>
+        </div>
       )}
     </div>
   );

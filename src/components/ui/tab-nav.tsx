@@ -33,6 +33,8 @@ export function TabNav({
     icon?: React.ComponentType<{ className?: string }>;
     /** Path prefix that marks this tab current. Defaults to `href`. */
     match?: string;
+    /** If true, requires exact pathname match. */
+    exact?: boolean;
   }[];
   className?: string;
 }) {
@@ -45,7 +47,9 @@ export function TabNav({
     >
       {items.map((item) => {
         const base = item.match ?? item.href;
-        const active = pathname === base || pathname.startsWith(`${base}/`);
+        const active = item.exact
+          ? pathname === item.href
+          : pathname === base || pathname.startsWith(`${base}/`);
 
         return (
           <Link

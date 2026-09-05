@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState, useTransition, useMemo } from "react";
 import { Search } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select";
 import { Avatar, EmptyState } from "@/components/ui/misc";
 import { Badge } from "@/components/ui/badge";
+import { TablePagination, useTablePagination } from "@/components/ui/table";
 import { formatDate } from "@/lib/format";
 import type { Profile, UserRole } from "@/lib/types";
 
@@ -24,6 +25,26 @@ export function UserTable({
   const router = useRouter();
   const [query, setQuery] = useState(initialQuery);
   const [, startTransition] = useTransition();
+
+  const filteredProfiles = useMemo(() => {
+    if (!query.trim()) return profiles;
+    const q = query.toLowerCase().trim();
+    return profiles.filter(
+      (p) =>
+        (p.full_name && p.full_name.toLowerCase().includes(q)) ||
+        p.email.toLowerCase().includes(q),
+    );
+  }, [profiles, query]);
+
+  const {
+    paginatedItems,
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    setPage,
+    setPageSize,
+  } = useTablePagination(filteredProfiles, 10);
 
   function update(id: string, patch: { role?: UserRole; is_banned?: boolean }, message: string) {
     startTransition(async () => {
@@ -44,7 +65,6 @@ export function UserTable({
         className="relative max-w-sm"
         onSubmit={(e) => {
           e.preventDefault();
-          router.push(query.trim() ? `/admin/users?q=${encodeURIComponent(query.trim())}` : "/admin/users");
         }}
       >
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
@@ -57,7 +77,7 @@ export function UserTable({
         />
       </form>
 
-      {profiles.length === 0 ? (
+      {filteredProfiles.length === 0 ? (
         <EmptyState icon={Search} title="No users found" description="Try a different search term." />
       ) : (
         <Card className="overflow-x-auto">
@@ -72,7 +92,7 @@ export function UserTable({
               </tr>
             </thead>
             <tbody>
-              {profiles.map((profile) => (
+              {paginatedItems.map((profile) => (
                 <tr key={profile.id} className="border-b border-hairline-soft last:border-b-0 hover:bg-sunken">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
@@ -126,6 +146,16 @@ export function UserTable({
               ))}
             </tbody>
           </table>
+
+          {/* Table Pagination */}
+          <TablePagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            pageSize={pageSize}
+            onPageChange={setPage}
+            onPageSizeChange={setPageSize}
+          />
         </Card>
       )}
     </div>

@@ -8,6 +8,7 @@ import { EventCard, EventCardSkeleton, EventRow } from "@/components/events/even
 import { CategoryRail } from "@/components/events/category-rail";
 import { HeroCollage } from "@/components/home/hero-collage";
 import { ClosingCta } from "@/components/home/closing-cta";
+import { SiteFooter } from "@/components/layout/site-footer";
 import { SearchField } from "@/components/layout/search-field";
 import { formatNumber } from "@/lib/format";
 import type { EventSearchResult } from "@/lib/types";
@@ -89,7 +90,7 @@ export default async function HomePage() {
               description="The next events to go on stage."
               action={
                 <Button asChild variant="ghost" size="sm">
-                  <Link href="/events">Browse all <ArrowRight /></Link>
+                  <Link href="/events">Discover all <ArrowRight /></Link>
                 </Button>
               }
             />
@@ -121,6 +122,9 @@ export default async function HomePage() {
 
       {/* ---- Closing panel --------------------------------------------------- */}
       <ClosingCta />
+
+      {/* ---- Site Footer (landing page only) -------------------------------- */}
+      <SiteFooter />
     </>
   );
 }

@@ -19,9 +19,8 @@ export function Card({
   return (
     <div
       className={cn(
-        "rounded-xl",
-        flat ? "border border-hairline" : "shadow-e1",
-        inset ? "bg-sunken" : "bg-card",
+        "rounded-xl bg-card",
+        inset && "bg-sunken",
         className,
       )}
       {...props}
@@ -38,7 +37,6 @@ export function CardHeader({
     <div
       className={cn(
         "flex items-start justify-between gap-4 px-5 py-4",
-        bordered && "border-b border-hairline-soft",
         className,
       )}
       {...props}

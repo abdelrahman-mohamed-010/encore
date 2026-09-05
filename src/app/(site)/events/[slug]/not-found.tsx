@@ -13,7 +13,7 @@ export default function EventNotFound() {
         action={
           <div className="flex gap-3">
             <Button asChild variant="solid" size="md">
-              <Link href="/events">Browse events</Link>
+              <Link href="/events">Discover events</Link>
             </Button>
             <Button asChild variant="outline" size="md">
               <Link href="/">Go home</Link>

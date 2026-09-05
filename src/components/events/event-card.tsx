@@ -26,8 +26,8 @@ export function EventCard({
     <Link
       href={`/events/${event.slug}`}
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-2xl bg-card shadow-e1",
-        "transition-[box-shadow,transform] duration-200 hover:-translate-y-1 hover:shadow-e2",
+        "group flex h-full flex-col overflow-hidden rounded-2xl bg-card",
+        "transition-transform duration-200 hover:-translate-y-1",
         className,
       )}
     >
@@ -44,6 +44,9 @@ export function EventCard({
         ) : (
           <div className="size-full bg-gradient-to-br from-sunken to-sunken-2" />
         )}
+
+        {/* Subtle gradient for badge readability */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/30 to-transparent" />
 
         <div className="absolute left-3 top-3 flex gap-1.5">
           {event.is_featured && (
@@ -133,7 +136,7 @@ export function EventRow({
 
 export function EventCardSkeleton() {
   return (
-    <div className="overflow-hidden rounded-2xl bg-card shadow-e1">
+    <div className="overflow-hidden rounded-2xl bg-card">
       <div className="aspect-[4/3] animate-pulse bg-sunken" />
       <div className="space-y-3 p-5">
         <div className="flex gap-3">

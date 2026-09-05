@@ -1,13 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { CalendarDays, MapPin, Ticket as TicketIcon } from "lucide-react";
+import { CalendarDays, Clock, MapPin, Ticket as TicketIcon } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireUser } from "@/lib/auth";
 import { renderTicketQr } from "@/lib/qr";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/misc";
+import { TicketQrModal } from "@/components/events/ticket-qr-modal";
 import { formatEventStamp } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -58,7 +59,7 @@ export default async function TicketsPage() {
         description="When you book an event, your tickets appear here with a QR code for the door."
         action={
           <Button asChild variant="solid" size="md">
-            <Link href="/events">Browse events</Link>
+            <Link href="/events">Discover events</Link>
           </Button>
         }
       />
@@ -70,7 +71,7 @@ export default async function TicketsPage() {
       {upcoming.length > 0 && (
         <section>
           <h2 className="mb-4 text-md font-semibold text-ink">Upcoming</h2>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-3">
             {upcoming.map((ticket) => (
               <TicketCard key={ticket.id} ticket={ticket} qr={qrCodes.get(ticket.id)} />
             ))}
@@ -81,7 +82,7 @@ export default async function TicketsPage() {
       {past.length > 0 && (
         <section>
           <h2 className="mb-4 text-md font-semibold text-ink">Past</h2>
-          <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-3">
             {past.map((ticket) => (
               <TicketCard key={ticket.id} ticket={ticket} past />
             ))}
@@ -129,74 +130,97 @@ function TicketCard({
   return (
     <article
       className={cn(
-        "overflow-hidden rounded-xl bg-card shadow-e1",
-        past && "opacity-70",
+        "group overflow-hidden rounded-2xl bg-card transition-shadow duration-200 hover:shadow-e2",
+        past && "opacity-60",
       )}
     >
-      <div className="flex gap-4 p-4">
-        <div className="relative size-16 shrink-0 overflow-hidden rounded-lg bg-sunken">
-          {event.cover_image_url && (
-            <Image src={event.cover_image_url} alt="" fill sizes="64px" className="object-cover" />
+      <div className="flex gap-4 p-4 sm:p-5">
+        {/* Event thumbnail */}
+        <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-sunken sm:size-20">
+          {event.cover_image_url ? (
+            <Image
+              src={event.cover_image_url}
+              alt=""
+              fill
+              sizes="80px"
+              className="object-cover"
+            />
+          ) : (
+            <div className="flex size-full items-center justify-center bg-gradient-to-br from-sunken to-sunken-2 text-ink-3">
+              <TicketIcon className="size-6 opacity-40" />
+            </div>
           )}
         </div>
 
+        {/* Event + ticket info */}
         <div className="min-w-0 flex-1">
           <div className="flex items-start justify-between gap-3">
             <Link href={`/events/${event.slug}`} className="min-w-0">
-              <h3 className="truncate font-flourish text-lg text-ink hover:underline">
+              <h3 className="truncate font-flourish text-lg leading-tight text-ink transition-colors group-hover:text-ink-2">
                 {event.title}
               </h3>
             </Link>
-            <Badge tone={STATUS_TONE[ticket.status]} size="xs">
+            <Badge tone={STATUS_TONE[ticket.status]} size="xs" className="shrink-0">
               {ticket.status === "used" ? "Checked in" : ticket.status}
             </Badge>
           </div>
 
-          <p className="mt-2 flex items-center gap-1.5 text-sm text-ink-2">
-            <CalendarDays className="size-3.5 shrink-0" />
-            {formatEventStamp(event.starts_at, event.timezone ?? undefined)}
-          </p>
-          <p className="mt-1 flex items-center gap-1.5 text-sm text-ink-2">
-            <MapPin className="size-3.5 shrink-0" />
-            <span className="truncate">
-              {event.is_online ? "Online event" : [event.venue?.name, event.venue?.city].filter(Boolean).join(" · ")}
-            </span>
-          </p>
+          <div className="mt-2 flex flex-col gap-1 text-sm text-ink-2">
+            <p className="flex items-center gap-1.5">
+              <CalendarDays className="size-3.5 shrink-0 text-ink-3" />
+              {formatEventStamp(event.starts_at, event.timezone ?? undefined)}
+            </p>
+            <p className="flex items-center gap-1.5">
+              <MapPin className="size-3.5 shrink-0 text-ink-3" />
+              <span className="truncate">
+                {event.is_online
+                  ? "Online event"
+                  : [event.venue?.name, event.venue?.city].filter(Boolean).join(" · ") || "Venue TBA"}
+              </span>
+            </p>
+          </div>
         </div>
       </div>
 
+      {/* Perforation line */}
       <div className="perforation h-px w-full" />
 
-      <div className="flex items-center gap-4 p-4">
-        {qr ? (
-          <div className="shrink-0 rounded-lg border border-hairline bg-white p-1.5">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={qr} alt={`QR code for ticket ${ticket.ticket_code}`} className="size-24" />
-          </div>
-        ) : (
-          <div className="grid size-[6.75rem] shrink-0 place-items-center rounded-lg border border-dashed border-hairline text-2xs text-ink-3">
-            {ticket.status === "used" ? "Checked in" : "Not scannable"}
-          </div>
-        )}
-
-        <dl className="min-w-0 flex-1 space-y-2 text-xs">
-          <div>
-            <dt className="text-ink-3">Ticket</dt>
-            <dd className="font-medium text-ink">{ticket.ticket_type?.name ?? "General"}</dd>
-          </div>
+      {/* Bottom row: ticket metadata + QR trigger */}
+      <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-5">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <Badge tone="neutral" size="xs">
+            {ticket.ticket_type?.name ?? "General"}
+          </Badge>
           {ticket.seat_label && (
-            <div>
-              <dt className="text-ink-3">Seat</dt>
-              <dd className="font-medium text-ink">{ticket.seat_label}</dd>
-            </div>
+            <Badge tone="neutral" size="xs">
+              Seat {ticket.seat_label}
+            </Badge>
           )}
-          <div>
-            <dt className="text-ink-3">Code</dt>
-            <dd className="font-mono text-xs font-medium tracking-wide text-ink">
-              {ticket.ticket_code}
-            </dd>
-          </div>
-        </dl>
+          <span className="font-mono text-2xs font-medium tracking-wide text-ink-3">
+            {ticket.ticket_code}
+          </span>
+        </div>
+
+        <div className="shrink-0">
+          {qr && ticket.status === "valid" ? (
+            <TicketQrModal
+              qr={qr}
+              ticketCode={ticket.ticket_code}
+              ticketType={ticket.ticket_type?.name}
+              eventTitle={event.title}
+              seatLabel={ticket.seat_label}
+            />
+          ) : past ? (
+            <span className="flex items-center gap-1 text-2xs text-ink-3">
+              <Clock className="size-3" />
+              Event ended
+            </span>
+          ) : (
+            <span className="text-2xs text-ink-3">
+              {ticket.status === "used" ? "Checked in" : "Not scannable"}
+            </span>
+          )}
+        </div>
       </div>
     </article>
   );

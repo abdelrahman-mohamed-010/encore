@@ -115,7 +115,7 @@ const VISIBILITY: Record<NonNullable<Card["from"]>, string> = {
 
 export function HeroCollage() {
   return (
-    <section className="relative -mt-(--size-nav) pt-(--size-nav) min-h-[720px] overflow-x-clip overflow-y-visible bg-paper">
+    <section className="relative -mt-(--size-nav) pt-(--size-nav) min-h-[720px] overflow-x-clip overflow-y-visible bg-transparent">
       {CARDS.map((card, index) => (
         <div
           key={card.className}

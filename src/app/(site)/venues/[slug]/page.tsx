@@ -69,7 +69,7 @@ export default async function VenuePage({ params }: Params) {
 
   return (
     <div className="container-page py-10">
-      <Breadcrumbs items={[{ label: "Browse", href: "/events" }, { label: venue.name }]} />
+      <Breadcrumbs items={[{ label: "Discover", href: "/events" }, { label: venue.name }]} />
 
       <div className="mt-3 flex flex-wrap items-start justify-between gap-4">
         <div>

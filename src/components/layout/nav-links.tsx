@@ -1,4 +1,4 @@
-import { CalendarDays, Compass, LayoutGrid, Sparkles } from "lucide-react";
+import { CalendarDays, Compass, LayoutGrid, Users } from "lucide-react";
 
 export type NavLink = {
   href: string;
@@ -13,10 +13,10 @@ export type NavLink = {
 };
 
 export const PRIMARY_NAV: NavLink[] = [
-  { href: "/events", label: "Browse", icon: Compass, match: "/events" },
+  { href: "/events", label: "Discover", icon: Compass, match: "/events" },
   { href: "/events?sort=soonest", label: "This week", icon: CalendarDays },
   { href: "/categories", label: "Categories", icon: LayoutGrid, match: "/categories" },
-  { href: "/organizers", label: "Organizers", icon: Sparkles, match: "/organizers" },
+  { href: "/organizers", label: "Organizers", icon: Users, match: "/organizers" },
 ];
 
 /** The three shown in the centre of the desktop nav. */

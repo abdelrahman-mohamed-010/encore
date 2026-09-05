@@ -85,7 +85,7 @@ export function NearbyEvents({
       if (error.code === error.PERMISSION_DENIED) setDenied(true);
       throw new Error(
         error.code === error.PERMISSION_DENIED
-          ? "Location access was denied. You can still browse the full map."
+          ? "Location access was denied. You can still discover the full map."
           : "Could not determine your location.",
       );
     });
@@ -105,7 +105,7 @@ export function NearbyEvents({
   const browseAll = (
     <Button asChild variant="outline" size="md">
       <Link href={mapHref}>
-        <MapIcon /> Browse all on the map
+        <MapIcon /> Discover all on the map
       </Link>
     </Button>
   );

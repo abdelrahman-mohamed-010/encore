@@ -193,8 +193,8 @@ export function SettingsForm({ profile }: { profile: Profile }) {
           </div>
 
           {/* Social Links Grid with PrefixInputs */}
-          <div className="space-y-3 pt-3">
-            <Label>Social Links</Label>
+          <div className="flex flex-col gap-2.5 pt-3">
+            <Label className="block">Social Links</Label>
             <div className="grid gap-3.5 sm:grid-cols-2">
               <PrefixInput
                 icon={<InstagramIcon className="size-4" />}

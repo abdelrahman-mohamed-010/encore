@@ -25,11 +25,30 @@ export async function GET(request: NextRequest) {
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
+  const { data: authData, error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error) {
     return NextResponse.redirect(`${origin}/auth/login?error=${encodeURIComponent(error.message)}`);
   }
 
-  return NextResponse.redirect(`${origin}${destination}`);
+  let finalDestination = destination;
+  if (!next || next === "/account/tickets") {
+    if (authData?.user?.id) {
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", authData.user.id)
+          .maybeSingle();
+
+        if (profile?.role === "admin") {
+          finalDestination = "/admin";
+        }
+      } catch {
+        // Fallback to default destination on lookup error
+      }
+    }
+  }
+
+  return NextResponse.redirect(`${origin}${finalDestination}`);
 }

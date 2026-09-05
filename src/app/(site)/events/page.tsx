@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { SearchX } from "lucide-react";
+import { MapPin, SearchX } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { EventCard, EventCardSkeleton } from "@/components/events/event-card";
 import { EventFilters } from "@/components/events/event-filters";
@@ -12,7 +12,7 @@ import { formatNumber } from "@/lib/format";
 import type { EventSearchResult } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "Browse events",
+  title: "Discover events",
   description: "Search concerts, theatre, conferences and festivals on Tazkarti.",
 };
 
@@ -89,15 +89,24 @@ export default async function EventsPage({
 
   return (
     <div className="container-page py-10 md:py-12">
-      <header className="mb-8">
-        <h1 className="display-2 text-ink">
-          {query ? `Results for “${query}”` : "Browse events"}
-        </h1>
-        <p className="mt-2 text-md text-ink-2">
-          {total > 0
-            ? `${formatNumber(total)} ${total === 1 ? "event" : "events"} on sale.`
-            : "Nothing matches those filters yet."}
-        </p>
+      <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="display-2 text-ink">
+            {query ? `Results for “${query}”` : "Discover events"}
+          </h1>
+          <p className="mt-2 text-md text-ink-2">
+            {total > 0
+              ? `${formatNumber(total)} ${total === 1 ? "event" : "events"} on sale.`
+              : "Nothing matches those filters yet."}
+          </p>
+        </div>
+
+        <Button asChild variant="outline" size="sm" className="rounded-xl gap-1.5">
+          <Link href="/events/map">
+            <MapPin className="size-3.5" />
+            <span>Map view</span>
+          </Link>
+        </Button>
       </header>
 
       <CategoryRail

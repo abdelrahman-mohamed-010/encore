@@ -76,7 +76,7 @@ export default async function SavedPage() {
         description="Tap Save on any event and it will wait for you here."
         action={
           <Button asChild variant="solid" size="md">
-            <Link href="/events">Browse events</Link>
+            <Link href="/events">Discover events</Link>
           </Button>
         }
       />

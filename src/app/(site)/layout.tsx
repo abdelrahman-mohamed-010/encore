@@ -1,7 +1,6 @@
 import { getMyOrganizers, getProfile } from "@/lib/auth";
 import { SessionProvider } from "@/contexts";
 import { SiteHeader } from "@/components/layout/site-header";
-import { SiteFooter } from "@/components/layout/site-footer";
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   // Resolved once here and shared through context. Both are memoised per
@@ -10,10 +9,11 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
   return (
     <SessionProvider profile={profile} memberships={memberships}>
-      <div className="flex min-h-dvh flex-col">
+      <div className="relative flex min-h-dvh flex-col">
+        {/* Soft top wash gradient present across all site pages */}
+        <div aria-hidden className="page-wash pointer-events-none absolute inset-x-0 top-0 h-[440px]" />
         <SiteHeader />
-        <main className="flex-1">{children}</main>
-        <SiteFooter />
+        <main className="relative z-10 flex-1">{children}</main>
       </div>
     </SessionProvider>
   );

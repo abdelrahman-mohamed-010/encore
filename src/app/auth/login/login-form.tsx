@@ -20,7 +20,8 @@ export function LoginForm({ next }: { next?: string }) {
   });
 
   const signIn = useAsyncAction(async ({ email, password }: SignInData) => {
-    const { error } = await createClient().auth.signInWithPassword({ email, password });
+    const supabase = createClient();
+    const { data: authData, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
       // Never say which half was wrong — that turns the form into an account
@@ -33,7 +34,27 @@ export function LoginForm({ next }: { next?: string }) {
     }
 
     toast.success("Signed in");
-    router.push(next?.startsWith("/") ? next : "/account/tickets");
+
+    // Default to /account/tickets, but if the user is an admin and didn't specify a custom next path,
+    // auto-navigate them directly to the admin panel on first login.
+    let destination = next?.startsWith("/") && !next.startsWith("//") ? next : "/account/tickets";
+    if ((!next || next === "/account/tickets") && authData?.user?.id) {
+      try {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role")
+          .eq("id", authData.user.id)
+          .maybeSingle();
+
+        if (profile?.role === "admin") {
+          destination = "/admin";
+        }
+      } catch {
+        // Fallback to default destination on lookup error
+      }
+    }
+
+    router.push(destination);
     router.refresh();
   });
 
