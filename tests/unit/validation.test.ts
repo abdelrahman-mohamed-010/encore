@@ -3,7 +3,7 @@ import { signInSchema, signUpSchema, resetPasswordSchema } from "@/lib/validatio
 import { organizerSchema, profileSchema } from "@/lib/validation/organizer";
 import { eventSchema, promoSchema, ticketTypeSchema } from "@/lib/validation/event";
 import { buyerSchema, sandboxCardSchema } from "@/lib/validation/checkout";
-import { slugify } from "@/lib/validation/common";
+import { MAX_TAGS, normaliseTags, slugify, splitTags } from "@/lib/validation/common";
 
 const iso = (offsetDays: number) => {
   const d = new Date(Date.now() + offsetDays * 86_400_000);
@@ -53,6 +53,25 @@ describe("organizer schemas", () => {
   });
 });
 
+describe("tags", () => {
+  it("splits typed and pasted text on commas and newlines", () => {
+    expect(splitTags("rock, live\narabic ,, ")).toEqual(["rock", "live", "arabic"]);
+  });
+
+  it("keeps the first spelling of a case-insensitive duplicate", () => {
+    expect(normaliseTags(["Rock", "rock", "ROCK"])).toEqual(["Rock"]);
+  });
+
+  it("trims and collapses inner whitespace", () => {
+    expect(normaliseTags(["  live   music  ", ""])).toEqual(["live music"]);
+  });
+
+  it("caps the list", () => {
+    const many = Array.from({ length: MAX_TAGS + 5 }, (_, i) => `tag-${i}`);
+    expect(normaliseTags(many)).toHaveLength(MAX_TAGS);
+  });
+});
+
 describe("event schema", () => {
   const base = {
     title: "Cairokee Live",
@@ -60,12 +79,17 @@ describe("event schema", () => {
     venueId: "venue-1",
     startsAt: iso(10),
     endsAt: iso(11),
-    tags: "rock, live, rock",
+    tags: ["rock", "live", "Rock"],
   };
 
-  it("accepts a well-formed event and de-duplicates tags", () => {
+  it("accepts a well-formed event and de-duplicates tags case-insensitively", () => {
     const parsed = eventSchema.parse(base);
     expect(parsed.tags).toEqual(["rock", "live"]);
+  });
+
+  it("treats missing tags as an empty list", () => {
+    const parsed = eventSchema.parse({ ...base, tags: undefined });
+    expect(parsed.tags).toEqual([]);
   });
 
   it("rejects an end time before the start", () => {

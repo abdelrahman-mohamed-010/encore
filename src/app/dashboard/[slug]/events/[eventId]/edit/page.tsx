@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
 import { EventForm } from "@/components/dashboard/event-form";
+import { fetchTagSuggestions } from "@/lib/tags";
 
 export const metadata: Metadata = { title: "Edit event" };
 
@@ -17,16 +18,18 @@ export default async function EditEventPage({
   const { organizer } = await requireOrganizer(slug, "staff");
   const supabase = await createClient();
 
-  const [{ data: event }, { data: categories }, { data: venues }] = await Promise.all([
-    supabase.from("events").select("*").eq("id", eventId).eq("organizer_id", organizer.id).maybeSingle(),
-    supabase.from("categories").select("id, name").eq("is_active", true).order("sort_order"),
-    supabase
-      .from("venues")
-      .select("id, name, city")
-      .or(`organizer_id.eq.${organizer.id},organizer_id.is.null`)
-      .eq("is_active", true)
-      .order("name"),
-  ]);
+  const [{ data: event }, { data: categories }, { data: venues }, tagSuggestions] =
+    await Promise.all([
+      supabase.from("events").select("*").eq("id", eventId).eq("organizer_id", organizer.id).maybeSingle(),
+      supabase.from("categories").select("id, name").eq("is_active", true).order("sort_order"),
+      supabase
+        .from("venues")
+        .select("id, name, city")
+        .or(`organizer_id.eq.${organizer.id},organizer_id.is.null`)
+        .eq("is_active", true)
+        .order("name"),
+      fetchTagSuggestions(),
+    ]);
 
   if (!event) notFound();
 
@@ -47,6 +50,7 @@ export default async function EditEventPage({
         organizerSlug={slug}
         categories={categories ?? []}
         venues={venues ?? []}
+        tagSuggestions={tagSuggestions}
         event={event}
       />
     </div>

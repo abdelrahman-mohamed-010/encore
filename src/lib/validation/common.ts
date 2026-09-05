@@ -76,13 +76,44 @@ export function slugify(value: string) {
     .slice(0, 60);
 }
 
-/** Comma-separated tags -> a clean, de-duplicated array. */
+export const MAX_TAGS = 20;
+export const MAX_TAG_LENGTH = 32;
+
+/** Splits typed or pasted text — "rock, live" — into separate tags. */
+export function splitTags(value: string) {
+  return value
+    .split(/[,\n]/)
+    .map((tag) => tag.trim())
+    .filter(Boolean);
+}
+
+/**
+ * Trimmed, inner whitespace collapsed, de-duplicated case-insensitively (the
+ * first spelling wins) and capped. The tag editor and the schema both call
+ * this, so what the organiser sees in the field is exactly what is stored.
+ */
+export function normaliseTags(values: string[]) {
+  const seen = new Set<string>();
+  const tags: string[] = [];
+
+  for (const value of values) {
+    const tag = value.trim().replace(/\s+/g, " ").slice(0, MAX_TAG_LENGTH);
+    if (!tag) continue;
+
+    const key = tag.toLowerCase();
+    if (seen.has(key)) continue;
+
+    seen.add(key);
+    tags.push(tag);
+    if (tags.length === MAX_TAGS) break;
+  }
+
+  return tags;
+}
+
+/** A list of tags -> a clean, de-duplicated array. */
 export const tagList = z
-  .string()
-  .trim()
+  .array(z.string())
+  .max(MAX_TAGS, `Use up to ${MAX_TAGS} tags.`)
   .optional()
-  .transform((value) =>
-    value
-      ? [...new Set(value.split(",").map((tag) => tag.trim()).filter(Boolean))].slice(0, 20)
-      : [],
-  );
+  .transform((values) => normaliseTags(values ?? []));

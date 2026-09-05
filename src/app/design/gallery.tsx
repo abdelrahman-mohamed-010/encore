@@ -12,6 +12,7 @@ import { IconChip, DateBlock } from "@/components/ui/field-row";
 import { AffixInput, Input, SearchInput, Switch, Textarea } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select";
 import { Combobox } from "@/components/ui/combobox";
+import { TagInput } from "@/components/ui/tag-input";
 import { DateField, DateTimeField, formatLocalDateTime } from "@/components/ui/date-picker";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { EmptyState, Meter, StatTile } from "@/components/ui/misc";
@@ -65,6 +66,7 @@ export function DesignGallery() {
   const [text, setText] = React.useState("");
   const [select, setSelect] = React.useState("gold");
   const [combo, setCombo] = React.useState("");
+  const [tags, setTags] = React.useState<string[]>(["rock", "live"]);
   const [date, setDate] = React.useState("");
   const [when, setWhen] = React.useState(formatLocalDateTime(new Date()));
   const [colour, setColour] = React.useState("#7c5cff");
@@ -325,6 +327,19 @@ export function DesignGallery() {
                 { value: "dubai", label: "Gulf Standard Time — Dubai", hint: "GMT+04:00" },
               ]}
             />
+          </Row>
+
+          <Row
+            title="Tags"
+            note="Chips, not punctuation. Type to filter what is already in use; Enter or a comma commits, Backspace removes the last one."
+          >
+            <div className="w-96">
+              <TagInput
+                value={tags}
+                onChange={setTags}
+                suggestions={["rock", "live", "arabic", "acoustic", "festival", "electronic", "comedy", "theatre"]}
+              />
+            </div>
           </Row>
 
           <Row
