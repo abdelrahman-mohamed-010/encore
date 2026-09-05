@@ -14,7 +14,6 @@ import { Input, Textarea, Switch, Label } from "@/components/ui/input";
 import { Combobox } from "@/components/ui/combobox";
 import { DateTimeField, formatLocalDateTime } from "@/components/ui/date-picker";
 import { ImageUpload } from "@/components/ui/image-upload";
-import { TagInput } from "@/components/ui/tag-input";
 import type { EventRow } from "@/lib/types";
 
 type Option = { id: string; name: string; city?: string | null };
@@ -31,15 +30,12 @@ export function EventForm({
   organizerSlug,
   categories,
   venues,
-  tagSuggestions = [],
   event,
 }: {
   organizerId: string;
   organizerSlug: string;
   categories: Option[];
   venues: Option[];
-  /** Tags already used across the platform, offered while typing. */
-  tagSuggestions?: string[];
   event?: EventRow;
 }) {
   const router = useRouter();
@@ -62,7 +58,7 @@ export function EventForm({
       startsAt: toLocalInput(event?.starts_at),
       endsAt: toLocalInput(event?.ends_at),
       coverImageUrl: event?.cover_image_url ?? "",
-      tags: event?.tags ?? [],
+      tags: (event?.tags ?? []).join(", "),
       refundPolicy: event?.refund_policy ?? "",
       minAge: event?.min_age ? String(event.min_age) : "",
     },
@@ -231,20 +227,8 @@ export function EventForm({
             )}
           </FormField>
 
-          <FormField<EventValues, "tags">
-            name="tags"
-            label="Tags"
-            hint="Helps people find the event. Pick an existing tag where one fits."
-          >
-            {({ value, onChange, ...field }) => (
-              <TagInput
-                {...field}
-                value={value ?? []}
-                onChange={onChange}
-                suggestions={tagSuggestions}
-                placeholder="rock, live, arabic…"
-              />
-            )}
+          <FormField<EventValues, "tags"> name="tags" label="Tags" hint="Comma separated. Helps people find the event.">
+            {(field) => <Input {...field} placeholder="rock, live, arabic" />}
           </FormField>
 
           <FormField<EventValues, "refundPolicy"> name="refundPolicy" label="Refund policy">
