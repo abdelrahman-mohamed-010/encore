@@ -19,6 +19,7 @@ import { Form, FormError, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SummaryLine } from "@/components/ui/misc";
 import { cn } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 
 type Line = {
   id: string;
@@ -67,8 +68,16 @@ export function CheckoutClient({
 
   // Three composed hooks replace the fourteen useState calls this screen used
   // to hold: the hold timer, the promo lookup, and the submission lifecycle.
-  const { msLeft, expired } = useCountdown(expiresAt, () => {
+  const { msLeft, expired } = useCountdown(expiresAt, async () => {
     toast.error("Your ticket hold expired", { description: "Please choose your tickets again." });
+    // Hand the seats back before leaving, so they are pickable again the
+    // instant the buyer lands on the event rather than a sweep later. Failing
+    // to is not worth blocking the redirect: the sweep will catch it.
+    try {
+      await createClient().rpc("expire_reservations", { p_event_id: event.id });
+    } catch {
+      // ignored on purpose
+    }
     router.push(`/events/${event.slug}?expired=1`);
   });
   const promo = usePromoCode(event.id);

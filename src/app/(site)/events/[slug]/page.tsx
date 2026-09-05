@@ -40,7 +40,13 @@ async function loadEvent(slug: string) {
 
   if (!event) return null;
 
-  const [{ data: availability }, { data: seats }] = await Promise.all([
+  // Release any hold whose ten minutes are up before reading the inventory.
+  // A scheduled sweep does this every minute too, but doing it here means the
+  // page a buyer is actually looking at can never show an abandoned checkout's
+  // seats as taken, or count its tickets against what is left.
+  await supabase.rpc("expire_reservations", { p_event_id: event.id });
+
+  const [{ data: availability }, { data: seats }, { data: types }] = await Promise.all([
     supabase.rpc("event_availability", { p_event_id: event.id }),
     event.seating_type === "reserved_seating"
       ? supabase
@@ -52,11 +58,24 @@ async function loadEvent(slug: string) {
           )
           .eq("event_id", event.id)
       : Promise.resolve({ data: [] as SeatWithPlace[] }),
+    // Which tiers price a seating section, so a seated event can still offer
+    // tiers that have no seats at all.
+    supabase.from("ticket_types").select("id, section_id").eq("event_id", event.id),
   ]);
+
+  const seatedTypeIds = new Set(
+    ((types ?? []) as { id: string; section_id: string | null }[])
+      .filter((type) => type.section_id)
+      .map((type) => type.id),
+  );
+
+  const all = (availability ?? []) as TicketAvailability[];
 
   return {
     event,
-    availability: (availability ?? []) as TicketAvailability[],
+    availability: all,
+    seatedAvailability: all.filter((tier) => seatedTypeIds.has(tier.ticket_type_id)),
+    generalAvailability: all.filter((tier) => !seatedTypeIds.has(tier.ticket_type_id)),
     seats: (seats ?? []) as unknown as SeatWithPlace[],
   };
 }
@@ -88,7 +107,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const loaded = await loadEvent(slug);
   if (!loaded) notFound();
 
-  const { event, availability, seats } = loaded;
+  const { event, availability, seatedAvailability, generalAvailability, seats } = loaded;
   const user = await getUser();
   const supabase = await createClient();
 
@@ -277,10 +296,14 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                 </p>
               </Card>
             ) : event.seating_type === "reserved_seating" ? (
+              // Seats and any unseated tiers are bought together: a second
+              // reservation on the same event replaces the first, so two
+              // separate baskets here would silently drop the buyer's seats.
               <SeatMap
                 eventId={event.id}
                 seats={seats}
-                availability={availability}
+                availability={seatedAvailability}
+                generalAdmission={generalAvailability}
                 signedIn={Boolean(user)}
               />
             ) : (
