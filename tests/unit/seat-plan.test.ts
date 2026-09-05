@@ -58,6 +58,27 @@ describe("buildSeatPlan", () => {
     expect(Number.isFinite(plan.height)).toBe(true);
   });
 
+  it("handles rows of different lengths without stretching the plan", () => {
+    // A 12-seat row and a 14-seat row interleave into sub-seat gaps if the raw
+    // coordinates are pooled, which would blow the plan several times too wide.
+    const seats: PlanSeat[] = [];
+    for (const [row, width] of [["A", 12], ["B", 14]] as const) {
+      for (let i = 0; i < width; i += 1) {
+        const s = seat(`${row}${i}`, (i + 0.5) / width, row === "A" ? 0.25 : 0.75);
+        seats.push({ ...s, rowLabel: row });
+      }
+    }
+
+    const { points, width } = buildSeatPlan(seats);
+    const rowB = points.filter((point) => point.rowLabel === "B");
+
+    // Neighbours in the wider row sit one pitch apart — to within the 4-decimal
+    // rounding the coordinates are stored at, which is worth ~0.04% here.
+    expect(rowB[1].left - rowB[0].left).toBeCloseTo(SEAT_PITCH, 1);
+    // ...and the plan stays about as wide as its longest row, not a multiple of it.
+    expect(width).toBeLessThan(SEAT_PITCH * 18);
+  });
+
   it("returns an empty plan for no seats", () => {
     expect(buildSeatPlan([])).toEqual({ width: 0, height: 0, points: [] });
   });

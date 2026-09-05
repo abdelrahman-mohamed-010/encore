@@ -37,22 +37,52 @@ const PADDING = SEAT_PITCH;
  */
 const PITCH_PERCENTILE = 0.25;
 
-function pitchOf(values: number[]) {
-  // Coordinates are numeric(6,4) in the database; matching that here keeps
-  // float noise from registering as a real gap.
-  const distinct = [...new Set(values.map((value) => Math.round(value * 10_000)))]
+/** Coordinates are numeric(6,4); matching that stops float noise reading as a gap. */
+function distinctSorted(values: number[]) {
+  return [...new Set(values.map((value) => Math.round(value * 10_000)))]
     .map((value) => value / 10_000)
     .sort((a, b) => a - b);
+}
 
-  const gaps: number[] = [];
+function gapsIn(values: number[], into: number[] = []) {
+  const distinct = distinctSorted(values);
   for (let i = 1; i < distinct.length; i += 1) {
     const gap = distinct[i] - distinct[i - 1];
-    if (gap > 0.0001) gaps.push(gap);
+    if (gap > 0.0001) into.push(gap);
   }
-  if (gaps.length === 0) return 0;
+  return into;
+}
 
+function percentile(gaps: number[]) {
+  if (gaps.length === 0) return 0;
   gaps.sort((a, b) => a - b);
   return gaps[Math.floor(gaps.length * PITCH_PERCENTILE)];
+}
+
+/**
+ * Seat pitch is the spacing between neighbours *in the same row*, so the gaps
+ * are collected per row and only then pooled. Pooling the raw coordinates
+ * instead would break any venue whose rows differ in length: a 12-seat row and
+ * a 14-seat row interleave into a stream of meaningless sub-seat gaps, and the
+ * plan would come out several times too wide.
+ */
+function pitchAcrossRows(seats: PlanSeat[]) {
+  const byRow = new Map<string, number[]>();
+  for (const seat of seats) {
+    const key = `${seat.sectionId}\u0000${seat.rowLabel}`;
+    const row = byRow.get(key);
+    if (row) row.push(seat.x);
+    else byRow.set(key, [seat.x]);
+  }
+
+  const gaps: number[] = [];
+  for (const row of byRow.values()) gapsIn(row, gaps);
+  return percentile(gaps);
+}
+
+/** Rows share a y, so the distinct values *are* the rows. */
+function pitchBetweenRows(seats: PlanSeat[]) {
+  return percentile(gapsIn(seats.map((seat) => seat.y)));
 }
 
 export type SeatPlan = {
@@ -65,14 +95,12 @@ export type SeatPlan = {
 export function buildSeatPlan(seats: PlanSeat[]): SeatPlan {
   if (seats.length === 0) return { width: 0, height: 0, points: [] };
 
-  const xs = seats.map((seat) => seat.x);
-  const ys = seats.map((seat) => seat.y);
-  const minX = Math.min(...xs);
-  const minY = Math.min(...ys);
+  const minX = Math.min(...seats.map((seat) => seat.x));
+  const minY = Math.min(...seats.map((seat) => seat.y));
 
   // A single row or column has no gap to measure; the fallback keeps it drawable.
-  const stepX = pitchOf(xs) || 0.05;
-  const stepY = pitchOf(ys) || 0.05;
+  const stepX = pitchAcrossRows(seats) || 0.05;
+  const stepY = pitchBetweenRows(seats) || 0.05;
 
   const points = seats.map((seat) => ({
     ...seat,
