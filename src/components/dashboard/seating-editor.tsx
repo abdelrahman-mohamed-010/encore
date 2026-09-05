@@ -480,8 +480,8 @@ export function SeatingEditor({
               <Armchair /> Create seat map
             </Button>
             <p className="mt-2 text-xs text-ink-3">
-              Buyers will pick seats instead of quantities. You can still add unseated ticket types
-              afterwards.
+              Buyers pick their seats from the map. Any ticket type without a section — standing,
+              livestream — still sells by quantity, in the same basket.
             </p>
           </div>
         </CardBody>

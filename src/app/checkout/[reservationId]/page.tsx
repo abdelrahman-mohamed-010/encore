@@ -29,8 +29,11 @@ export default async function CheckoutPage({
   if (!reservation) notFound();
   if (reservation.user_id !== user.id) notFound();
 
-  // A dead hold cannot be paid for — send them back to pick again.
+  // A dead hold cannot be paid for — send them back to pick again. Release it
+  // on the way out so the seats are on sale again by the time they land, rather
+  // than sitting held until something else happens to sweep them.
   if (reservation.status !== "active" || new Date(reservation.expires_at) < new Date()) {
+    await supabase.rpc("expire_reservations", { p_event_id: reservation.event_id });
     redirect(`/events/${reservation.event?.slug ?? ""}?expired=1`);
   }
 

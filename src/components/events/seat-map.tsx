@@ -3,6 +3,7 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Minus, Plus, Maximize2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import {
   TransformComponent,
   TransformWrapper,
@@ -10,7 +11,7 @@ import {
 } from "react-zoom-pan-pinch";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { useAsyncAction, useSeatSelection } from "@/hooks";
+import { useAsyncAction, useSeatSelection, useTicketSelection } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
 import { buildSeatPlan, seatInDirection, SEAT_SIZE, type PlanSeat } from "@/lib/seat-plan";
@@ -41,11 +42,20 @@ export function SeatMap({
   eventId,
   seats,
   availability,
+  generalAdmission = [],
   signedIn,
 }: {
   eventId: string;
   seats: SeatNode[];
+  /** Tiers that price a seating section. */
   availability: TicketAvailability[];
+  /**
+   * Tiers on this event with no seats behind them — standing, livestream, a
+   * donation. They are bought in the same basket as the seats, because
+   * `create_reservation` replaces a buyer's existing hold on the event, so a
+   * second basket would quietly throw their seats away.
+   */
+  generalAdmission?: TicketAvailability[];
   signedIn: boolean;
 }) {
   const router = useRouter();
@@ -101,6 +111,10 @@ export function SeatMap({
 
   const seatById = useMemo(() => new Map(plan.points.map((seat) => [seat.id, seat])), [plan.points]);
   const selection = useSeatSelection(seats, priceFor, MAX_SEATS);
+  const extras = useTicketSelection(generalAdmission);
+
+  const totalCount = selection.count + extras.count;
+  const totalCents = selection.subtotalCents + extras.subtotalCents;
 
   // One tab stop for the whole plan: arrow keys move between seats from there,
   // which beats tabbing through several hundred of them.
@@ -134,14 +148,14 @@ export function SeatMap({
       router.push(`/auth/login?next=${encodeURIComponent(`/events/${eventId}`)}`);
       return;
     }
-    if (selection.count === 0) {
+    if (totalCount === 0) {
       toast.error("Pick at least one seat");
       return;
     }
 
     const { data, error } = await createClient().rpc("create_reservation", {
       p_event_id: eventId,
-      p_items: [],
+      p_items: extras.lines,
       p_seat_ids: selection.selected,
     });
 
@@ -149,6 +163,7 @@ export function SeatMap({
       // Another buyer may have taken one of these seats meanwhile.
       toast.error("Could not hold those seats", { description: error.message });
       selection.clear();
+      extras.clear();
       router.refresh();
       return;
     }
@@ -158,6 +173,22 @@ export function SeatMap({
   });
 
   const showLabels = scale >= LABEL_AT_SCALE;
+
+  function describeSelection() {
+    const parts = selection.selected
+      .map((id) => {
+        const seat = seatById.get(id);
+        return seat ? `${seat.rowLabel}${seat.seatNumber}` : "";
+      })
+      .filter(Boolean);
+
+    for (const tier of generalAdmission) {
+      const qty = extras.quantities[tier.ticket_type_id] ?? 0;
+      if (qty > 0) parts.push(`${qty} x ${tier.name}`);
+    }
+
+    return parts.length > 0 ? parts.join(", ") : "Nothing selected yet";
+  }
 
   return (
     <div className="space-y-4">
@@ -283,33 +314,83 @@ export function SeatMap({
         </div>
       </Card>
 
+      {generalAdmission.length > 0 && (
+        <div className="overflow-hidden rounded-xl bg-card shadow-e1">
+          <div className="border-b border-hairline-soft px-4 py-2.5">
+            <p className="text-md font-medium text-ink-2">Tickets without a seat</p>
+          </div>
+          {generalAdmission.map((tier) => {
+            const qty = extras.quantities[tier.ticket_type_id] ?? 0;
+            const soldOut = tier.available <= 0;
+            const disabled = soldOut || !tier.on_sale;
+            const ceiling = Math.min(tier.max_per_order, tier.available);
+
+            return (
+              <div
+                key={tier.ticket_type_id}
+                className={cn(
+                  "flex items-center gap-4 border-b border-hairline-soft px-4 py-3 last:border-b-0",
+                  disabled && "opacity-55",
+                )}
+              >
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-md font-medium text-ink">{tier.name}</p>
+                    {soldOut && <Badge tone="critical" size="xs">Sold out</Badge>}
+                    {!soldOut && !tier.on_sale && <Badge tone="caution" size="xs">Not on sale</Badge>}
+                  </div>
+                  <p className="mt-0.5 text-base text-ink-2">
+                    {tier.price_cents === 0 ? "Free" : formatMoney(tier.price_cents, tier.currency)}
+                  </p>
+                </div>
+                <div className="flex shrink-0 items-center gap-1">
+                  <Button
+                    variant="outline"
+                    size="icon-sm"
+                    aria-label={`Remove one ${tier.name}`}
+                    disabled={disabled || qty === 0}
+                    onClick={() => extras.step(tier, -1)}
+                  >
+                    <Minus />
+                  </Button>
+                  <span className="w-8 text-center text-base font-semibold tabular text-ink">
+                    {qty}
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="icon-sm"
+                    aria-label={`Add one ${tier.name}`}
+                    disabled={disabled || qty >= ceiling}
+                    onClick={() => extras.step(tier, 1)}
+                  >
+                    <Plus />
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl bg-card shadow-e1 px-4 py-3.5">
         <div className="min-w-0">
-          <p className="text-xs text-ink-3">
-            {selection.count > 0
-              ? selection.selected
-                  .map((id) => {
-                    const seat = seatById.get(id);
-                    return seat ? `${seat.rowLabel}${seat.seatNumber}` : "";
-                  })
-                  .filter(Boolean)
-                  .join(", ")
-              : "No seats selected"}
-          </p>
+          <p className="text-xs text-ink-3">{describeSelection()}</p>
           <p className="text-lg font-semibold tabular text-ink">
-            {formatMoney(selection.subtotalCents, currency)}
+            {formatMoney(totalCents, currency)}
           </p>
         </div>
         <Button
           variant="primary"
           size="lg"
           loading={reserve.pending}
-          disabled={selection.count === 0}
+          disabled={totalCount === 0}
           onClick={() => reserve.run()}
         >
-          {signedIn
-            ? `Get ${selection.count || ""} ${selection.count === 1 ? "seat" : "seats"}`.trim()
-            : "Sign in to book"}
+          {!signedIn
+            ? "Sign in to book"
+            : totalCount === 0
+              ? "Get tickets"
+              : `Get ${totalCount} ${totalCount === 1 ? "ticket" : "tickets"}`}
         </Button>
       </div>
     </div>
