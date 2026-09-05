@@ -17,6 +17,11 @@ export const profileSchema = z.object({
   phone: z.string().trim().max(40, "That phone number is too long.").optional().or(z.literal("")),
   bio: optionalText(600),
   avatarUrl: optionalUrl,
+  website: optionalUrl,
+  instagram: optionalText(80),
+  twitter: optionalText(80),
+  youtube: optionalText(80),
+  linkedin: optionalText(80),
 });
 export type ProfileValues = z.input<typeof profileSchema>;
 export type ProfileData = z.output<typeof profileSchema>;

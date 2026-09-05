@@ -854,11 +854,16 @@ export type Database = {
           email: string
           full_name: string | null
           id: string
+          instagram: string | null
           is_banned: boolean
+          linkedin: string | null
           locale: string
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
+          twitter: string | null
           updated_at: string
+          website: string | null
+          youtube: string | null
         }
         Insert: {
           avatar_url?: string | null
@@ -867,11 +872,16 @@ export type Database = {
           email: string
           full_name?: string | null
           id: string
+          instagram?: string | null
           is_banned?: boolean
+          linkedin?: string | null
           locale?: string
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          twitter?: string | null
           updated_at?: string
+          website?: string | null
+          youtube?: string | null
         }
         Update: {
           avatar_url?: string | null
@@ -880,11 +890,16 @@ export type Database = {
           email?: string
           full_name?: string | null
           id?: string
+          instagram?: string | null
           is_banned?: boolean
+          linkedin?: string | null
           locale?: string
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          twitter?: string | null
           updated_at?: string
+          website?: string | null
+          youtube?: string | null
         }
         Relationships: []
       }

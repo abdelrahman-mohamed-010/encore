@@ -263,3 +263,31 @@ export function Stepper({
     </div>
   );
 }
+
+export const PrefixInput = React.forwardRef<
+  HTMLInputElement,
+  React.ComponentProps<"input"> & {
+    icon?: React.ReactNode;
+    prefixText?: string;
+  }
+>(({ className, icon, prefixText, ...props }, ref) => (
+  <div
+    className={cn(
+      "flex h-(--size-field) w-full items-center gap-2 rounded-xl bg-sunken px-3.5 text-sm transition-[box-shadow,background-color]",
+      "focus-within:bg-card focus-within:ring-2 focus-within:ring-focus",
+      className,
+    )}
+  >
+    {icon && <span className="flex shrink-0 items-center text-ink-3">{icon}</span>}
+    {prefixText && (
+      <span className="select-none text-xs font-medium text-ink-3 shrink-0">{prefixText}</span>
+    )}
+    <input
+      ref={ref}
+      className="size-full bg-transparent text-ink placeholder:text-ink-3 outline-none"
+      {...props}
+    />
+  </div>
+));
+PrefixInput.displayName = "PrefixInput";
+
