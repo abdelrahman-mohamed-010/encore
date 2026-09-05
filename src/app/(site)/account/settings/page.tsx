@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Settings" };
 export default async function SettingsPage() {
   const profile = await requireProfile();
   return (
-    <div className="max-w-xl">
+    <div className="mx-auto max-w-2xl">
       <SettingsForm profile={profile} />
     </div>
   );

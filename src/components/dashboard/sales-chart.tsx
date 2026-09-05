@@ -74,7 +74,7 @@ export function RevenueChart({ data, currency }: { data: SalesPoint[]; currency:
         <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
           <defs>
             <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--series-1)" stopOpacity={0.16} />
+              <stop offset="0%" stopColor="var(--series-1)" stopOpacity={0.25} />
               <stop offset="100%" stopColor="var(--series-1)" stopOpacity={0} />
             </linearGradient>
           </defs>
@@ -103,13 +103,13 @@ export function RevenueChart({ data, currency }: { data: SalesPoint[]; currency:
             type="monotone"
             dataKey="gross_cents"
             stroke="var(--series-1)"
-            strokeWidth={2}
+            strokeWidth={4.5}
             strokeLinecap="round"
             strokeLinejoin="round"
             fill="url(#revenueFill)"
-            /* The 2px ring in the surface colour keeps the dot legible where it
+            /* The 3px ring in the surface colour keeps the dot legible where it
                crosses the line, and enlarges its hover target. */
-            activeDot={{ r: 4, strokeWidth: 2, stroke: "var(--color-card)" }}
+            activeDot={{ r: 6, strokeWidth: 3, stroke: "var(--color-card)" }}
           />
         </AreaChart>
       </ResponsiveContainer>
@@ -124,7 +124,7 @@ export function TicketsChart({ data }: { data: SalesPoint[] }) {
   return (
     <VizFrame total={formatNumber(total)}>
       <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -18 }} barCategoryGap="30%">
+        <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -18 }}>
           <CartesianGrid stroke="var(--viz-grid)" vertical={false} />
           <XAxis
             dataKey="day"
@@ -146,7 +146,7 @@ export function TicketsChart({ data }: { data: SalesPoint[] }) {
             cursor={{ fill: "var(--color-sunken)" }}
             content={<ChartTooltip formatter={(value) => `${formatNumber(value)} tickets`} />}
           />
-          <Bar dataKey="tickets" fill="var(--series-2)" radius={[4, 4, 0, 0]} maxBarSize={24} />
+          <Bar dataKey="tickets" fill="var(--series-2)" radius={[4, 4, 0, 0]} barSize={16} minPointSize={3} />
         </BarChart>
       </ResponsiveContainer>
     </VizFrame>

@@ -1,19 +1,12 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
-
 import { EmptyState } from "@/components/ui/misc";
 import { CalendarDays } from "lucide-react";
 import { Scanner } from "@/components/dashboard/scanner";
-import { DashboardBody, DashboardHeader } from "@/components/dashboard/page-header";
 
 export const metadata: Metadata = { title: "Check-in" };
 
-/**
- * Events that ended within the last 12 hours are still worth scanning for (late
- * arrivals, re-entry). Reading the clock is correct here — this is an async
- * Server Component that runs once per request, not a re-rendering client tree.
- */
 function scanWindowStart() {
   return new Date(Date.now() - 12 * 60 * 60 * 1000).toISOString();
 }
@@ -23,7 +16,6 @@ export default async function ScanPage({ params }: { params: Promise<{ slug: str
   const { organizer } = await requireOrganizer(slug, "scanner");
   const supabase = await createClient();
 
-  // Anything running now or soon is worth scanning for.
   const { data: events } = await supabase
     .from("events")
     .select("id, title, starts_at")
@@ -33,13 +25,13 @@ export default async function ScanPage({ params }: { params: Promise<{ slug: str
     .order("starts_at", { ascending: true });
 
   return (
-    <>
-      <DashboardHeader
-        title="Check-in"
-        description="Scan a ticket QR code, or type the code if the camera is unavailable."
-      />
-
-      <DashboardBody className="space-y-6">
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight text-ink">Check-in Scanner</h2>
+        <p className="mt-1 text-sm text-ink-3">
+          Scan a ticket QR code, or type the code if the camera is unavailable.
+        </p>
+      </div>
 
       {!events || events.length === 0 ? (
         <EmptyState
@@ -50,7 +42,6 @@ export default async function ScanPage({ params }: { params: Promise<{ slug: str
       ) : (
         <Scanner events={events} />
       )}
-      </DashboardBody>
-    </>
-);
+    </div>
+  );
 }

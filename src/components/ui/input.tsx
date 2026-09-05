@@ -177,8 +177,8 @@ export function Switch({
       onClick={() => onCheckedChange(!checked)}
       className={cn(
         "relative inline-flex h-6.5 w-11 shrink-0 items-center rounded-full",
-        "transition-colors duration-200",
-        checked ? "bg-positive" : "bg-line-2",
+        "transition-colors duration-200 cursor-pointer",
+        checked ? "bg-primary" : "bg-line-2",
         disabled && "cursor-not-allowed opacity-40",
         className,
       )}

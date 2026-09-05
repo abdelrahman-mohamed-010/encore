@@ -6,11 +6,9 @@ import { isStripeConnectConfigured } from "@/lib/payments/stripe";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle, CardDescription } from "@/components/ui/surface";
-
 import { FieldRow } from "@/components/ui/field-row";
 import { DisconnectStripeButton } from "@/components/dashboard/disconnect-stripe";
 import { formatDate } from "@/lib/format";
-import { DashboardBody, DashboardHeader } from "@/components/dashboard/page-header";
 
 export const metadata: Metadata = { title: "Payments" };
 
@@ -36,13 +34,13 @@ export default async function PaymentsSettingsPage({
   const live = Boolean(account?.charges_enabled && !account?.disconnected_at);
 
   return (
-    <>
-      <DashboardHeader
-        title="Payments"
-        description="Connect your own Stripe account. Ticket money goes straight to you; Tazkarti takes only its service fee as an application fee on each charge."
-      />
-
-      <DashboardBody className="max-w-2xl space-y-6">
+    <div className="mx-auto max-w-2xl space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold tracking-tight text-ink">Payouts & Stripe</h2>
+        <p className="mt-1 text-sm text-ink-3">
+          Connect your own Stripe account. Ticket money goes straight to you; Tazkarti takes only its service fee as an application fee on each charge.
+        </p>
+      </div>
 
       {connected === "1" && (
         <div className="flex items-start gap-2.5 rounded-xl border border-transparent bg-positive-bg px-4 py-3 text-sm text-positive">
@@ -62,7 +60,7 @@ export default async function PaymentsSettingsPage({
           <div>
             <CardTitle className="flex items-center gap-2">
               <Wallet className="size-4 text-ink-3" />
-              Stripe
+              Stripe Connect
             </CardTitle>
             <CardDescription>
               {live
@@ -157,7 +155,6 @@ export default async function PaymentsSettingsPage({
           back proportionally.
         </p>
       </Card>
-      </DashboardBody>
-    </>
-);
+    </div>
+  );
 }

@@ -1,16 +1,16 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Tag, Trash2 } from "lucide-react";
+import { Plus, Search, Tag, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { useAsyncAction } from "@/hooks";
 import { promoSchema, type PromoData, type PromoValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
-import { Card, SectionHeader } from "@/components/ui/surface";
+import { Card } from "@/components/ui/surface";
 import {
   Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
@@ -34,7 +34,14 @@ export function PromoManager({
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [query, setQuery] = useState("");
   const [, startTransition] = useTransition();
+
+  const filteredPromos = useMemo(() => {
+    if (!query.trim()) return promos;
+    const q = query.toLowerCase().trim();
+    return promos.filter((p) => p.code.toLowerCase().includes(q));
+  }, [promos, query]);
 
   const form = useForm<PromoValues, unknown, PromoData>({
     resolver: zodResolver(promoSchema),
@@ -104,32 +111,45 @@ export function PromoManager({
   }
 
   return (
-    <div className="space-y-6 px-5 py-8 md:px-8">
-      <SectionHeader
-        level={1}
-        title="Promo codes"
-        description="Discounts buyers can apply at checkout."
-        action={
-          <Button variant="solid" size="md" onClick={() => setOpen(true)}>
-            <Plus /> New code
-          </Button>
-        }
-      />
+    <div className="space-y-4">
+      {/* Controls Bar matching Events, Orders, and Attendees */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative min-w-56 max-w-sm flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
+          <Input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search promo codes..."
+            className="pl-9"
+            aria-label="Search promo codes"
+          />
+        </div>
 
-      {promos.length === 0 ? (
+        <Button variant="solid" size="md" onClick={() => setOpen(true)}>
+          <Plus /> New code
+        </Button>
+      </div>
+
+      {filteredPromos.length === 0 ? (
         <EmptyState
           icon={Tag}
-          title="No promo codes yet"
-          description="Create a code to run a presale, a partner discount or a friends-and-family rate."
+          title={promos.length === 0 ? "No promo codes yet" : "No matching codes found"}
+          description={
+            promos.length === 0
+              ? "Create a code to run a presale, a partner discount or a friends-and-family rate."
+              : "Try adjusting your search query."
+          }
           action={
-            <Button variant="solid" size="md" onClick={() => setOpen(true)}>
-              <Plus /> New code
-            </Button>
+            promos.length === 0 ? (
+              <Button variant="solid" size="md" onClick={() => setOpen(true)}>
+                <Plus /> New code
+              </Button>
+            ) : undefined
           }
         />
       ) : (
         <Card className="overflow-hidden">
-          {promos.map((promo) => (
+          {filteredPromos.map((promo) => (
             <div
               key={promo.id}
               className="flex items-center gap-4 border-b border-hairline-soft px-4 py-3.5 last:border-b-0"

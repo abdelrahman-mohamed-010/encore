@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/surface";
-
-import { EmptyState } from "@/components/ui/misc";
 import { QuerySelect } from "@/components/ui/query-select";
-import { formatDateTime } from "@/lib/format";
-import { DashboardBody, DashboardHeader } from "@/components/dashboard/page-header";
+import { DashboardAttendeesTable } from "@/components/dashboard/dashboard-attendees-table";
 
 export const metadata: Metadata = { title: "Attendees" };
 
@@ -46,84 +40,14 @@ export default async function AttendeesPage({
         .limit(500)
     : { data: [] };
 
-  const rows = tickets ?? [];
-  const checkedIn = rows.filter((t) => t.status === "used").length;
-
   return (
-    <>
-      <DashboardHeader
-        title="Attendees"
-        description={`${rows.length} tickets issued · ${checkedIn} checked in`}
-        actions={
-          <QuerySelect
-            param="event"
-            label="Filter by event"
-            allLabel="All events"
-            className="w-56"
-            value={eventFilter ?? ""}
-            options={(events ?? []).map((event) => ({ value: event.id, label: event.title }))}
-          />
-        }
+    <div className="space-y-4">
+      <DashboardAttendeesTable
+        tickets={(tickets ?? []) as unknown as Parameters<typeof DashboardAttendeesTable>[0]["tickets"]}
+        events={events ?? []}
+        initialEventFilter={eventFilter}
+        slug={slug}
       />
-
-      <DashboardBody className="space-y-6">
-
-      {rows.length === 0 ? (
-        <EmptyState
-          icon={Users}
-          title="No attendees yet"
-          description="Once tickets are sold, everyone appears here with their check-in state."
-        />
-      ) : (
-        <Card className="overflow-x-auto">
-          <table className="w-full min-w-[48rem] text-left text-sm">
-            <thead>
-              <tr className="border-b border-hairline text-2xs uppercase tracking-[0.06em] text-ink-3">
-                <th scope="col" className="px-4 py-3 font-semibold">Attendee</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Event</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Ticket</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Code</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Check-in</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((ticket) => (
-                <tr key={ticket.id} className="border-b border-hairline-soft last:border-b-0 hover:bg-sunken">
-                  <td className="px-4 py-3">
-                    <p className="truncate text-ink">{ticket.attendee_name ?? "—"}</p>
-                    <p className="truncate text-xs text-ink-3">{ticket.attendee_email ?? ""}</p>
-                  </td>
-                  <td className="max-w-40 truncate px-4 py-3 text-ink-2">{ticket.event?.title}</td>
-                  <td className="px-4 py-3 text-ink-2">
-                    {ticket.ticket_type?.name}
-                    {ticket.seat_label && (
-                      <span className="block text-xs text-ink-3">{ticket.seat_label}</span>
-                    )}
-                  </td>
-                  <td className="px-4 py-3 font-mono text-xs text-ink-2">{ticket.ticket_code}</td>
-                  <td className="px-4 py-3">
-                    {ticket.status === "used" ? (
-                      <div>
-                        <Badge tone="positive" size="xs">Checked in</Badge>
-                        {ticket.checked_in_at && (
-                          <span className="mt-1 block text-2xs text-ink-3">
-                            {formatDateTime(ticket.checked_in_at)}
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <Badge tone={ticket.status === "valid" ? "neutral" : "critical"} size="xs">
-                        {ticket.status === "valid" ? "Not scanned" : ticket.status}
-                      </Badge>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </Card>
-      )}
-      </DashboardBody>
-    </>
-);
+    </div>
+  );
 }

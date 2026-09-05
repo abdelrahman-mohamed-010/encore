@@ -8,6 +8,7 @@ import { SearchField } from "./search-field";
 import { PrimaryNav } from "./primary-nav";
 import { UserMenu } from "./user-menu";
 import { MobileNav } from "./mobile-nav";
+import { DashboardTopLink } from "./dashboard-top-link";
 
 export async function SiteHeader() {
   const [profile, memberships] = await Promise.all([getProfile(), getMyOrganizers()]);
@@ -37,12 +38,10 @@ export async function SiteHeader() {
 
             {profile ? (
               <>
-                <Link
+                <DashboardTopLink
                   href={memberships.length ? `/dashboard/${memberships[0].organizer.slug}` : "/dashboard/new"}
-                  className="hidden text-md font-medium text-ink transition-colors hover:text-ink-2 sm:inline"
-                >
-                  {memberships.length ? "Dashboard" : "Sell tickets"}
-                </Link>
+                  label={memberships.length ? "Dashboard" : "Sell tickets"}
+                />
                 <ThemeToggle />
                 <UserMenu profile={profile} memberships={memberships} />
               </>

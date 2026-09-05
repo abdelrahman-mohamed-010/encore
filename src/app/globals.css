@@ -607,14 +607,14 @@
    above it.
    --------------------------------------------------------------------------- */
 .viz {
-  --series-1: #6d5df6;  /* violet — revenue */
-  --series-2: #1b9a4f;  /* green  — tickets */
+  --series-1: #3b82f6;  /* blue  — revenue */
+  --series-2: #10b981;  /* light green — tickets */
   --viz-grid: var(--color-hairline);
   --viz-axis: var(--color-ink-3);
 }
 [data-theme="dark"] .viz {
-  --series-1: #8b78f0;
-  --series-2: #35a86a;
+  --series-1: #60a5fa;
+  --series-2: #34d399;
 }
 
 /* Map markers are created imperatively by MapLibre, so they are styled here
