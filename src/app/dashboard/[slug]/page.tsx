@@ -37,7 +37,7 @@ export default async function DashboardOverview({
 
   const [{ data: stats }, { data: series }, { data: events }, { data: account }] = await Promise.all([
     supabase.rpc("organizer_stats", { p_organizer_id: organizer.id }),
-    supabase.rpc("organizer_sales_series", { p_organizer_id: organizer.id, p_days: 30 }),
+    supabase.rpc("organizer_sales_series", { p_organizer_id: organizer.id, p_days: 14 }),
     supabase
       .from("events")
       .select("id, title, slug, status, starts_at, cover_image_url")
@@ -128,12 +128,12 @@ export default async function DashboardOverview({
 
       <Divider />
 
-      <SectionBlock title="Sales" description="Gross revenue and tickets issued, last 30 days.">
+      <SectionBlock title="Sales" description="Gross revenue and tickets issued, last 14 days.">
         <div className="grid gap-5 lg:grid-cols-2">
           <Card>
             <CardHeader className="flex-col items-start gap-0">
               <CardTitle>Revenue</CardTitle>
-              <p className="text-sm text-ink-2">Gross, last 30 days</p>
+              <p className="text-sm text-ink-2">Gross, last 14 days</p>
             </CardHeader>
             <CardBody className="pt-1">
               <RevenueChart data={points} currency={currency} />
@@ -143,7 +143,7 @@ export default async function DashboardOverview({
           <Card>
             <CardHeader className="flex-col items-start gap-0">
               <CardTitle>Tickets issued</CardTitle>
-              <p className="text-sm text-ink-2">Per day, last 30 days</p>
+              <p className="text-sm text-ink-2">Per day, last 14 days</p>
             </CardHeader>
             <CardBody className="pt-1">
               <TicketsChart data={points} />
@@ -170,7 +170,7 @@ export default async function DashboardOverview({
               <li key={event.id}>
                 <Link
                   href={`/dashboard/${slug}/events/${event.id}`}
-                  className="flex items-center gap-4 rounded-xl bg-card px-5 py-3.5 shadow-e1 transition-shadow hover:shadow-e2"
+                  className="flex items-center gap-4 rounded-xl bg-card px-5 py-3.5 transition-colors hover:bg-sunken/60"
                 >
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-flourish text-lg text-ink">{event.title}</p>

@@ -99,9 +99,9 @@ export const SelectItem = React.forwardRef<
 >(({ className, children, hint, ...props }, ref) => (
   <SelectPrimitive.Item ref={ref} className={cn("pop-item pr-2", className)} {...props}>
     <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
-    {hint && <span className="ml-auto shrink-0 text-xs tnum text-ink-3">{hint}</span>}
+    {hint && <span className="ml-auto shrink-0 text-sm tnum text-ink-3">{hint}</span>}
     <SelectPrimitive.ItemIndicator className={cn("shrink-0 text-ink", !hint && "ml-auto")}>
-      <Check className="size-4" aria-hidden />
+      <Check className="size-[18px]" aria-hidden />
     </SelectPrimitive.ItemIndicator>
   </SelectPrimitive.Item>
 ));
@@ -110,14 +110,14 @@ SelectItem.displayName = "SelectItem";
 export function SelectLabel({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Label>) {
   return (
     <SelectPrimitive.Label
-      className={cn("px-2.5 pb-1 pt-2 text-2xs font-semibold uppercase tracking-wider text-ink-3", className)}
+      className={cn("px-2.5 pb-1.5 pt-2 text-xs font-semibold uppercase tracking-[0.06em] text-ink-3", className)}
       {...props}
     />
   );
 }
 
 export function SelectSeparator({ className, ...props }: React.ComponentProps<typeof SelectPrimitive.Separator>) {
-  return <SelectPrimitive.Separator className={cn("my-1.5 h-px bg-hairline-soft", className)} {...props} />;
+  return <SelectPrimitive.Separator className={cn("-mx-1.5 my-1.5 h-px bg-hairline-soft", className)} {...props} />;
 }
 
 /**

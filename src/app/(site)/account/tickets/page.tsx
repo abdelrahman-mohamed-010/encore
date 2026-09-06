@@ -130,7 +130,7 @@ function TicketCard({
   return (
     <article
       className={cn(
-        "group overflow-hidden rounded-2xl bg-card transition-shadow duration-200 hover:shadow-e2",
+        "group overflow-hidden rounded-2xl bg-card",
         past && "opacity-60",
       )}
     >

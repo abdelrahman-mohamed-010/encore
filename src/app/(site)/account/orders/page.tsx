@@ -60,7 +60,7 @@ export default async function OrdersPage() {
         return (
           <article
             key={order.id}
-            className="group overflow-hidden rounded-2xl bg-card transition-shadow duration-200 hover:shadow-e2"
+            className="group overflow-hidden rounded-2xl bg-card"
           >
             <div className="flex gap-4 p-4 sm:p-5">
               {/* Date block or thumbnail */}

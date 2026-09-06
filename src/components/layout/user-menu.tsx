@@ -43,14 +43,14 @@ export function UserMenu({
         <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="md" />
       </DropdownTrigger>
 
-      <DropdownContent className="min-w-60">
-        <div className="flex items-center gap-2.5 px-2.5 py-2">
+      <DropdownContent className="min-w-64">
+        <div className="flex items-center gap-3 px-3 py-2.5">
           <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="sm" />
           <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-ink">
+            <p className="truncate text-md font-semibold text-ink">
               {profile.full_name ?? "Your account"}
             </p>
-            <p className="truncate text-xs text-ink-2">{profile.email}</p>
+            <p className="truncate text-sm text-ink-2">{profile.email}</p>
           </div>
         </div>
         <DropdownSeparator />
@@ -77,7 +77,7 @@ export function UserMenu({
                 <Link href={`/dashboard/${organizer.slug}`}>
                   <Building2 />
                   <span className="min-w-0 flex-1 truncate">{organizer.name}</span>
-                  <span className="shrink-0 text-2xs font-semibold uppercase tracking-[0.06em] text-ink-3">
+                  <span className="shrink-0 text-xs font-semibold uppercase tracking-[0.06em] text-ink-3">
                     {role}
                   </span>
                 </Link>

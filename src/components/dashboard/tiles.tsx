@@ -44,7 +44,7 @@ export function QuickAction({
   );
 
   const classes = cn(
-    "flex w-full items-center gap-4 rounded-xl bg-card p-3 text-left shadow-e1 transition-shadow hover:shadow-e2",
+    "flex w-full items-center gap-4 rounded-xl bg-card p-3 text-left transition-colors hover:bg-sunken/60",
     className,
   );
 
@@ -86,7 +86,7 @@ export function PlainCard({
   return (
     <div
       className={cn(
-        "flex items-center gap-4 rounded-xl bg-card px-5 py-3.5 shadow-e1",
+        "flex items-center gap-4 rounded-xl bg-card px-5 py-3.5",
         className,
       )}
     >

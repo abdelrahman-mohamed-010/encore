@@ -19,7 +19,7 @@ export function DropdownContent({
       <Primitive.Content
         align={align}
         sideOffset={sideOffset}
-        className={cn("surface-pop motion-pop z-50 min-w-[13.75rem] p-1.5", className)}
+        className={cn("surface-pop motion-pop z-50 min-w-[14.5rem] p-1.5", className)}
         {...props}
       />
     </Primitive.Portal>
@@ -37,7 +37,7 @@ export function DropdownItem({
         "pop-item",
         tone === "danger" && "pop-item-danger",
         "data-[disabled]:pointer-events-none",
-        "[&_svg]:size-[17px] [&_svg]:shrink-0 [&_svg]:text-ink-2",
+        "[&_svg]:size-[18px] [&_svg]:shrink-0 [&_svg]:text-ink-2",
         className,
       )}
       {...props}
@@ -62,12 +62,12 @@ export function DropdownCheckItem({
 export function DropdownLabel({ className, ...props }: React.ComponentProps<typeof Primitive.Label>) {
   return (
     <Primitive.Label
-      className={cn("px-2.5 pb-1 pt-2 text-2xs font-semibold uppercase tracking-[0.07em] text-ink-3", className)}
+      className={cn("px-2.5 pb-1.5 pt-2 text-xs font-semibold uppercase tracking-[0.06em] text-ink-3", className)}
       {...props}
     />
   );
 }
 
 export function DropdownSeparator({ className, ...props }: React.ComponentProps<typeof Primitive.Separator>) {
-  return <Primitive.Separator className={cn("my-1 h-px bg-hairline-soft", className)} {...props} />;
+  return <Primitive.Separator className={cn("-mx-1.5 my-1 h-px bg-hairline-soft", className)} {...props} />;
 }

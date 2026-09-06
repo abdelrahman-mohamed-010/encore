@@ -341,10 +341,10 @@
 
   /* A row inside any floating panel. */
   .pop-item {
-    display: flex; align-items: center; gap: 0.625rem;
-    width: 100%; height: 2.25rem; padding: 0 0.625rem;
+    display: flex; align-items: center; gap: 0.75rem;
+    width: 100%; min-height: 2.5rem; padding: 0 0.75rem;
     border-radius: var(--radius-sm);
-    font-size: var(--text-sm); font-weight: 500; color: var(--color-ink);
+    font-size: var(--text-md); font-weight: 500; color: var(--color-ink);
     cursor: pointer; user-select: none; outline: none;
     transition: background-color 0.1s linear;
   }
@@ -361,11 +361,11 @@
   .pop-item-danger:hover:not([data-disabled]) { background-color: var(--color-critical-bg); }
 
   /* A two-line row: the item grows to fit rather than clipping the sub-label. */
-  .pop-item-sub { height: auto; padding-block: 0.375rem; }
+  .pop-item-sub { height: auto; min-height: 2.75rem; padding-block: 0.5rem; }
   .pop-item-sub .sub {
     display: block;
-    margin-top: -1px;
-    font-size: var(--text-xs);
+    margin-top: 1px;
+    font-size: var(--text-sm);
     font-weight: 400;
     color: var(--color-ink-2);
   }
@@ -607,14 +607,14 @@
    above it.
    --------------------------------------------------------------------------- */
 .viz {
-  --series-1: #3b82f6;  /* blue  — revenue */
-  --series-2: #10b981;  /* light green — tickets */
+  --series-1: var(--color-brand-600, #7b4fe0);  /* brand violet — unified across charts */
+  --series-2: var(--color-brand-600, #7b4fe0);
   --viz-grid: var(--color-hairline);
   --viz-axis: var(--color-ink-3);
 }
 [data-theme="dark"] .viz {
-  --series-1: #60a5fa;
-  --series-2: #34d399;
+  --series-1: var(--color-brand-400, #a680ee);
+  --series-2: var(--color-brand-400, #a680ee);
 }
 
 /* Map markers are created imperatively by MapLibre, so they are styled here

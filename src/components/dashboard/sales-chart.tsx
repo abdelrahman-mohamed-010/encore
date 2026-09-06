@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import {
   Area, AreaChart, Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis,
 } from "recharts";
-import { formatMoney, formatMoneyCompact, formatNumber } from "@/lib/format";
+import { formatMoney, formatNumber } from "@/lib/format";
 
 export type SalesPoint = { day: string; gross_cents: number; orders: number; tickets: number };
 
@@ -63,7 +63,7 @@ function VizFrame({ total, children }: { total: string; children: React.ReactNod
 
 /**
  * Daily gross revenue. One series, so no legend — the card title names it —
- * and a 2px line over a 10% wash rather than a saturated block.
+ * and a 2px line over a subtle wash rather than a saturated block.
  */
 export function RevenueChart({ data, currency }: { data: SalesPoint[]; currency: string }) {
   const total = useMemo(() => data.reduce((sum, d) => sum + d.gross_cents, 0), [data]);
@@ -71,10 +71,10 @@ export function RevenueChart({ data, currency }: { data: SalesPoint[]; currency:
   return (
     <VizFrame total={formatMoney(total, currency)}>
       <ResponsiveContainer width="100%" height={200}>
-        <AreaChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -10 }}>
+        <AreaChart data={data} margin={{ top: 8, right: 2, bottom: 0, left: 2 }}>
           <defs>
             <linearGradient id="revenueFill" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="var(--series-1)" stopOpacity={0.25} />
+              <stop offset="0%" stopColor="var(--series-1)" stopOpacity={0.2} />
               <stop offset="100%" stopColor="var(--series-1)" stopOpacity={0} />
             </linearGradient>
           </defs>
@@ -88,13 +88,7 @@ export function RevenueChart({ data, currency }: { data: SalesPoint[]; currency:
             minTickGap={32}
             dy={6}
           />
-          <YAxis
-            tick={AXIS_STYLE}
-            tickLine={false}
-            axisLine={false}
-            width={56}
-            tickFormatter={(value: number) => formatMoneyCompact(value, currency)}
-          />
+          <YAxis hide />
           <Tooltip
             cursor={{ stroke: "var(--viz-axis)", strokeWidth: 1 }}
             content={<ChartTooltip formatter={(value) => formatMoney(value, currency)} />}
@@ -103,13 +97,11 @@ export function RevenueChart({ data, currency }: { data: SalesPoint[]; currency:
             type="monotone"
             dataKey="gross_cents"
             stroke="var(--series-1)"
-            strokeWidth={4.5}
+            strokeWidth={2}
             strokeLinecap="round"
             strokeLinejoin="round"
             fill="url(#revenueFill)"
-            /* The 3px ring in the surface colour keeps the dot legible where it
-               crosses the line, and enlarges its hover target. */
-            activeDot={{ r: 6, strokeWidth: 3, stroke: "var(--color-card)" }}
+            activeDot={{ r: 5, strokeWidth: 2, stroke: "var(--color-card)" }}
           />
         </AreaChart>
       </ResponsiveContainer>
@@ -124,7 +116,7 @@ export function TicketsChart({ data }: { data: SalesPoint[] }) {
   return (
     <VizFrame total={formatNumber(total)}>
       <ResponsiveContainer width="100%" height={200}>
-        <BarChart data={data} margin={{ top: 4, right: 4, bottom: 0, left: -18 }}>
+        <BarChart data={data} barCategoryGap="12%" margin={{ top: 8, right: 4, bottom: 0, left: 4 }}>
           <CartesianGrid stroke="var(--viz-grid)" vertical={false} />
           <XAxis
             dataKey="day"
@@ -132,21 +124,21 @@ export function TicketsChart({ data }: { data: SalesPoint[] }) {
             tick={AXIS_STYLE}
             tickLine={false}
             axisLine={false}
-            minTickGap={32}
+            minTickGap={24}
             dy={6}
           />
-          <YAxis
-            tick={AXIS_STYLE}
-            tickLine={false}
-            axisLine={false}
-            width={40}
-            allowDecimals={false}
-          />
+          <YAxis hide />
           <Tooltip
             cursor={{ fill: "var(--color-sunken)" }}
             content={<ChartTooltip formatter={(value) => `${formatNumber(value)} tickets`} />}
           />
-          <Bar dataKey="tickets" fill="var(--series-2)" radius={[4, 4, 0, 0]} barSize={16} minPointSize={3} />
+          <Bar
+            dataKey="tickets"
+            fill="var(--series-1)"
+            radius={[4, 4, 0, 0]}
+            maxBarSize={48}
+            minPointSize={3}
+          />
         </BarChart>
       </ResponsiveContainer>
     </VizFrame>
