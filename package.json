@@ -59,6 +59,7 @@
     "react-day-picker": "^10.0.1",
     "react-dom": "19.2.8",
     "react-hook-form": "^7.87.0",
+    "react-resizable-panels": "^4.12.3",
     "react-zoom-pan-pinch": "^4.2.0",
     "recharts": "^3.10.1",
     "server-only": "^0.0.1",

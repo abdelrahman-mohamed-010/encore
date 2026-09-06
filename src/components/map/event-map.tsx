@@ -233,6 +233,18 @@ export function EventMap({
     });
   }, [selectedId, groups]);
 
+  // --- Invalidate map size on container resize (e.g. split pane drag) ---
+  React.useEffect(() => {
+    if (!containerRef.current || !mapReady) return;
+    const observer = new ResizeObserver(() => {
+      mapRef.current?.invalidateSize();
+    });
+    observer.observe(containerRef.current);
+    return () => {
+      observer.disconnect();
+    };
+  }, [mapReady]);
+
   return (
     <div className={cn("relative isolate overflow-hidden bg-sunken", className)}>
       <div ref={containerRef} className="size-full" data-testid="event-map" />

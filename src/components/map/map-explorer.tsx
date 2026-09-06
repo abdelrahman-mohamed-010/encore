@@ -4,10 +4,12 @@ import * as React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, CalendarDays, MapPin, X } from "lucide-react";
+import { Group, Panel, Separator } from "react-resizable-panels";
 import { EventMap } from "@/components/map/event-map";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/misc";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { formatDateTime, formatMoney } from "@/lib/format";
 import { formatDistance } from "@/lib/geo";
 import { cn } from "@/lib/utils";
@@ -154,37 +156,74 @@ export function MapExplorer({
 }) {
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const selected = pins.find((pin) => pin.id === selectedId) ?? null;
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+
+  const drawerContent = (
+    <div data-testid="map-list" className="flex h-full min-h-0 flex-col bg-paper">
+      {pins.length === 0 ? (
+        <div className="p-4">
+          <EmptyState icon={MapPin} title="Nothing on the map" description={emptyMessage} />
+        </div>
+      ) : selected ? (
+        <DetailPanel pin={selected} onBack={() => setSelectedId(null)} />
+      ) : (
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          {pins.map((pin) => (
+            <EventRow
+              key={pin.id}
+              pin={pin}
+              selected={pin.id === selectedId}
+              onSelect={() => setSelectedId(pin.id)}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
 
   return (
-    <div className={cn("grid min-h-0 lg:grid-cols-[22rem_minmax(0,1fr)]", className)}>
-      <div data-testid="map-list" className="flex min-h-0 flex-col border-hairline lg:border-r">
-        {pins.length === 0 ? (
-          <div className="p-4">
-            <EmptyState icon={MapPin} title="Nothing on the map" description={emptyMessage} />
-          </div>
-        ) : selected ? (
-          <DetailPanel pin={selected} onBack={() => setSelectedId(null)} />
-        ) : (
-          <div className="min-h-0 flex-1 overflow-y-auto">
-            {pins.map((pin) => (
-              <EventRow
-                key={pin.id}
-                pin={pin}
-                selected={pin.id === selectedId}
-                onSelect={() => setSelectedId(pin.id)}
-              />
-            ))}
-          </div>
-        )}
-      </div>
+    <div className={cn("relative min-h-0 h-full w-full overflow-hidden", className)}>
+      <Group
+        id="map-explorer-split"
+        orientation={isDesktop ? "horizontal" : "vertical"}
+        className="h-full w-full"
+      >
+        <Panel
+          id="drawer-panel"
+          defaultSize={isDesktop ? "360px" : "45%"}
+          minSize={isDesktop ? "280px" : "25%"}
+          maxSize={isDesktop ? "650px" : "75%"}
+          className="flex min-h-0 flex-col overflow-hidden bg-paper"
+        >
+          {drawerContent}
+        </Panel>
 
-      <EventMap
-        pins={pins}
-        selectedId={selectedId}
-        onSelect={(pin) => setSelectedId(pin.id)}
-        viewer={viewer}
-        className="min-h-80 lg:min-h-0"
-      />
+        <Separator
+          className={cn(
+            "group relative flex shrink-0 items-center justify-center bg-hairline-soft/80 transition-colors hover:bg-brand-500/20 active:bg-brand-500/30",
+            isDesktop
+              ? "w-2 cursor-col-resize hover:w-2.5"
+              : "h-2 cursor-row-resize hover:h-2.5",
+          )}
+        >
+          <div
+            className={cn(
+              "rounded-full bg-ink-3/40 transition-all group-hover:bg-brand-600 group-active:bg-brand-600",
+              isDesktop ? "h-8 w-1 group-hover:h-12" : "h-1 w-8 group-hover:w-12",
+            )}
+          />
+        </Separator>
+
+        <Panel id="map-panel" minSize={isDesktop ? "35%" : "25%"} className="min-h-0 flex-1">
+          <EventMap
+            pins={pins}
+            selectedId={selectedId}
+            onSelect={(pin) => setSelectedId(pin.id)}
+            viewer={viewer}
+            className="h-full w-full min-h-0"
+          />
+        </Panel>
+      </Group>
     </div>
   );
 }
