@@ -1,10 +1,6 @@
-import { ListSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton";
+import { SkeletonRows } from "@/components/ui/skeleton";
 
-export default function PromosLoading() {
-  return (
-    <div className="space-y-6 px-5 py-8 md:px-8">
-      <PageHeaderSkeleton />
-      <ListSkeleton rows={4} />
-    </div>
-  );
+/** Only the part that is waiting on data; the page's own chrome is static. */
+export default function DashboardSlugPromosLoading() {
+  return <div className="space-y-6"><SkeletonRows rows={6} height="h-14" className="rounded-xl" /></div>;
 }

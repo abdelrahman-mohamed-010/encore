@@ -1,12 +1,6 @@
-import { ListSkeleton, PageHeaderSkeleton } from "@/components/ui/skeleton";
+import { SkeletonGrid } from "@/components/ui/skeleton";
 
-export default function DashboardIndexLoading() {
-  return (
-    <div className="container-page py-12">
-      <div className="mx-auto max-w-2xl space-y-8">
-        <PageHeaderSkeleton withAction={false} />
-        <ListSkeleton rows={3} />
-      </div>
-    </div>
-  );
+/** Only the part that is waiting on data; the page's own chrome is static. */
+export default function DashboardLoading() {
+  return <div className="space-y-6"><SkeletonGrid count={3} itemClassName="min-h-40" /></div>;
 }

@@ -1,11 +1,6 @@
-import { ListSkeleton, PageHeaderSkeleton, StatRowSkeleton } from "@/components/ui/skeleton";
+import { StatRowSkeleton } from "@/components/ui/skeleton";
 
+/** Only the part that is waiting on data; the page's own chrome is static. */
 export default function AdminLoading() {
-  return (
-    <div className="space-y-8">
-      <PageHeaderSkeleton withAction={false} />
-      <StatRowSkeleton />
-      <ListSkeleton rows={5} />
-    </div>
-  );
+  return <div className="space-y-6"><StatRowSkeleton count={4} /></div>;
 }
