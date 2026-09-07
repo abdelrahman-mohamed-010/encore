@@ -3,6 +3,7 @@ import { ExternalLink, Plus } from "lucide-react";
 import { requireOrganizer, getMyOrganizers, getProfile } from "@/lib/auth";
 import { SessionProvider } from "@/contexts";
 import { SiteHeader } from "@/components/layout/site-header";
+import { ReportDownload } from "@/components/dashboard/report-download";
 import { OrganizerSwitcher } from "@/components/dashboard/organizer-switcher";
 import { DashboardTabs } from "@/components/dashboard/dashboard-nav";
 import { Avatar } from "@/components/ui/misc";
@@ -61,6 +62,9 @@ export default async function DashboardLayout({
                     <ExternalLink /> Public page
                   </Link>
                 </Button>
+                {/* organizer_stats refuses anyone below staff, so a scanner
+                    would only ever get an error from this. */}
+                {canCreate && <ReportDownload slug={organizer.slug} />}
                 {canCreate && (
                   <Button asChild variant="solid" size="md">
                     <Link href={`/dashboard/${organizer.slug}/events/new`}>
