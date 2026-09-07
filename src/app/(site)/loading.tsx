@@ -1,6 +1,15 @@
-import { EventGridSkeleton } from "@/components/ui/skeleton";
+import { EventGridSkeleton, PageHeaderSkeleton, Shimmer } from "@/components/ui/skeleton";
 
-/** Only the part that is waiting on data; the page's own chrome is static. */
 export default function SiteLoading() {
-  return <div className="container-page py-10"><EventGridSkeleton count={6} /></div>;
+  return (
+    <div className="container-page py-10 md:py-12">
+      <PageHeaderSkeleton withAction={false} />
+      <div className="mt-6 flex gap-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Shimmer key={i} className="h-9 w-24 rounded-lg" />
+        ))}
+      </div>
+      <EventGridSkeleton className="mt-8" />
+    </div>
+  );
 }

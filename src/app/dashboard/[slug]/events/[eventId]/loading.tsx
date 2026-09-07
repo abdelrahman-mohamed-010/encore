@@ -1,6 +1,21 @@
-import { ChartSkeleton, StatRowSkeleton } from "@/components/ui/skeleton";
+import { ListSkeleton, Shimmer, StatRowSkeleton } from "@/components/ui/skeleton";
 
-/** Only the part that is waiting on data; the page's own chrome is static. */
-export default function DashboardSlugEventsEventidLoading() {
-  return <div className="space-y-6 px-5 py-8 md:px-8"><><StatRowSkeleton /><ChartSkeleton className="mt-6" /></></div>;
+export default function ManageEventLoading() {
+  return (
+    <div className="space-y-6 px-5 py-8 md:px-8">
+      <Shimmer className="h-3 w-20" />
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-2.5">
+          <Shimmer className="h-7 w-72" />
+          <Shimmer className="h-3.5 w-56" />
+        </div>
+        <div className="flex gap-2">
+          <Shimmer className="h-8 w-24" />
+          <Shimmer className="h-8 w-32" />
+        </div>
+      </div>
+      <StatRowSkeleton />
+      <ListSkeleton rows={3} />
+    </div>
+  );
 }

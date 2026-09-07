@@ -1,6 +1,10 @@
-import { SkeletonRows } from "@/components/ui/skeleton";
+import { PageHeaderSkeleton, TableSkeleton } from "@/components/ui/skeleton";
 
-/** Only the part that is waiting on data; the page's own chrome is static. */
-export default function DashboardSlugAttendeesLoading() {
-  return <div className="space-y-6"><SkeletonRows rows={10} height="h-14" className="rounded-xl" /></div>;
+export default function AttendeesLoading() {
+  return (
+    <div className="space-y-6 px-5 py-8 md:px-8">
+      <PageHeaderSkeleton />
+      <TableSkeleton rows={10} columns={5} />
+    </div>
+  );
 }

@@ -1,6 +1,12 @@
-import { StatRowSkeleton } from "@/components/ui/skeleton";
+import { EventCardSkeleton, Shimmer } from "@/components/ui/skeleton";
 
-/** Only the part that is waiting on data; the page's own chrome is static. */
-export default function SiteAccountLoading() {
-  return <div className="space-y-6"><StatRowSkeleton count={3} /></div>;
+export default function AccountLoading() {
+  return (
+    <div className="mt-8 grid gap-4 md:grid-cols-2">
+      {Array.from({ length: 4 }).map((_, i) => (
+        <EventCardSkeleton key={i} />
+      ))}
+      <Shimmer className="hidden" />
+    </div>
+  );
 }
