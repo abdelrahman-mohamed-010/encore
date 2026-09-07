@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { SelectField } from "@/components/ui/select";
+import { Shimmer } from "@/components/ui/skeleton";
 
 /**
  * Table primitives. The wrapper owns the horizontal scroll so a wide table
@@ -191,6 +192,34 @@ export function TablePagination({
         </Button>
       </div>
     </div>
+  );
+}
+
+/**
+ * Suspense fallback for a table body: one flat block per row, spanning every
+ * column, the same height as a real row. Use as the `fallback` for a
+ * `<Suspense>` wrapping the `<tbody>`/`<tfoot>` of a table whose `<thead>`
+ * renders outside the boundary and never needs a skeleton.
+ */
+export function TableRowsSkeleton({
+  rows = 6,
+  columns,
+  rowHeight = "h-11",
+}: {
+  rows?: number;
+  columns: number;
+  rowHeight?: string;
+}) {
+  return (
+    <tbody>
+      {Array.from({ length: rows }).map((_, i) => (
+        <tr key={i} className="border-b border-hairline-soft last:border-b-0">
+          <td colSpan={columns} className="px-4 py-3">
+            <Shimmer className={cn(rowHeight, "rounded-lg")} />
+          </td>
+        </tr>
+      ))}
+    </tbody>
   );
 }
 

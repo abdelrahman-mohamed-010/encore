@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
-import { DashboardOrdersTable } from "@/components/dashboard/dashboard-orders-table";
+import { DashboardOrdersShell, type DashboardOrderItem } from "@/components/dashboard/dashboard-orders-table";
 
 export const metadata: Metadata = { title: "Orders" };
 
@@ -14,7 +14,7 @@ export default async function DashboardOrdersPage({
   const { organizer, role } = await requireOrganizer(slug, "staff");
   const supabase = await createClient();
 
-  const { data: orders } = await supabase
+  const ordersPromise = supabase
     .from("orders")
     .select(
       `id, order_number, status, total_cents, refunded_cents, currency, created_at,
@@ -24,17 +24,14 @@ export default async function DashboardOrdersPage({
     )
     .eq("organizer_id", organizer.id)
     .order("created_at", { ascending: false })
-    .limit(200);
+    .limit(200)
+    .then(({ data }) => (data ?? []) as unknown as DashboardOrderItem[]);
 
   const canRefund = role === "owner" || role === "admin";
 
   return (
     <div className="space-y-6">
-      <DashboardOrdersTable
-        orders={(orders ?? []) as unknown as Parameters<typeof DashboardOrdersTable>[0]["orders"]}
-        canRefund={canRefund}
-        slug={slug}
-      />
+      <DashboardOrdersShell ordersPromise={ordersPromise} canRefund={canRefund} />
     </div>
   );
 }

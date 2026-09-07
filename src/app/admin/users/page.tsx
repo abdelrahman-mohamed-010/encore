@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { SectionHeader } from "@/components/ui/surface";
-import { UserTable } from "@/components/admin/user-table";
+import { UserTableShell } from "@/components/admin/user-table";
 
 export const metadata: Metadata = { title: "Users" };
 
@@ -24,12 +24,12 @@ export default async function AdminUsersPage({
     query = query.or(`email.ilike.${term},full_name.ilike.${term}`);
   }
 
-  const { data: profiles } = await query;
+  const profilesPromise = query.then(({ data }) => data ?? []);
 
   return (
     <div className="space-y-6">
       <SectionHeader level={1} title="Users" description="Everyone with a Tazkarti account." />
-      <UserTable profiles={profiles ?? []} initialQuery={q ?? ""} />
+      <UserTableShell profilesPromise={profilesPromise} initialQuery={q ?? ""} />
     </div>
   );
 }

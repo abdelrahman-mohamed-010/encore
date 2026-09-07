@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
-import { QuerySelect } from "@/components/ui/query-select";
-import { DashboardAttendeesTable } from "@/components/dashboard/dashboard-attendees-table";
+import { DashboardAttendeesShell, type DashboardAttendeeItem } from "@/components/dashboard/dashboard-attendees-table";
 
 export const metadata: Metadata = { title: "Attendees" };
 
@@ -27,8 +26,8 @@ export default async function AttendeesPage({
   const eventIds = (events ?? []).map((e) => e.id);
   const scoped = eventFilter && eventIds.includes(eventFilter) ? [eventFilter] : eventIds;
 
-  const { data: tickets } = eventIds.length
-    ? await supabase
+  const ticketsPromise = eventIds.length
+    ? supabase
         .from("tickets")
         .select(
           `id, ticket_code, attendee_name, attendee_email, seat_label, status, checked_in_at,
@@ -38,12 +37,13 @@ export default async function AttendeesPage({
         .in("event_id", scoped)
         .order("issued_at", { ascending: false })
         .limit(500)
-    : { data: [] };
+        .then(({ data }) => (data ?? []) as unknown as DashboardAttendeeItem[])
+    : Promise.resolve([]);
 
   return (
     <div className="space-y-4">
-      <DashboardAttendeesTable
-        tickets={(tickets ?? []) as unknown as Parameters<typeof DashboardAttendeesTable>[0]["tickets"]}
+      <DashboardAttendeesShell
+        ticketsPromise={ticketsPromise}
         events={events ?? []}
         initialEventFilter={eventFilter}
         slug={slug}

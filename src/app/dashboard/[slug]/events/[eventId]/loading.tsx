@@ -1,4 +1,4 @@
-import { ListSkeleton, Shimmer, StatRowSkeleton } from "@/components/ui/skeleton";
+import { Shimmer } from "@/components/ui/skeleton";
 
 export default function ManageEventLoading() {
   return (
@@ -14,8 +14,10 @@ export default function ManageEventLoading() {
           <Shimmer className="h-8 w-32" />
         </div>
       </div>
-      <StatRowSkeleton />
-      <ListSkeleton rows={3} />
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => <Shimmer key={i} className="h-24 rounded-xl" />)}
+      </div>
+      <Shimmer className="h-64 rounded-xl" />
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { useState, useTransition, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
@@ -17,11 +18,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select";
 import { Form, FormError, FormField } from "@/components/ui/form";
-import { Avatar, EmptyState } from "@/components/ui/misc";
-import { TablePagination, useTablePagination } from "@/components/ui/table";
+import { Avatar } from "@/components/ui/misc";
+import { TablePagination, TableRowsSkeleton, useTablePagination } from "@/components/ui/table";
 import type { OrgMemberRole } from "@/lib/types";
 
-type Member = {
+export type Member = {
   userId: string;
   role: OrgMemberRole;
   fullName: string | null;
@@ -59,21 +60,23 @@ const ROLE_HELP: Record<OrgMemberRole, string> = {
   scanner: "Check people in at the door. No access to sales.",
 };
 
-export function TeamManager({
+const COLUMN_COUNT = 4;
+
+/** Static shell: search, role filter, "Role info" / "Add member". Never a skeleton. */
+export function TeamShell({
+  membersPromise,
   organizerId,
   viewerRole,
-  members,
 }: {
+  membersPromise: PromiseLike<Member[]>;
   organizerId: string;
   viewerRole: OrgMemberRole;
-  members: Member[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [roleInfoOpen, setRoleInfoOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
-  const [, startTransition] = useTransition();
 
   const canManageOwners = viewerRole === "owner";
 
@@ -83,28 +86,6 @@ export function TeamManager({
   });
 
   const selectedRole = useWatch({ control: form.control, name: "role" });
-
-  const filteredMembers = useMemo(() => {
-    return members.filter((m) => {
-      const q = query.toLowerCase().trim();
-      const matchesQuery =
-        !q ||
-        (m.fullName && m.fullName.toLowerCase().includes(q)) ||
-        m.email.toLowerCase().includes(q);
-      const matchesRole = roleFilter === "all" || m.role === roleFilter;
-      return matchesQuery && matchesRole;
-    });
-  }, [members, query, roleFilter]);
-
-  const {
-    paginatedItems,
-    currentPage,
-    totalPages,
-    totalItems,
-    pageSize,
-    setPage,
-    setPageSize,
-  } = useTablePagination(filteredMembers, 10);
 
   const addMember = useAsyncAction(async (values: TeamMemberData) => {
     const supabase = createClient();
@@ -137,45 +118,8 @@ export function TeamManager({
     router.refresh();
   });
 
-  function changeRole(member: Member, next: OrgMemberRole) {
-    startTransition(async () => {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from("organizer_members")
-        .update({ role: next })
-        .eq("organizer_id", organizerId)
-        .eq("user_id", member.userId);
-
-      if (error) {
-        toast.error("Could not change the role", { description: error.message });
-        return;
-      }
-      toast.success("Role updated");
-      router.refresh();
-    });
-  }
-
-  function removeMember(member: Member) {
-    startTransition(async () => {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from("organizer_members")
-        .delete()
-        .eq("organizer_id", organizerId)
-        .eq("user_id", member.userId);
-
-      if (error) {
-        toast.error("Could not remove them", { description: error.message });
-        return;
-      }
-      toast.success("Removed from the team");
-      router.refresh();
-    });
-  }
-
   return (
     <div className="space-y-4">
-      {/* Controls Bar matching Events, Orders, and Attendees */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 flex-wrap items-center gap-3">
           <div className="relative min-w-56 max-w-sm flex-1">
@@ -214,99 +158,28 @@ export function TeamManager({
         </div>
       </div>
 
-      {filteredMembers.length === 0 ? (
-        <EmptyState
-          icon={Search}
-          title="No team members found"
-          description={
-            members.length === 0
-              ? "Invite collaborators to help manage events, scan tickets, or view sales."
-              : "Try adjusting your search or role filter."
-          }
-          action={
-            members.length === 0 ? (
-              <Button variant="solid" size="md" onClick={() => setOpen(true)}>
-                <UserPlus /> Add member
-              </Button>
-            ) : undefined
-          }
-        />
-      ) : (
-        <Card className="overflow-x-auto">
-          <table className="w-full min-w-[44rem] text-left text-sm">
-            <thead>
-              <tr className="border-b border-hairline text-2xs uppercase tracking-[0.06em] text-ink-3">
-                <th scope="col" className="px-4 py-3 font-semibold">Member</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Email</th>
-                <th scope="col" className="px-4 py-3 font-semibold">Role</th>
-                <th scope="col" className="px-4 py-3 text-right" />
-              </tr>
-            </thead>
-            <tbody>
-              {paginatedItems.map((member) => (
-                <tr
-                  key={member.userId}
-                  className="border-b border-hairline-soft transition-colors hover:bg-sunken/60 last:border-b-0"
-                >
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <Avatar
-                        src={member.avatarUrl}
-                        name={member.fullName ?? member.email}
-                        size="md"
-                      />
-                      <span className="font-medium text-ink">
-                        {member.fullName ?? "Team member"}
-                      </span>
-                    </div>
-                  </td>
-
-                  <td className="whitespace-nowrap px-4 py-3 text-ink-2">
-                    {member.email}
-                  </td>
-
-                  <td className="px-4 py-3">
-                    <SelectField
-                      value={member.role}
-                      onChange={(value) => changeRole(member, value as OrgMemberRole)}
-                      aria-label={`Role for ${member.email}`}
-                      size="sm"
-                      className="w-32"
-                      disabled={member.role === "owner" && !canManageOwners}
-                      options={(["owner", "admin", "staff", "scanner"] as OrgMemberRole[])
-                        .filter((r) => r !== "owner" || canManageOwners || member.role === "owner")
-                        .map((r) => ({ value: r, label: r[0].toUpperCase() + r.slice(1) }))}
-                    />
-                  </td>
-
-                  <td className="px-4 py-3 text-right">
-                    {!(member.role === "owner" && !canManageOwners) && (
-                      <Button
-                        variant="ghost"
-                        size="icon-sm"
-                        aria-label={`Remove ${member.email}`}
-                        onClick={() => removeMember(member)}
-                      >
-                        <Trash2 className="size-4 text-ink-3 hover:text-critical" />
-                      </Button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-          {/* Table Pagination */}
-          <TablePagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            totalItems={totalItems}
-            pageSize={pageSize}
-            onPageChange={setPage}
-            onPageSizeChange={setPageSize}
-          />
-        </Card>
-      )}
+      <Card className="overflow-x-auto">
+        <table className="w-full min-w-[44rem] text-left text-sm">
+          <thead>
+            <tr className="border-b border-hairline text-2xs uppercase tracking-[0.06em] text-ink-3">
+              <th scope="col" className="px-4 py-3 font-semibold">Member</th>
+              <th scope="col" className="px-4 py-3 font-semibold">Email</th>
+              <th scope="col" className="px-4 py-3 font-semibold">Role</th>
+              <th scope="col" className="px-4 py-3 text-right" />
+            </tr>
+          </thead>
+          <React.Suspense fallback={<TableRowsSkeleton rows={5} columns={COLUMN_COUNT} />}>
+            <TeamRows
+              membersPromise={membersPromise}
+              query={query}
+              roleFilter={roleFilter}
+              organizerId={organizerId}
+              canManageOwners={canManageOwners}
+              onAddFirst={() => setOpen(true)}
+            />
+          </React.Suspense>
+        </table>
+      </Card>
 
       {/* Role Info Modal */}
       <Dialog open={roleInfoOpen} onOpenChange={setRoleInfoOpen}>
@@ -383,5 +256,176 @@ export function TeamManager({
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function TeamRows({
+  membersPromise,
+  query,
+  roleFilter,
+  organizerId,
+  canManageOwners,
+  onAddFirst,
+}: {
+  membersPromise: PromiseLike<Member[]>;
+  query: string;
+  roleFilter: string;
+  organizerId: string;
+  canManageOwners: boolean;
+  onAddFirst: () => void;
+}) {
+  const router = useRouter();
+  const members = React.use(membersPromise);
+  const [, startTransition] = useTransition();
+
+  const filteredMembers = useMemo(() => {
+    return members.filter((m) => {
+      const q = query.toLowerCase().trim();
+      const matchesQuery =
+        !q ||
+        (m.fullName && m.fullName.toLowerCase().includes(q)) ||
+        m.email.toLowerCase().includes(q);
+      const matchesRole = roleFilter === "all" || m.role === roleFilter;
+      return matchesQuery && matchesRole;
+    });
+  }, [members, query, roleFilter]);
+
+  const {
+    paginatedItems,
+    currentPage,
+    totalPages,
+    totalItems,
+    pageSize,
+    setPage,
+    setPageSize,
+  } = useTablePagination(filteredMembers, 10);
+
+  function changeRole(member: Member, next: OrgMemberRole) {
+    startTransition(async () => {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("organizer_members")
+        .update({ role: next })
+        .eq("organizer_id", organizerId)
+        .eq("user_id", member.userId);
+
+      if (error) {
+        toast.error("Could not change the role", { description: error.message });
+        return;
+      }
+      toast.success("Role updated");
+      router.refresh();
+    });
+  }
+
+  function removeMember(member: Member) {
+    startTransition(async () => {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("organizer_members")
+        .delete()
+        .eq("organizer_id", organizerId)
+        .eq("user_id", member.userId);
+
+      if (error) {
+        toast.error("Could not remove them", { description: error.message });
+        return;
+      }
+      toast.success("Removed from the team");
+      router.refresh();
+    });
+  }
+
+  if (filteredMembers.length === 0) {
+    return (
+      <tbody>
+        <tr>
+          <td colSpan={COLUMN_COUNT} className="px-4 py-16 text-center">
+            <p className="text-sm font-medium text-ink">No team members found</p>
+            <p className="mt-1 text-sm text-ink-3">
+              {members.length === 0
+                ? "Invite collaborators to help manage events, scan tickets, or view sales."
+                : "Try adjusting your search or role filter."}
+            </p>
+            {members.length === 0 && (
+              <Button variant="solid" size="md" className="mt-4" onClick={onAddFirst}>
+                <UserPlus /> Add member
+              </Button>
+            )}
+          </td>
+        </tr>
+      </tbody>
+    );
+  }
+
+  return (
+    <>
+      <tbody>
+        {paginatedItems.map((member) => (
+          <tr
+            key={member.userId}
+            className="border-b border-hairline-soft transition-colors hover:bg-sunken/60 last:border-b-0"
+          >
+            <td className="px-4 py-3">
+              <div className="flex items-center gap-3">
+                <Avatar
+                  src={member.avatarUrl}
+                  name={member.fullName ?? member.email}
+                  size="md"
+                />
+                <span className="font-medium text-ink">
+                  {member.fullName ?? "Team member"}
+                </span>
+              </div>
+            </td>
+
+            <td className="whitespace-nowrap px-4 py-3 text-ink-2">
+              {member.email}
+            </td>
+
+            <td className="px-4 py-3">
+              <SelectField
+                value={member.role}
+                onChange={(value) => changeRole(member, value as OrgMemberRole)}
+                aria-label={`Role for ${member.email}`}
+                size="sm"
+                className="w-32"
+                disabled={member.role === "owner" && !canManageOwners}
+                options={(["owner", "admin", "staff", "scanner"] as OrgMemberRole[])
+                  .filter((r) => r !== "owner" || canManageOwners || member.role === "owner")
+                  .map((r) => ({ value: r, label: r[0].toUpperCase() + r.slice(1) }))}
+              />
+            </td>
+
+            <td className="px-4 py-3 text-right">
+              {!(member.role === "owner" && !canManageOwners) && (
+                <Button
+                  variant="ghost"
+                  size="icon-sm"
+                  aria-label={`Remove ${member.email}`}
+                  onClick={() => removeMember(member)}
+                >
+                  <Trash2 className="size-4 text-ink-3 hover:text-critical" />
+                </Button>
+              )}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colSpan={COLUMN_COUNT} className="p-0">
+            <TablePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              totalItems={totalItems}
+              pageSize={pageSize}
+              onPageChange={setPage}
+              onPageSizeChange={setPageSize}
+            />
+          </td>
+        </tr>
+      </tfoot>
+    </>
   );
 }

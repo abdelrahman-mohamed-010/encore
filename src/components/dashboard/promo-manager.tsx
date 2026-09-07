@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, useTransition } from "react";
 import { useForm, useWatch } from "react-hook-form";
@@ -20,28 +21,23 @@ import { Combobox } from "@/components/ui/combobox";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/misc";
+import { Shimmer } from "@/components/ui/skeleton";
 import { formatMoney, formatNumber } from "@/lib/format";
 import type { PromoCode } from "@/lib/types";
 
-export function PromoManager({
+/** Static shell: search + "New code". Never a skeleton. */
+export function PromoShell({
   organizerId,
-  promos,
+  promosPromise,
   events,
 }: {
   organizerId: string;
-  promos: PromoCode[];
+  promosPromise: PromiseLike<PromoCode[]>;
   events: { id: string; title: string }[];
 }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
-  const [, startTransition] = useTransition();
-
-  const filteredPromos = useMemo(() => {
-    if (!query.trim()) return promos;
-    const q = query.toLowerCase().trim();
-    return promos.filter((p) => p.code.toLowerCase().includes(q));
-  }, [promos, query]);
 
   const form = useForm<PromoValues, unknown, PromoData>({
     resolver: zodResolver(promoSchema),
@@ -82,37 +78,8 @@ export function PromoManager({
     router.refresh();
   });
 
-  function toggleActive(promo: PromoCode) {
-    startTransition(async () => {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from("promo_codes")
-        .update({ is_active: !promo.is_active })
-        .eq("id", promo.id);
-      if (error) {
-        toast.error("Could not update the code", { description: error.message });
-        return;
-      }
-      router.refresh();
-    });
-  }
-
-  function remove(promo: PromoCode) {
-    startTransition(async () => {
-      const supabase = createClient();
-      const { error } = await supabase.from("promo_codes").delete().eq("id", promo.id);
-      if (error) {
-        toast.error("Could not delete the code", { description: error.message });
-        return;
-      }
-      toast.success("Promo code deleted");
-      router.refresh();
-    });
-  }
-
   return (
     <div className="space-y-4">
-      {/* Controls Bar matching Events, Orders, and Attendees */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="relative min-w-56 max-w-sm flex-1">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
@@ -130,66 +97,19 @@ export function PromoManager({
         </Button>
       </div>
 
-      {filteredPromos.length === 0 ? (
-        <EmptyState
-          icon={Tag}
-          title={promos.length === 0 ? "No promo codes yet" : "No matching codes found"}
-          description={
-            promos.length === 0
-              ? "Create a code to run a presale, a partner discount or a friends-and-family rate."
-              : "Try adjusting your search query."
-          }
-          action={
-            promos.length === 0 ? (
-              <Button variant="solid" size="md" onClick={() => setOpen(true)}>
-                <Plus /> New code
-              </Button>
-            ) : undefined
-          }
-        />
-      ) : (
-        <Card className="overflow-hidden">
-          {filteredPromos.map((promo) => (
-            <div
-              key={promo.id}
-              className="flex items-center gap-4 border-b border-hairline-soft px-4 py-3.5 last:border-b-0"
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="font-mono text-base font-semibold text-ink">{promo.code}</span>
-                  <Badge tone={promo.is_active ? "positive" : "neutral"} size="xs">
-                    {promo.is_active ? "Active" : "Paused"}
-                  </Badge>
-                  {promo.event_id && <Badge tone="outline" size="xs">One event</Badge>}
-                </div>
-                <p className="mt-1 text-xs text-ink-3">
-                  {promo.discount_type === "percentage"
-                    ? `${promo.discount_value}% off`
-                    : `${formatMoney(Number(promo.discount_value))} off`}
-                  {promo.min_order_cents > 0 && ` · min ${formatMoney(promo.min_order_cents)}`}
-                  {" · "}
-                  {formatNumber(promo.times_redeemed)} used
-                  {promo.max_redemptions ? ` of ${formatNumber(promo.max_redemptions)}` : ""}
-                </p>
+      <React.Suspense
+        fallback={
+          <Card className="overflow-hidden">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className="border-b border-hairline-soft px-4 py-3.5 last:border-b-0">
+                <Shimmer className="h-11 rounded-lg" />
               </div>
-
-              <Switch
-                checked={promo.is_active}
-                onCheckedChange={() => toggleActive(promo)}
-                label={`Toggle ${promo.code}`}
-              />
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Delete ${promo.code}`}
-                onClick={() => remove(promo)}
-              >
-                <Trash2 />
-              </Button>
-            </div>
-          ))}
-        </Card>
-      )}
+            ))}
+          </Card>
+        }
+      >
+        <PromoRows promosPromise={promosPromise} query={query} onCreateFirst={() => setOpen(true)} />
+      </React.Suspense>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent size="sm">
@@ -274,5 +194,118 @@ export function PromoManager({
         </DialogContent>
       </Dialog>
     </div>
+  );
+}
+
+function PromoRows({
+  promosPromise,
+  query,
+  onCreateFirst,
+}: {
+  promosPromise: PromiseLike<PromoCode[]>;
+  query: string;
+  onCreateFirst: () => void;
+}) {
+  const router = useRouter();
+  const promos = React.use(promosPromise);
+  const [, startTransition] = useTransition();
+
+  const filteredPromos = useMemo(() => {
+    if (!query.trim()) return promos;
+    const q = query.toLowerCase().trim();
+    return promos.filter((p) => p.code.toLowerCase().includes(q));
+  }, [promos, query]);
+
+  function toggleActive(promo: PromoCode) {
+    startTransition(async () => {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("promo_codes")
+        .update({ is_active: !promo.is_active })
+        .eq("id", promo.id);
+      if (error) {
+        toast.error("Could not update the code", { description: error.message });
+        return;
+      }
+      router.refresh();
+    });
+  }
+
+  function remove(promo: PromoCode) {
+    startTransition(async () => {
+      const supabase = createClient();
+      const { error } = await supabase.from("promo_codes").delete().eq("id", promo.id);
+      if (error) {
+        toast.error("Could not delete the code", { description: error.message });
+        return;
+      }
+      toast.success("Promo code deleted");
+      router.refresh();
+    });
+  }
+
+  if (filteredPromos.length === 0) {
+    return (
+      <EmptyState
+        icon={Tag}
+        title={promos.length === 0 ? "No promo codes yet" : "No matching codes found"}
+        description={
+          promos.length === 0
+            ? "Create a code to run a presale, a partner discount or a friends-and-family rate."
+            : "Try adjusting your search query."
+        }
+        action={
+          promos.length === 0 ? (
+            <Button variant="solid" size="md" onClick={onCreateFirst}>
+              <Plus /> New code
+            </Button>
+          ) : undefined
+        }
+      />
+    );
+  }
+
+  return (
+    <Card className="overflow-hidden">
+      {filteredPromos.map((promo) => (
+        <div
+          key={promo.id}
+          className="flex items-center gap-4 border-b border-hairline-soft px-4 py-3.5 last:border-b-0"
+        >
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-mono text-base font-semibold text-ink">{promo.code}</span>
+              <Badge tone={promo.is_active ? "positive" : "neutral"} size="xs">
+                {promo.is_active ? "Active" : "Paused"}
+              </Badge>
+              {promo.event_id && <Badge tone="outline" size="xs">One event</Badge>}
+            </div>
+            <p className="mt-1 text-xs text-ink-3">
+              {promo.discount_type === "percentage"
+                ? `${promo.discount_value}% off`
+                : `${formatMoney(Number(promo.discount_value))} off`}
+              {promo.min_order_cents > 0 && ` · min ${formatMoney(promo.min_order_cents)}`}
+              {" · "}
+              {formatNumber(promo.times_redeemed)} used
+              {promo.max_redemptions ? ` of ${formatNumber(promo.max_redemptions)}` : ""}
+            </p>
+          </div>
+
+          <Switch
+            checked={promo.is_active}
+            onCheckedChange={() => toggleActive(promo)}
+            label={`Toggle ${promo.code}`}
+          />
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={`Delete ${promo.code}`}
+            onClick={() => remove(promo)}
+          >
+            <Trash2 />
+          </Button>
+        </div>
+      ))}
+    </Card>
   );
 }

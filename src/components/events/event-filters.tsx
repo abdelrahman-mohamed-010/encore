@@ -34,11 +34,9 @@ const WHEN = [
 export function EventFilters({
   categories,
   cities,
-  total,
 }: {
   categories: Category[];
   cities: string[];
-  total: number;
 }) {
   const router = useRouter();
   const params = useSearchParams();
@@ -120,9 +118,6 @@ export function EventFilters({
         </Button>
 
         <div className="ml-auto flex items-center gap-2.5">
-          <span className="hidden text-sm text-ink-3 sm:inline tnum">
-            {total} {total === 1 ? "event" : "events"}
-          </span>
           <SelectField
             aria-label="Sort by"
             size="sm"

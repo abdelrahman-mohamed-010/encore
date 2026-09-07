@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { SectionHeader } from "@/components/ui/surface";
-import { EventReviewList } from "@/components/admin/event-review-list";
+import { EventReviewShell, type ReviewEvent } from "@/components/admin/event-review-list";
 
 export const metadata: Metadata = { title: "Event review" };
 
 export default async function AdminEventsPage() {
   const supabase = await createClient();
 
-  const { data: events } = await supabase
+  const eventsPromise = supabase
     .from("events")
     .select(
       `id, title, slug, status, starts_at, cover_image_url, subtitle, created_at,
@@ -18,17 +18,10 @@ export default async function AdminEventsPage() {
     )
     .in("status", ["pending_review", "published", "draft", "paused"])
     .order("created_at", { ascending: false })
-    .limit(100);
-
-  return (
-    <div className="space-y-6">
-      <SectionHeader
-        level={1}
-        title="Event review"
-        description="Approve events before they go on sale, or pull one down."
-      />
-      <EventReviewList
-        events={(events ?? []).map((event) => ({
+    .limit(100)
+    .then(
+      ({ data }) =>
+        (data ?? []).map((event) => ({
           id: event.id,
           title: event.title,
           slug: event.slug,
@@ -40,8 +33,17 @@ export default async function AdminEventsPage() {
           venueLabel: [event.venue?.name, event.venue?.city].filter(Boolean).join(" · "),
           tiers: (event.ticket_types ?? []).length,
           capacity: (event.ticket_types ?? []).reduce((sum, t) => sum + t.quantity_total, 0),
-        }))}
+        })) as ReviewEvent[],
+    );
+
+  return (
+    <div className="space-y-6">
+      <SectionHeader
+        level={1}
+        title="Event review"
+        description="Approve events before they go on sale, or pull one down."
       />
+      <EventReviewShell eventsPromise={eventsPromise} />
     </div>
   );
 }

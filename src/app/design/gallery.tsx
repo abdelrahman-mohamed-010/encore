@@ -24,7 +24,7 @@ import {
 import {
   Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle,
 } from "@/components/ui/sheet";
-import { EventCardSkeleton } from "@/components/ui/skeleton";
+import { EventCardSkeleton } from "@/components/events/event-card";
 import { cn } from "@/lib/utils";
 
 /**

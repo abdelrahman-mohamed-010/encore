@@ -1,17 +1,22 @@
-import { EventGridSkeleton, Shimmer, SkeletonText } from "@/components/ui/skeleton";
+import { Shimmer } from "@/components/ui/skeleton";
 
 export default function OrganizerLoading() {
   return (
     <>
-      <Shimmer className="h-40 rounded-none md:h-56" />
-      <div className="container-page">
-        <div className="relative -mt-10 flex items-end gap-4 md:-mt-12">
-          <Shimmer className="size-20 rounded-full border-4 border-paper md:size-24" />
-          <Shimmer className="mb-2 h-8 w-56" />
+      <Shimmer className="h-44 rounded-none md:h-64" />
+      <div className="container-page pb-16">
+        <div className="relative -mt-12 flex items-end gap-5 pb-6 border-b border-hairline md:-mt-16">
+          <Shimmer className="size-24 rounded-2xl border-4 border-paper md:size-28" />
+          <Shimmer className="mb-1 h-9 w-64" />
         </div>
-        <SkeletonText lines={2} className="mt-5 max-w-2xl" />
-        <Shimmer className="mt-12 h-7 w-48" />
-        <EventGridSkeleton className="mt-6" />
+        <Shimmer className="mt-6 h-16 max-w-3xl" />
+
+        <div className="mt-12 space-y-4">
+          <Shimmer className="h-8 w-48" />
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Shimmer key={i} className="h-32 rounded-2xl sm:h-28" />
+          ))}
+        </div>
       </div>
     </>
   );

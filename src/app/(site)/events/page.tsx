@@ -1,22 +1,18 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { MapPin, SearchX } from "lucide-react";
+import { MapPin } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { EventCard, EventCardSkeleton } from "@/components/events/event-card";
+import { EventCardSkeleton } from "@/components/events/event-card";
 import { EventFilters } from "@/components/events/event-filters";
 import { CategoryRail } from "@/components/events/category-rail";
-import { EmptyState } from "@/components/ui/misc";
 import { Button } from "@/components/ui/button";
-import { formatNumber } from "@/lib/format";
-import type { EventSearchResult } from "@/lib/types";
+import { EventsResults } from "./events-results";
 
 export const metadata: Metadata = {
   title: "Discover events",
   description: "Search concerts, theatre, conferences and festivals on Tazkarti.",
 };
-
-const PAGE_SIZE = 24;
 
 type SearchParams = Record<string, string | string[] | undefined>;
 
@@ -51,6 +47,8 @@ function dateWindow(when?: string): { from?: string; to?: string } {
   return { from: now.toISOString(), to: end.toISOString() };
 }
 
+const PAGE_SIZE = 24;
+
 export default async function EventsPage({
   searchParams,
 }: {
@@ -61,45 +59,34 @@ export default async function EventsPage({
 
   const page = Math.max(1, Number(single(params, "page") ?? 1) || 1);
   const window = dateWindow(single(params, "when"));
+  const query = single(params, "q");
 
-  const [{ data: rows }, { data: categories }, { data: venues }] = await Promise.all([
-    supabase.rpc("search_events", {
-      p_query: single(params, "q") ?? undefined,
-      p_category_slug: single(params, "category") ?? undefined,
-      p_city: single(params, "city") ?? undefined,
-      p_from: window.from,
-      p_to: window.to,
-      p_free_only: single(params, "free") === "1",
-      p_featured_only: single(params, "featured") === "1",
-      p_organizer_slug: single(params, "organizer") ?? undefined,
-      p_sort: single(params, "sort") ?? "soonest",
-      p_limit: PAGE_SIZE,
-      p_offset: (page - 1) * PAGE_SIZE,
-    }),
+  const [{ data: categories }, { data: venues }] = await Promise.all([
     supabase.from("categories").select("*").eq("is_active", true).order("sort_order"),
     supabase.from("venues").select("city").eq("is_active", true),
   ]);
-
-  const events = (rows ?? []) as EventSearchResult[];
-  const total = Number(events[0]?.total_count ?? 0);
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const cities = [...new Set((venues ?? []).map((v) => v.city).filter(Boolean))].sort();
 
-  const query = single(params, "q");
+  const resultsPromise = supabase.rpc("search_events", {
+    p_query: query ?? undefined,
+    p_category_slug: single(params, "category") ?? undefined,
+    p_city: single(params, "city") ?? undefined,
+    p_from: window.from,
+    p_to: window.to,
+    p_free_only: single(params, "free") === "1",
+    p_featured_only: single(params, "featured") === "1",
+    p_organizer_slug: single(params, "organizer") ?? undefined,
+    p_sort: single(params, "sort") ?? "soonest",
+    p_limit: PAGE_SIZE,
+    p_offset: (page - 1) * PAGE_SIZE,
+  });
 
   return (
     <div className="container-page py-10 md:py-12">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h1 className="display-2 text-ink">
-            {query ? `Results for “${query}”` : "Discover events"}
-          </h1>
-          <p className="mt-2 text-md text-ink-2">
-            {total > 0
-              ? `${formatNumber(total)} ${total === 1 ? "event" : "events"} on sale.`
-              : "Nothing matches those filters yet."}
-          </p>
-        </div>
+        <h1 className="display-2 text-ink">
+          {query ? `Results for “${query}”` : "Discover events"}
+        </h1>
 
         <Button asChild variant="outline" size="sm" className="rounded-xl gap-1.5">
           <Link href="/events/map">
@@ -116,61 +103,24 @@ export default async function EventsPage({
       />
 
       <Suspense fallback={<div className="h-9 rounded-lg bg-sunken" />}>
-        <EventFilters categories={categories ?? []} cities={cities} total={total} />
+        <EventFilters categories={categories ?? []} cities={cities} />
       </Suspense>
 
       <Suspense
         key={JSON.stringify(params)}
         fallback={
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => <EventCardSkeleton key={i} />)}
+          <div className="mt-8">
+            <div className="mb-2 h-5 w-40 rounded bg-sunken" />
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => <EventCardSkeleton key={i} />)}
+            </div>
           </div>
         }
       >
-        {events.length === 0 ? (
-          <EmptyState
-            className="mt-10"
-            icon={SearchX}
-            title="No events match those filters"
-            description="Try widening the date range, clearing the category, or searching for something else."
-            action={
-              <Button asChild variant="outline" size="sm">
-                <Link href="/events">Clear filters</Link>
-              </Button>
-            }
-          />
-        ) : (
-          <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {events.map((event, index) => (
-              <EventCard key={event.id} event={event} priority={index < 3} />
-            ))}
-          </div>
-        )}
+        <div className="mt-8">
+          <EventsResults resultsPromise={resultsPromise} params={params} page={page} />
+        </div>
       </Suspense>
-
-      {totalPages > 1 && (
-        <nav className="mt-10 flex items-center justify-center gap-2" aria-label="Pagination">
-          <Button asChild variant="outline" size="sm" disabled={page <= 1}>
-            <Link
-              href={`/events?${new URLSearchParams({ ...(params as Record<string, string>), page: String(page - 1) })}`}
-              aria-disabled={page <= 1}
-            >
-              Previous
-            </Link>
-          </Button>
-          <span className="px-3 text-sm text-ink-3 tabular">
-            Page {page} of {totalPages}
-          </span>
-          <Button asChild variant="outline" size="sm" disabled={page >= totalPages}>
-            <Link
-              href={`/events?${new URLSearchParams({ ...(params as Record<string, string>), page: String(page + 1) })}`}
-              aria-disabled={page >= totalPages}
-            >
-              Next
-            </Link>
-          </Button>
-        </nav>
-      )}
     </div>
   );
 }
