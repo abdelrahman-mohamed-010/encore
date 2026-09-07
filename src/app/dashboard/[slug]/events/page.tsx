@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/surface";
+
 
 import { EmptyState, Meter } from "@/components/ui/misc";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";
@@ -55,7 +55,6 @@ export default async function DashboardEventsPage({
       />
 
       <DashboardBody className="space-y-6">
-
       {!events || events.length === 0 ? (
         <EmptyState
           icon={CalendarDays}
@@ -68,7 +67,7 @@ export default async function DashboardEventsPage({
           }
         />
       ) : (
-        <Card className="overflow-hidden">
+        <ul className="space-y-2">
           {events.map((event) => {
             const tiers = event.ticket_types ?? [];
             const capacity = tiers.reduce((sum, t) => sum + t.quantity_total, 0);
@@ -77,10 +76,10 @@ export default async function DashboardEventsPage({
             const currency = tiers[0]?.currency ?? "USD";
 
             return (
+              <li key={event.id}>
               <Link
-                key={event.id}
                 href={`/dashboard/${slug}/events/${event.id}`}
-                className="flex items-center gap-4 border-b border-hairline-soft px-4 py-4 transition-colors last:border-b-0 hover:bg-sunken"
+                className="flex items-center gap-4 rounded-xl bg-card px-5 py-4 shadow-e1 transition-shadow hover:shadow-e2"
               >
                 <div className="relative size-12 shrink-0 overflow-hidden rounded-lg bg-sunken">
                   {event.cover_image_url && (
@@ -90,7 +89,7 @@ export default async function DashboardEventsPage({
 
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="truncate text-base font-medium text-ink">{event.title}</p>
+                    <p className="truncate font-flourish text-lg text-ink">{event.title}</p>
                     <Badge tone={STATUS_TONE[event.status]} size="xs">
                       {event.status.replace("_", " ")}
                     </Badge>
@@ -117,9 +116,10 @@ export default async function DashboardEventsPage({
                   {formatMoney(gross, currency)}
                 </span>
               </Link>
+              </li>
             );
           })}
-        </Card>
+        </ul>
       )}
       </DashboardBody>
     </>

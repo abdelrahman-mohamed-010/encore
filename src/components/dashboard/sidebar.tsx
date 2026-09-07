@@ -18,8 +18,13 @@ type Item = {
 };
 
 /**
- * Grouped rather than one flat list: nine undifferentiated links is a list to
- * read every time, three labelled groups of three is a place you learn.
+ * The sidebar is organization-level only.
+ *
+ * Anything that belongs to a single event — its guests, its ticket types, its
+ * numbers — lives on that event's own tabs, so this list stays short and the
+ * organizer never has to pick a resource and then filter it back down to the
+ * event they were already thinking about. Grouped rather than flat: a labelled
+ * group is a place you learn, a flat list of nine is one you re-read.
  */
 const GROUPS: { label: string; items: Item[] }[] = [
   {
@@ -34,7 +39,7 @@ const GROUPS: { label: string; items: Item[] }[] = [
   {
     label: "At the door",
     items: [
-      { href: "/attendees", label: "Attendees", icon: Users, min: "scanner" },
+      { href: "/attendees", label: "All attendees", icon: Users, min: "scanner" },
       { href: "/scan", label: "Check-in", icon: QrCode, min: "scanner" },
     ],
   },

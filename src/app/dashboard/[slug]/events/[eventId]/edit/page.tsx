@@ -1,7 +1,5 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { ArrowLeft } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
 import { EventForm } from "@/components/dashboard/event-form";
@@ -32,13 +30,6 @@ export default async function EditEventPage({
 
   return (
     <div className="max-w-3xl space-y-6 px-5 py-8 md:px-8">
-      <Link
-        href={`/dashboard/${slug}/events/${eventId}`}
-        className="inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
-      >
-        <ArrowLeft className="size-3.5" />
-        Back to event
-      </Link>
 
       <h1 className="display-3 text-ink">Edit event</h1>
 

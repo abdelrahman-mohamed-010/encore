@@ -97,7 +97,7 @@ async function shoot(page: Page, name: string, dark: boolean) {
   if (dark) await page.emulateMedia({ colorScheme: "dark" });
   await page.goto("/design");
   await expect(page.getByRole("heading", { name: "Design system" })).toBeVisible();
-  if (dark) await expect(page.locator("html")).toHaveClass(/dark/);
+  if (dark) await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   await page.screenshot({ path: `test-results/design-${name}.png`, fullPage: true });
 }
 
