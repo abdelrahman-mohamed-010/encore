@@ -3,19 +3,17 @@ import { cn } from "@/lib/utils";
 /**
  * Loading placeholders.
  *
- * Three rules, and they are what keep this from turning back into a second,
- * worse copy of the UI:
+ * These are never used for a whole page. A route-level loading.tsx sits at the
+ * segment boundary and swaps out everything below it, so the heading, the
+ * filters, the search box and the table header — none of which are waiting on
+ * anything — get replaced too. Instead each piece of the page that actually
+ * fetches is wrapped in its own <Suspense>, and only that piece falls back to
+ * one of these while its query runs.
  *
- * 1. **One block per thing.** A card's placeholder is a single rectangle at the
- *    card's own footprint and radius — never a card containing smaller grey
- *    rectangles. Drawing the inside of a component you are about to replace
- *    duplicates its layout, and the duplicate drifts the moment the real one
- *    changes.
- * 2. **Only what is actually waiting.** Headings, filters, search boxes, tabs
- *    and table headers do not come from the database, so they render straight
- *    away and stay put. Placeholders belong around the rows and cells alone.
- * 3. **Same box as the real thing.** Matching height and radius means the page
- *    does not reflow when the content lands.
+ * The shapes follow one rule: a placeholder is a single block at the real
+ * element's footprint and radius, never a reconstruction of its insides. A card
+ * standing in for a card is one rectangle, not a bordered box containing five
+ * smaller grey boxes — that is a second copy of the layout, and it drifts.
  */
 export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
@@ -30,33 +28,32 @@ export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivEl
 }
 
 /**
- * Rows inside a surface that is already on screen — a table body under its real
- * header, a list inside its real card. One block per row, no chrome of its own.
+ * Rows for a table or list whose header, filters and surface are already on
+ * screen. One block per row at the real row height, nothing else.
  */
 export function SkeletonRows({
   rows = 8,
-  height = "h-12",
+  height = "h-14",
   className,
 }: {
   rows?: number;
-  /** Match the real row's height so the table does not jump. */
   height?: string;
   className?: string;
 }) {
   return (
-    <div className={cn("space-y-px", className)} aria-hidden>
+    <div className={cn("space-y-2", className)} aria-hidden>
       {Array.from({ length: rows }).map((_, i) => (
-        <Skeleton key={i} className={cn("w-full rounded-none", height)} />
+        <Skeleton key={i} className={cn("w-full rounded-xl", height)} />
       ))}
     </div>
   );
 }
 
-/** A grid of equal blocks, for any collection of cards. */
-export function SkeletonGrid({
+/** Cards in a grid: one block each, at the card's own size and radius. */
+export function SkeletonCards({
   count = 6,
   className,
-  itemClassName,
+  itemClassName = "min-h-96 rounded-2xl",
 }: {
   count?: number;
   className?: string;
@@ -65,42 +62,8 @@ export function SkeletonGrid({
   return (
     <div className={cn("grid gap-5 sm:grid-cols-2 lg:grid-cols-3", className)} aria-hidden>
       {Array.from({ length: count }).map((_, i) => (
-        <Skeleton key={i} className={cn("h-full min-h-64 rounded-2xl", itemClassName)} />
+        <Skeleton key={i} className={cn("h-full", itemClassName)} />
       ))}
     </div>
   );
-}
-
-/**
- * The event card's own footprint: 4:3 artwork above a two-line block, at the
- * card's rounded-2xl. One rectangle, not a facsimile of the card.
- */
-export function EventCardSkeleton({ className }: { className?: string }) {
-  return <Skeleton className={cn("h-full min-h-96 rounded-2xl", className)} />;
-}
-
-export function EventGridSkeleton({ count = 6, className }: { count?: number; className?: string }) {
-  return (
-    <div className={cn("grid gap-5 sm:grid-cols-2 lg:grid-cols-3", className)} aria-hidden>
-      {Array.from({ length: count }).map((_, i) => (
-        <EventCardSkeleton key={i} />
-      ))}
-    </div>
-  );
-}
-
-/** Dashboard metric tiles, at the tile's real height and radius. */
-export function StatRowSkeleton({ count = 4 }: { count?: number }) {
-  return (
-    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4" aria-hidden>
-      {Array.from({ length: count }).map((_, i) => (
-        <Skeleton key={i} className="h-[6.5rem] rounded-xl" />
-      ))}
-    </div>
-  );
-}
-
-/** A chart's plot area. The card and its title are real and already drawn. */
-export function ChartSkeleton({ className }: { className?: string }) {
-  return <Skeleton className={cn("h-[17rem] rounded-xl", className)} />;
 }

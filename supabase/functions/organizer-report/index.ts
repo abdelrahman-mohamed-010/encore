@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { buildReport, money, type ReportInput } from "./report.ts";
+import { buildReport, money, type ReportInput, type SeriesPoint } from "./report.ts";
 
 /**
  * Sales report for one organizer, as a PDF.
@@ -59,7 +59,7 @@ Deno.serve(async (req) => {
   });
   if (statsError) return fail("You do not have access to this organizer's figures.", 403);
 
-  const [{ data: events }, { data: tickets }] = await Promise.all([
+  const [{ data: events }, { data: tickets }, { data: series }] = await Promise.all([
     supabase
       .from("events")
       .select("id, title, status, starts_at, timezone")
@@ -69,6 +69,9 @@ Deno.serve(async (req) => {
       .from("tickets")
       .select("event_id, status")
       .in("status", ["valid", "used"]),
+    // The same fourteen-day window the dashboard charts, so the printed report
+    // and the screen never disagree.
+    supabase.rpc("organizer_sales_series", { p_organizer_id: organizer.id, p_days: 14 }),
   ]);
 
   // Tallied here rather than in SQL: the volumes are small, and it avoids
@@ -89,16 +92,36 @@ Deno.serve(async (req) => {
     organizerName: organizer.name,
     generatedAt: new Date(),
     currency,
-    summary: [
-      { label: "Gross revenue", value: money(Number(figures.gross_cents ?? 0), currency) },
-      { label: "Net after fees and refunds", value: money(Number(figures.net_cents ?? 0), currency) },
-      { label: "Refunded", value: money(Number(figures.refunded_cents ?? 0), currency) },
-      { label: "Platform fees", value: money(Number(figures.platform_fees_cents ?? 0), currency) },
-      { label: "Paid orders", value: String(figures.orders_paid ?? 0) },
-      { label: "Tickets sold", value: String(figures.tickets_sold ?? 0) },
-      { label: "Checked in", value: String(figures.tickets_checked_in ?? 0) },
-      { label: "Published events", value: String(figures.events_published ?? 0) },
+    // The dashboard's own four tiles, label, figure and sub-line alike.
+    tiles: [
+      {
+        label: "Gross revenue",
+        value: money(Number(figures.gross_cents ?? 0), currency),
+        sub: `${figures.orders_paid ?? 0} paid orders`,
+      },
+      {
+        label: "Net to you",
+        value: money(Number(figures.net_cents ?? 0), currency),
+        sub: `after ${money(Number(figures.platform_fees_cents ?? 0), currency)} fees`,
+      },
+      {
+        label: "Tickets sold",
+        value: String(figures.tickets_sold ?? 0),
+        sub: `${figures.tickets_checked_in ?? 0} checked in`,
+      },
+      {
+        label: "Published events",
+        value: String(figures.events_published ?? 0),
+        sub: `${figures.events_upcoming ?? 0} upcoming`,
+      },
     ],
+    series: ((series ?? []) as { day: string; gross_cents: number; tickets: number }[]).map(
+      (point): SeriesPoint => ({
+        day: point.day,
+        grossCents: Number(point.gross_cents ?? 0),
+        tickets: Number(point.tickets ?? 0),
+      }),
+    ),
     events: (events ?? []).map((event) => ({
       title: event.title,
       date: new Date(event.starts_at).toLocaleDateString("en-GB", {

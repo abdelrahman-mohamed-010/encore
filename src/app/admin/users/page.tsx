@@ -1,6 +1,8 @@
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { SectionHeader } from "@/components/ui/surface";
+import { SkeletonRows } from "@/components/ui/skeleton";
 import { UserTable } from "@/components/admin/user-table";
 
 export const metadata: Metadata = { title: "Users" };
@@ -11,6 +13,19 @@ export default async function AdminUsersPage({
   searchParams: Promise<{ q?: string }>;
 }) {
   const { q } = await searchParams;
+
+  return (
+    <div className="space-y-6">
+      {/* The heading is not waiting on anything, so it is simply drawn. */}
+      <SectionHeader level={1} title="Users" description="Everyone with a Tazkarti account." />
+      <Suspense key={q ?? ""} fallback={<SkeletonRows rows={10} />}>
+        <Users query={q} />
+      </Suspense>
+    </div>
+  );
+}
+
+async function Users({ query: q }: { query?: string }) {
   const supabase = await createClient();
 
   let query = supabase
@@ -25,11 +40,5 @@ export default async function AdminUsersPage({
   }
 
   const { data: profiles } = await query;
-
-  return (
-    <div className="space-y-6">
-      <SectionHeader level={1} title="Users" description="Everyone with a Tazkarti account." />
-      <UserTable profiles={profiles ?? []} initialQuery={q ?? ""} />
-    </div>
-  );
+  return <UserTable profiles={profiles ?? []} initialQuery={q ?? ""} />;
 }

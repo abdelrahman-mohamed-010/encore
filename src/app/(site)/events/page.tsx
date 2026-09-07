@@ -3,7 +3,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { MapPin, SearchX } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { EventCard, EventCardSkeleton } from "@/components/events/event-card";
+import { EventCard } from "@/components/events/event-card";
+import { SkeletonCards } from "@/components/ui/skeleton";
 import { EventFilters } from "@/components/events/event-filters";
 import { CategoryRail } from "@/components/events/category-rail";
 import { EmptyState } from "@/components/ui/misc";
@@ -123,7 +124,7 @@ export default async function EventsPage({
         key={JSON.stringify(params)}
         fallback={
           <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, i) => <EventCardSkeleton key={i} />)}
+            <SkeletonCards count={6} className="contents" />
           </div>
         }
       >

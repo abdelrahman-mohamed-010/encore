@@ -4,7 +4,8 @@ import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
 import { SectionHeader } from "@/components/ui/surface";
-import { EventCard, EventCardSkeleton, EventRow } from "@/components/events/event-card";
+import { EventCard, EventRow } from "@/components/events/event-card";
+import { SkeletonCards } from "@/components/ui/skeleton";
 import { CategoryRail } from "@/components/events/category-rail";
 import { HeroCollage } from "@/components/home/hero-collage";
 import { ClosingCta } from "@/components/home/closing-cta";
@@ -97,7 +98,7 @@ export default async function HomePage() {
             <Suspense
               fallback={
                 <div className="mt-7 grid gap-5 sm:grid-cols-2">
-                  {Array.from({ length: 4 }).map((_, i) => <EventCardSkeleton key={i} />)}
+                  <SkeletonCards count={4} className="contents" />
                 </div>
               }
             >
