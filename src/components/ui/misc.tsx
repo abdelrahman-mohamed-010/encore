@@ -2,6 +2,14 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { initials } from "@/lib/format";
 
+export function Skeleton({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
+  return (
+    <div className={cn("relative overflow-hidden rounded-lg bg-sunken", className)} {...props}>
+      <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-black/[0.05] to-transparent dark:via-white/[0.06] [animation:sweep_1.6s_infinite]" />
+    </div>
+  );
+}
+
 export function Avatar({
   src,
   name,
