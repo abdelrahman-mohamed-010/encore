@@ -204,19 +204,21 @@ export function useTablePagination<T>(items: T[], initialPageSize = 10) {
   const totalItems = items.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
 
-  // Clamped on the way out rather than corrected in an effect: filtering down
-  // to fewer pages would otherwise render one empty frame on the stale page
-  // before the effect fired.
-  const page = Math.min(currentPage, totalPages);
+  // Reset or clamp current page if items change
+  React.useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
 
   const paginatedItems = React.useMemo(() => {
-    const start = (page - 1) * pageSize;
+    const start = (currentPage - 1) * pageSize;
     return items.slice(start, start + pageSize);
-  }, [items, page, pageSize]);
+  }, [items, currentPage, pageSize]);
 
   return {
     paginatedItems,
-    currentPage: page,
+    currentPage,
     totalPages,
     totalItems,
     pageSize,
