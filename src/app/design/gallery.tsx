@@ -24,7 +24,7 @@ import {
 import {
   Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle,
 } from "@/components/ui/sheet";
-import { EventCardSkeleton } from "@/components/ui/skeleton";
+import { Skeleton, SkeletonCards, SkeletonRows } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 /**
@@ -492,7 +492,7 @@ export function DesignGallery() {
         <CardHeader bordered><CardTitle>Loading and empty</CardTitle></CardHeader>
         <CardBody className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            <EventCardSkeleton /><EventCardSkeleton /><EventCardSkeleton />
+            <SkeletonCards count={3} className="w-full" itemClassName="min-h-56 rounded-2xl" />
           </div>
           <EmptyState
             icon={CalendarDays}
