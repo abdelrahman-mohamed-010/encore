@@ -71,10 +71,6 @@ export async function PromoRows({
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-mono text-base font-semibold text-ink">{promo.code}</span>
-              <Badge tone={promo.is_active ? "positive" : "neutral"} size="xs">
-                {promo.is_active ? "Active" : "Paused"}
-              </Badge>
-              {promo.event_id && <Badge tone="outline" size="xs">One event</Badge>}
             </div>
             <p className="mt-1 text-xs text-ink-3">
               {promo.discount_type === "percentage"
