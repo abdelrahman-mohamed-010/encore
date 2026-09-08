@@ -30,15 +30,13 @@ export const metadata: Metadata = {
 async function getHomeData() {
   const supabase = await createClient();
 
-  const [featured, upcoming, categories, counts] = await Promise.all([
-    supabase.rpc("search_events", { p_featured_only: true, p_limit: 3 }),
+  const [upcoming, categories, counts] = await Promise.all([
     supabase.rpc("search_events", { p_sort: "soonest", p_limit: 9 }),
     supabase.from("categories").select("*").eq("is_active", true).order("sort_order"),
     supabase.rpc("search_events", { p_limit: 1 }),
   ]);
 
   return {
-    featured: (featured.data ?? []) as EventSearchResult[],
     upcoming: (upcoming.data ?? []) as EventSearchResult[],
     categories: categories.data ?? [],
     totalEvents: counts.data?.[0]?.total_count ?? 0,
@@ -46,7 +44,7 @@ async function getHomeData() {
 }
 
 export default async function HomePage() {
-  const { featured, upcoming, categories, totalEvents } = await getHomeData();
+  const { upcoming, categories, totalEvents } = await getHomeData();
   const soonest = upcoming.slice(0, 5);
 
   return (
@@ -69,32 +67,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ---- Featured ------------------------------------------------------ */}
-      {featured.length > 0 && (
-        <section className="container-page py-14 md:py-16">
-          <SectionHeader
-            eyebrow="Handpicked"
-            title="Featured this season"
-            description="The events our team would clear a night for."
-            action={
-              <Button asChild variant="outline" size="sm">
-                <Link href="/events?featured=1">
-                  See all <ArrowRight />
-                </Link>
-              </Button>
-            }
-          />
-
-          <div className="no-scrollbar -mx-4 mt-7 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
-            {featured.map((event, index) => (
-              <div key={event.id} className="w-72 shrink-0 snap-start sm:w-80">
-                <EventCard event={event} priority={index === 0} className="h-full" />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
       {/* ---- Upcoming + rail ----------------------------------------------- */}
       <section className="container-page pb-14 md:pb-16">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -116,8 +88,8 @@ export default async function HomePage() {
               }
             >
               <div className="mt-7 grid gap-5 sm:grid-cols-2">
-                {upcoming.slice(0, 6).map((event) => (
-                  <EventCard key={event.id} event={event} />
+                {upcoming.slice(0, 6).map((event, index) => (
+                  <EventCard key={event.id} event={event} priority={index === 0} />
                 ))}
               </div>
             </Suspense>

@@ -28,7 +28,7 @@ export function EventCard({
       href={`/events/${event.slug}`}
       className={cn(
         "group flex h-full flex-col overflow-hidden rounded-2xl bg-card shadow-e1",
-        "transition-[transform,box-shadow] duration-300 ease-out-quint hover:-translate-y-1.5 hover:shadow-pop",
+        "transition-shadow duration-300 ease-out-quint hover:shadow-e2",
         className,
       )}
     >
@@ -40,7 +40,7 @@ export function EventCard({
             fill
             priority={priority}
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            className="object-cover"
           />
         ) : (
           <div className="size-full bg-gradient-to-br from-sunken to-sunken-2" />

@@ -167,7 +167,7 @@ export async function EventsRows({
               <td className="px-5 py-3.5 text-right whitespace-nowrap">
                 <Tooltip content="View public page">
                   <Button asChild variant="ghost" size="icon-sm" className="rounded-lg">
-                    <Link href={`/events/${event.slug}`} target="_blank" onClick={(e) => e.stopPropagation()}>
+                    <Link href={`/events/${event.slug}`} target="_blank">
                       <ExternalLink className="size-3.5 text-ink-3" />
                     </Link>
                   </Button>

@@ -268,7 +268,10 @@ export function RowLink({
   const router = useRouter();
   return (
     <tr
-      onClick={() => router.push(href)}
+      onClick={(e) => {
+        if ((e.target as HTMLElement).closest("a, button")) return;
+        router.push(href);
+      }}
       className={cn(
         "cursor-pointer border-b border-hairline-soft last:border-b-0 transition-colors hover:bg-sunken/70",
         className,
@@ -321,18 +324,15 @@ export function PaginationRow({
  * Reusable hook to handle client-side table pagination effortlessly.
  */
 export function useTablePagination<T>(items: T[], initialPageSize = 10) {
-  const [currentPage, setCurrentPage] = React.useState(1);
+  const [storedPage, setCurrentPage] = React.useState(1);
   const [pageSize, setPageSize] = React.useState(initialPageSize);
 
   const totalItems = items.length;
   const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-
-  // Reset or clamp current page if items change
-  React.useEffect(() => {
-    if (currentPage > totalPages) {
-      setCurrentPage(1);
-    }
-  }, [totalPages, currentPage]);
+  // Derived at render time rather than clamped via an effect + setState: if
+  // the item count shrinks and the stored page overshoots, this falls back
+  // to the last real page immediately, with no extra render in between.
+  const currentPage = Math.min(storedPage, totalPages);
 
   const paginatedItems = React.useMemo(() => {
     const start = (currentPage - 1) * pageSize;

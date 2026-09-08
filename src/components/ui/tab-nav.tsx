@@ -9,7 +9,7 @@ export const ACCOUNT_TABS = [
   { href: "/account/tickets", label: "Tickets", icon: Ticket },
   { href: "/account/orders", label: "Orders", icon: Receipt },
   { href: "/account/saved", label: "Saved", icon: Heart },
-  { href: "/account/settings", label: "Settings", icon: Settings, end: true },
+  { href: "/account/settings", label: "Settings", icon: Settings },
 ];
 
 export function AccountTabs({ className }: { className?: string }) {
@@ -35,8 +35,6 @@ export function TabNav({
     match?: string;
     /** If true, requires exact pathname match. */
     exact?: boolean;
-    /** Pushed to the far right of the bar, separated from the rest — for Settings. */
-    end?: boolean;
   }[];
   className?: string;
 }) {
@@ -63,7 +61,6 @@ export function TabNav({
               active
                 ? "border-ink text-ink"
                 : "border-transparent text-ink-2 hover:text-ink",
-              item.end && "ml-auto",
             )}
           >
             {item.icon && (

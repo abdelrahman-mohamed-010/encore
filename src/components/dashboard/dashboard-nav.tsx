@@ -70,7 +70,6 @@ export function DashboardTabs({
       label: "Settings",
       icon: Settings,
       min: "admin" as OrgMemberRole,
-      end: true,
     },
   ];
 

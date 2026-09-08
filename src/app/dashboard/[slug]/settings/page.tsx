@@ -13,7 +13,7 @@ export default async function OrganizerSettingsPage({
   const { organizer } = await requireOrganizer(slug, "admin");
 
   return (
-    <div className="mx-auto max-w-2xl">
+    <div className="max-w-2xl">
       <OrganizerSettingsForm organizer={organizer} />
     </div>
   );

@@ -13,8 +13,7 @@ export function HeroCollage() {
       <div className="container-page relative z-10 py-28 text-center md:py-36">
         <h1 className="display-1 text-ink">
           Find your next
-          <br />
-          <span className="text-brand">night out.</span>
+          <span className="text-brand"> night out.</span>
         </h1>
 
         <p className="mx-auto mt-7 max-w-lg text-lg leading-relaxed text-ink-2">

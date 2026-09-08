@@ -34,7 +34,7 @@ export default async function PaymentsSettingsPage({
   const connectConfigured = isStripeConnectConfigured();
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
+    <div className="max-w-2xl space-y-6">
       <div>
         <h2 className="text-2xl font-bold tracking-tight text-ink">Payouts & Stripe</h2>
         <p className="mt-1 text-sm text-ink-3">
