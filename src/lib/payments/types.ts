@@ -27,7 +27,7 @@ export type RefundInput = {
 };
 
 /**
- * A payment rail. Tazkarti ships two: `stripe`, which charges on the
+ * A payment rail. Encore ships two: `stripe`, which charges on the
  * organizer's own connected account and takes a platform application fee, and
  * `sandbox`, which simulates the same lifecycle so the product is fully
  * usable before any organizer has connected Stripe.

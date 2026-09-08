@@ -1,4 +1,4 @@
-# Tazkarti
+# Encore
 
 A multi-tenant event ticketing platform. Organizers create events, sell tickets
 on **their own Stripe account**, and check people in at the door; attendees
@@ -33,7 +33,7 @@ blocked or sold independently, and a held seat is locked against a second buyer.
 
 **Payments the organizer owns.** Each organizer connects their own Stripe
 account through Connect OAuth. Charges are created on that account with
-Tazkarti's service fee as `application_fee_amount`, so the organizer is the
+Encore's service fee as `application_fee_amount`, so the organizer is the
 merchant of record and payouts follow their own Stripe schedule. Refunds pull
 the platform fee back proportionally.
 

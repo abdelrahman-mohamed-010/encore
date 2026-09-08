@@ -38,7 +38,7 @@ export function ReportDownload({ slug }: { slug: string }) {
   });
 
   return (
-    <Button variant="outline" size="sm" loading={download.pending} onClick={() => download.run()}>
+    <Button variant="outline" size="md" loading={download.pending} onClick={() => download.run()}>
       <Download /> Download report
     </Button>
   );

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Suspense } from "react";
+import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,17 @@ import { formatNumber } from "@/lib/format";
 import type { EventSearchResult } from "@/lib/types";
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: "Discover events near you",
+  description:
+    "Browse concerts, theatre, conferences and festivals, buy tickets in seconds, and manage your own events with real-time sales and check-in.",
+  openGraph: {
+    title: "Encore — Find your next night out",
+    description: "Discover and book events. Sell tickets with real-time sales and check-in.",
+    type: "website",
+  },
+};
 
 async function getHomeData() {
   const supabase = await createClient();
@@ -73,9 +85,11 @@ export default async function HomePage() {
             }
           />
 
-          <div className="mt-7 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="no-scrollbar -mx-4 mt-7 flex snap-x snap-mandatory gap-5 overflow-x-auto px-4 pb-2 sm:mx-0 sm:px-0">
             {featured.map((event, index) => (
-              <EventCard key={event.id} event={event} priority={index === 0} />
+              <div key={event.id} className="w-72 shrink-0 snap-start sm:w-80">
+                <EventCard event={event} priority={index === 0} className="h-full" />
+              </div>
             ))}
           </div>
         </section>

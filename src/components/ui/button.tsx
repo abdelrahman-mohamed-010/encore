@@ -19,10 +19,10 @@ import { cn } from "@/lib/utils";
  */
 const buttonVariants = cva(
   [
-    "relative inline-flex select-none items-center justify-center gap-2 whitespace-nowrap",
+    "relative inline-flex cursor-pointer select-none items-center justify-center gap-2 whitespace-nowrap",
     "font-medium transition-[background-color,box-shadow,filter,transform] duration-150",
     "active:translate-y-px",
-    "disabled:pointer-events-none disabled:opacity-45 disabled:active:translate-y-0",
+    "disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-45 disabled:active:translate-y-0",
     "[&_svg]:pointer-events-none [&_svg]:shrink-0",
   ],
   {

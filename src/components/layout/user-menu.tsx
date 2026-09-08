@@ -39,7 +39,7 @@ export function UserMenu({
   return (
     <>
       <Dropdown>
-      <DropdownTrigger className="flex items-center rounded-full transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
+      <DropdownTrigger className="flex cursor-pointer items-center rounded-full transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus">
         <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="md" />
       </DropdownTrigger>
 

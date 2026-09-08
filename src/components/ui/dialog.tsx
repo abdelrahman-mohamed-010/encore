@@ -22,8 +22,8 @@ export function DialogContent({
       <DialogPrimitive.Overlay className="animate-fade fixed inset-0 z-50 bg-n-1000/45 backdrop-blur-[2px]" />
       <DialogPrimitive.Content
         className={cn(
-          "animate-rise fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2",
-          "max-h-[calc(100dvh-3rem)] overflow-y-auto rounded-xl bg-card shadow-pop",
+          "animate-rise fixed left-1/2 top-1/2 z-50 flex w-[calc(100vw-2rem)] -translate-x-1/2 -translate-y-1/2 flex-col",
+          "max-h-[calc(100dvh-3rem)] overflow-hidden rounded-xl bg-card shadow-pop",
           "focus:outline-none",
           sizes[size],
           className,
@@ -43,7 +43,7 @@ export function DialogHeader({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("relative flex flex-col gap-1 border-b border-hairline-soft px-5 py-4 pr-12", className)}
+      className={cn("relative flex shrink-0 flex-col gap-1 border-b border-hairline-soft px-5 py-4 pr-12", className)}
       {...props}
     >
       {children}
@@ -71,14 +71,14 @@ export function DialogDescription({
 }
 
 export function DialogBody({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
-  return <div className={cn("px-5 py-4", className)} {...props} />;
+  return <div className={cn("min-h-0 flex-1 overflow-y-auto px-5 py-4", className)} {...props} />;
 }
 
 export function DialogFooter({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "flex flex-col-reverse gap-2 border-t border-hairline-soft px-5 py-3.5 sm:flex-row sm:justify-end",
+        "flex shrink-0 flex-col-reverse gap-2 border-t border-hairline-soft px-5 py-3.5 sm:flex-row sm:justify-end",
         className,
       )}
       {...props}

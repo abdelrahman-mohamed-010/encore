@@ -1,21 +1,25 @@
 import type { Metadata } from "next";
 import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
-import { DashboardAttendeesShell, type DashboardAttendeeItem } from "@/components/dashboard/dashboard-attendees-table";
+import { DashboardAttendeesShell } from "@/components/dashboard/dashboard-attendees-table";
+import { AttendeeRows } from "@/components/dashboard/dashboard-attendees-rows";
 
 export const metadata: Metadata = { title: "Attendees" };
+
+const PAGE_SIZE = 15;
 
 export default async function AttendeesPage({
   params,
   searchParams,
 }: {
   params: Promise<{ slug: string }>;
-  searchParams: Promise<{ event?: string }>;
+  searchParams: Promise<{ event?: string; q?: string; status?: string; page?: string }>;
 }) {
   const { slug } = await params;
-  const { event: eventFilter } = await searchParams;
+  const { event: eventFilter, q, status, page: pageParam } = await searchParams;
   const { organizer } = await requireOrganizer(slug, "scanner");
   const supabase = await createClient();
+  const page = Math.max(1, Number(pageParam) || 1);
 
   const { data: events } = await supabase
     .from("events")
@@ -24,30 +28,19 @@ export default async function AttendeesPage({
     .order("starts_at", { ascending: false });
 
   const eventIds = (events ?? []).map((e) => e.id);
-  const scoped = eventFilter && eventIds.includes(eventFilter) ? [eventFilter] : eventIds;
-
-  const ticketsPromise = eventIds.length
-    ? supabase
-        .from("tickets")
-        .select(
-          `id, ticket_code, attendee_name, attendee_email, seat_label, status, checked_in_at,
-           ticket_type:ticket_types(name),
-           event:events(title)`,
-        )
-        .in("event_id", scoped)
-        .order("issued_at", { ascending: false })
-        .limit(500)
-        .then(({ data }) => (data ?? []) as unknown as DashboardAttendeeItem[])
-    : Promise.resolve([]);
 
   return (
     <div className="space-y-4">
-      <DashboardAttendeesShell
-        ticketsPromise={ticketsPromise}
-        events={events ?? []}
-        initialEventFilter={eventFilter}
-        slug={slug}
-      />
+      <DashboardAttendeesShell events={events ?? []}>
+        <AttendeeRows
+          eventIds={eventIds}
+          eventFilter={eventFilter}
+          query={q}
+          statusFilter={status}
+          page={page}
+          pageSize={PAGE_SIZE}
+        />
+      </DashboardAttendeesShell>
     </div>
   );
 }

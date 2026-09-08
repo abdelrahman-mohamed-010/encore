@@ -23,7 +23,7 @@ export function TabsTrigger({ className, ...props }: React.ComponentProps<typeof
   return (
     <Primitive.Trigger
       className={cn(
-        "relative -mb-px whitespace-nowrap border-b-2 border-transparent pb-2.5 pt-1 text-base font-medium text-ink-3",
+        "relative -mb-px cursor-pointer whitespace-nowrap border-b-2 border-transparent pb-2.5 pt-1 text-base font-medium text-ink-3",
         "transition-colors hover:text-ink-2",
         "data-[state=active]:border-solid data-[state=active]:text-ink",
         className,
@@ -69,7 +69,7 @@ export function Segmented({
             aria-selected={active}
             onClick={() => onChange(option.value)}
             className={cn(
-              "rounded-md font-medium transition-colors",
+              "cursor-pointer rounded-md font-medium transition-colors",
               size === "sm" ? "px-2.5 py-1 text-xs" : "px-3 py-1.5 text-sm",
               active
                 ? "bg-card text-ink shadow-e1"

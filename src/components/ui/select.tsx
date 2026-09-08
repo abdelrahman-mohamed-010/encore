@@ -34,7 +34,7 @@ export const SelectTrigger = React.forwardRef<
   <SelectPrimitive.Trigger
     ref={ref}
     className={cn(
-      "group flex w-full items-center justify-between gap-2.5 bg-sunken font-medium text-ink",
+      "group flex w-full cursor-pointer items-center justify-between gap-2.5 bg-sunken font-medium text-ink",
       "transition-[background-color,box-shadow] duration-150 hover:bg-sunken-2",
       "focus:outline-none focus-visible:bg-card focus-visible:shadow-[0_0_0_2px_var(--color-focus)]",
       "data-[state=open]:bg-card data-[state=open]:shadow-[0_0_0_2px_var(--color-focus)]",

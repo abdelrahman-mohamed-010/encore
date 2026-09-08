@@ -121,7 +121,7 @@ export function Tag({
           type="button"
           onClick={onRemove}
           aria-label="Remove"
-          className="grid size-[18px] place-items-center rounded-[5px] text-ink-2 transition-colors hover:bg-btn-h hover:text-ink"
+          className="grid size-[18px] cursor-pointer place-items-center rounded-[5px] text-ink-2 transition-colors hover:bg-btn-h hover:text-ink"
         >
           <svg className="size-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
             <path d="M18 6 6 18M6 6l12 12" />

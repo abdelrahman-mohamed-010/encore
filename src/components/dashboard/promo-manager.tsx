@@ -1,43 +1,39 @@
 "use client";
 
 import * as React from "react";
-import { useRouter } from "next/navigation";
-import { useMemo, useState, useTransition } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Search, Tag, Trash2 } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { useAsyncAction } from "@/hooks";
+import { useAsyncAction, useDebouncedSearchParam } from "@/hooks";
 import { promoSchema, type PromoData, type PromoValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/surface";
 import {
   Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { AffixInput, Input, Switch } from "@/components/ui/input";
+import { AffixInput, Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select";
 import { Combobox } from "@/components/ui/combobox";
 import { Form, FormError, FormField } from "@/components/ui/form";
-import { Badge } from "@/components/ui/badge";
-import { EmptyState } from "@/components/ui/misc";
+import { Card } from "@/components/ui/surface";
 import { Shimmer } from "@/components/ui/skeleton";
-import { formatMoney, formatNumber } from "@/lib/format";
-import type { PromoCode } from "@/lib/types";
 
-/** Static shell: search + "New code". Never a skeleton. */
+/** Static shell: search + "New code". Server-driven — never a skeleton itself. */
 export function PromoShell({
   organizerId,
-  promosPromise,
   events,
+  children,
 }: {
   organizerId: string;
-  promosPromise: PromiseLike<PromoCode[]>;
   events: { id: string; title: string }[];
+  children: React.ReactNode;
 }) {
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [query, setQuery] = useState("");
+  const searchParams = useSearchParams();
+  const [open, setOpen] = React.useState(searchParams.get("new") === "1");
+  const { value: query, onChange: setQuery } = useDebouncedSearchParam("q");
 
   const form = useForm<PromoValues, unknown, PromoData>({
     resolver: zodResolver(promoSchema),
@@ -98,17 +94,18 @@ export function PromoShell({
       </div>
 
       <React.Suspense
+        key={searchParams.toString()}
         fallback={
           <Card className="overflow-hidden">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="border-b border-hairline-soft px-4 py-3.5 last:border-b-0">
+              <div key={i} className="border-b border-hairline-soft px-5 py-3.5 last:border-b-0">
                 <Shimmer className="h-11 rounded-lg" />
               </div>
             ))}
           </Card>
         }
       >
-        <PromoRows promosPromise={promosPromise} query={query} onCreateFirst={() => setOpen(true)} />
+        {children}
       </React.Suspense>
 
       <Dialog open={open} onOpenChange={setOpen}>
@@ -194,118 +191,5 @@ export function PromoShell({
         </DialogContent>
       </Dialog>
     </div>
-  );
-}
-
-function PromoRows({
-  promosPromise,
-  query,
-  onCreateFirst,
-}: {
-  promosPromise: PromiseLike<PromoCode[]>;
-  query: string;
-  onCreateFirst: () => void;
-}) {
-  const router = useRouter();
-  const promos = React.use(promosPromise);
-  const [, startTransition] = useTransition();
-
-  const filteredPromos = useMemo(() => {
-    if (!query.trim()) return promos;
-    const q = query.toLowerCase().trim();
-    return promos.filter((p) => p.code.toLowerCase().includes(q));
-  }, [promos, query]);
-
-  function toggleActive(promo: PromoCode) {
-    startTransition(async () => {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from("promo_codes")
-        .update({ is_active: !promo.is_active })
-        .eq("id", promo.id);
-      if (error) {
-        toast.error("Could not update the code", { description: error.message });
-        return;
-      }
-      router.refresh();
-    });
-  }
-
-  function remove(promo: PromoCode) {
-    startTransition(async () => {
-      const supabase = createClient();
-      const { error } = await supabase.from("promo_codes").delete().eq("id", promo.id);
-      if (error) {
-        toast.error("Could not delete the code", { description: error.message });
-        return;
-      }
-      toast.success("Promo code deleted");
-      router.refresh();
-    });
-  }
-
-  if (filteredPromos.length === 0) {
-    return (
-      <EmptyState
-        icon={Tag}
-        title={promos.length === 0 ? "No promo codes yet" : "No matching codes found"}
-        description={
-          promos.length === 0
-            ? "Create a code to run a presale, a partner discount or a friends-and-family rate."
-            : "Try adjusting your search query."
-        }
-        action={
-          promos.length === 0 ? (
-            <Button variant="solid" size="md" onClick={onCreateFirst}>
-              <Plus /> New code
-            </Button>
-          ) : undefined
-        }
-      />
-    );
-  }
-
-  return (
-    <Card className="overflow-hidden">
-      {filteredPromos.map((promo) => (
-        <div
-          key={promo.id}
-          className="flex items-center gap-4 border-b border-hairline-soft px-4 py-3.5 last:border-b-0"
-        >
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="font-mono text-base font-semibold text-ink">{promo.code}</span>
-              <Badge tone={promo.is_active ? "positive" : "neutral"} size="xs">
-                {promo.is_active ? "Active" : "Paused"}
-              </Badge>
-              {promo.event_id && <Badge tone="outline" size="xs">One event</Badge>}
-            </div>
-            <p className="mt-1 text-xs text-ink-3">
-              {promo.discount_type === "percentage"
-                ? `${promo.discount_value}% off`
-                : `${formatMoney(Number(promo.discount_value))} off`}
-              {promo.min_order_cents > 0 && ` · min ${formatMoney(promo.min_order_cents)}`}
-              {" · "}
-              {formatNumber(promo.times_redeemed)} used
-              {promo.max_redemptions ? ` of ${formatNumber(promo.max_redemptions)}` : ""}
-            </p>
-          </div>
-
-          <Switch
-            checked={promo.is_active}
-            onCheckedChange={() => toggleActive(promo)}
-            label={`Toggle ${promo.code}`}
-          />
-          <Button
-            variant="ghost"
-            size="icon-sm"
-            aria-label={`Delete ${promo.code}`}
-            onClick={() => remove(promo)}
-          >
-            <Trash2 />
-          </Button>
-        </div>
-      ))}
-    </Card>
   );
 }

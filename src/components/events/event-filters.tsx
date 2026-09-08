@@ -136,7 +136,7 @@ export function EventFilters({
               key={chip.key}
               type="button"
               onClick={() => setParam(chip.key, "")}
-              className="group"
+              className="group cursor-pointer"
               aria-label={`Remove filter ${chip.label}`}
             >
               <Badge tone="neutral" size="md" className="gap-1.5 pr-1.5 transition-colors group-hover:bg-sunken-2">

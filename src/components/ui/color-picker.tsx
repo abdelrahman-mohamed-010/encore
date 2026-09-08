@@ -56,7 +56,7 @@ export function ColorPicker({
           aria-describedby={describedBy}
           aria-label={`Colour: ${value}`}
           className={cn(
-            "flex h-(--size-field) items-center gap-2.5 rounded-md bg-sunken px-3",
+            "flex h-(--size-field) cursor-pointer items-center gap-2.5 rounded-md bg-sunken px-3",
             "transition-[background-color,box-shadow] duration-150 hover:bg-sunken-2",
             "focus-visible:bg-card focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--color-focus)]",
             "data-[state=open]:bg-card data-[state=open]:shadow-[0_0_0_2px_var(--color-focus)]",
@@ -91,7 +91,7 @@ export function ColorPicker({
                   onBlur?.();
                 }}
                 className={cn(
-                  "grid size-8 place-items-center rounded-lg ring-1 ring-inset ring-black/10 transition-transform",
+                  "grid size-8 cursor-pointer place-items-center rounded-lg ring-1 ring-inset ring-black/10 transition-transform",
                   "hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2",
                 )}
                 style={{ backgroundColor: swatch }}

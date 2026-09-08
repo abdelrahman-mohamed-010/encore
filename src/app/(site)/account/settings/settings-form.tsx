@@ -123,7 +123,7 @@ export function SettingsForm({ profile }: { profile: Profile }) {
         <section className="space-y-6">
           <div>
             <h2 className="text-2xl font-bold tracking-tight text-ink">Your Profile</h2>
-            <p className="mt-1 text-sm text-ink-3">Manage your public information and presence on Tazkarti.</p>
+            <p className="mt-1 text-sm text-ink-3">Manage your public information and presence on Encore.</p>
           </div>
 
           <div className="grid gap-8 md:grid-cols-[1fr_auto]">

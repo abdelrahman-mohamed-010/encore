@@ -43,7 +43,7 @@ export function RegisterForm({ next }: { next?: string }) {
       return;
     }
 
-    toast.success("Welcome to Tazkarti");
+    toast.success("Welcome to Encore");
     router.push(next?.startsWith("/") ? next : "/account/tickets");
     router.refresh();
   });

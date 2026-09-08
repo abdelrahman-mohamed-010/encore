@@ -33,7 +33,7 @@ export default async function PricingPage() {
         <p className="eyebrow">Pricing</p>
         <h1 className="display-1 mt-3 text-ink">Free to start. We earn when you sell.</h1>
         <p className="mx-auto mt-5 max-w-lg text-md leading-relaxed text-ink-2">
-          No monthly fee, no setup cost. Tazkarti takes a service fee on paid tickets, added at
+          No monthly fee, no setup cost. Encore takes a service fee on paid tickets, added at
           checkout, and free events cost nothing at all.
         </p>
       </div>

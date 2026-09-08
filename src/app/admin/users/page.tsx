@@ -1,35 +1,26 @@
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
 import { SectionHeader } from "@/components/ui/surface";
 import { UserTableShell } from "@/components/admin/user-table";
+import { UserRows } from "@/components/admin/user-table-rows";
 
 export const metadata: Metadata = { title: "Users" };
+
+const PAGE_SIZE = 10;
 
 export default async function AdminUsersPage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string }>;
+  searchParams: Promise<{ q?: string; page?: string }>;
 }) {
-  const { q } = await searchParams;
-  const supabase = await createClient();
-
-  let query = supabase
-    .from("profiles")
-    .select("id, email, full_name, avatar_url, role, is_banned, created_at")
-    .order("created_at", { ascending: false })
-    .limit(200);
-
-  if (q?.trim()) {
-    const term = `%${q.trim()}%`;
-    query = query.or(`email.ilike.${term},full_name.ilike.${term}`);
-  }
-
-  const profilesPromise = query.then(({ data }) => data ?? []);
+  const { q, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
 
   return (
     <div className="space-y-6">
-      <SectionHeader level={1} title="Users" description="Everyone with a Tazkarti account." />
-      <UserTableShell profilesPromise={profilesPromise} initialQuery={q ?? ""} />
+      <SectionHeader level={1} title="Users" description="Everyone with an Encore account." />
+      <UserTableShell>
+        <UserRows query={q} page={page} pageSize={PAGE_SIZE} />
+      </UserTableShell>
     </div>
   );
 }

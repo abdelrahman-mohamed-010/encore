@@ -1,5 +1,5 @@
 /**
- * The Tazkarti component library.
+ * The Encore component library.
  *
  * Rules of the system, in short:
  *   - No native `<select>`, `<input type="date|datetime-local|time|color">`.

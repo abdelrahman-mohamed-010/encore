@@ -32,9 +32,16 @@ export async function generateMetadata({
   const { slug } = await params;
   const organizer = await loadOrganizer(slug);
   if (!organizer) return { title: "Organizer not found" };
+  const description = organizer.description ?? `Events by ${organizer.name} on Encore.`;
   return {
     title: organizer.name,
-    description: organizer.description ?? `Events by ${organizer.name} on Tazkarti.`,
+    description,
+    openGraph: {
+      title: organizer.name,
+      description,
+      type: "profile",
+      images: organizer.logo_url ? [organizer.logo_url] : undefined,
+    },
   };
 }
 
@@ -60,8 +67,23 @@ export default async function OrganizerPage({ params }: { params: Promise<{ slug
     groupedEvents[dayKey].push(event);
   }
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: organizer.name,
+    description: organizer.description ?? undefined,
+    logo: organizer.logo_url ?? undefined,
+    url: `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/organizers/${slug}`,
+    sameAs: organizer.website ? [organizer.website] : undefined,
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Banner */}
       <div className="relative h-44 bg-sunken md:h-64">
         {organizer.banner_url ? (

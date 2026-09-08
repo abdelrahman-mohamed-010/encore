@@ -40,7 +40,7 @@ export function Scanner({ events }: { events: { id: string; title: string }[] })
   const scan = useAsyncAction(async (payload: string) => {
     const parsed = parseTicketPayload(payload);
     if (!parsed) {
-      toast.error("That QR code is not a Tazkarti ticket");
+      toast.error("That QR code is not an Encore ticket");
       return;
     }
     if (!eventId) return;

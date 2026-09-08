@@ -4,8 +4,8 @@ import * as React from "react";
 
 type Theme = "light" | "dark" | "system";
 
-const STORAGE_KEY = "tazkarti-theme";
-const THEME_EVENT = "tazkarti:theme";
+const STORAGE_KEY = "encore-theme";
+const THEME_EVENT = "encore:theme";
 
 /* ---------------------------------------------------------------------------
  * Theme is external state (localStorage + the OS preference), so it is read

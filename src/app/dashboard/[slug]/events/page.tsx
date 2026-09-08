@@ -1,34 +1,36 @@
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
 import { requireOrganizer } from "@/lib/auth";
-import { DashboardEventsShell, type DashboardEventItem } from "@/components/dashboard/dashboard-events-table";
+import { DashboardEventsShell } from "@/components/dashboard/dashboard-events-table";
+import { EventsRows } from "@/components/dashboard/dashboard-events-rows";
 
 export const metadata: Metadata = { title: "Events" };
 
+const PAGE_SIZE = 10;
+
 export default async function DashboardEventsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
 }) {
   const { slug } = await params;
+  const { q, status, page: pageParam } = await searchParams;
   const { organizer } = await requireOrganizer(slug, "staff");
-  const supabase = await createClient();
-
-  // Not awaited here: the shell (search/filter/"New event") renders instantly,
-  // and only the table body suspends on this promise.
-  const eventsPromise = supabase
-    .from("events")
-    .select(
-      `id, title, slug, status, starts_at, cover_image_url, seating_type,
-       ticket_types(price_cents, currency, quantity_total, quantity_sold, quantity_reserved)`,
-    )
-    .eq("organizer_id", organizer.id)
-    .order("starts_at", { ascending: false })
-    .then(({ data }) => (data ?? []) as unknown as DashboardEventItem[]);
+  const page = Math.max(1, Number(pageParam) || 1);
 
   return (
     <div className="space-y-6">
-      <DashboardEventsShell eventsPromise={eventsPromise} slug={slug} />
+      <DashboardEventsShell slug={slug}>
+        <EventsRows
+          organizerId={organizer.id}
+          slug={slug}
+          query={q}
+          status={status}
+          page={page}
+          pageSize={PAGE_SIZE}
+        />
+      </DashboardEventsShell>
     </div>
   );
 }

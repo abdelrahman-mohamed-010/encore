@@ -27,8 +27,8 @@ export function EventCard({
     <Link
       href={`/events/${event.slug}`}
       className={cn(
-        "group flex h-full flex-col overflow-hidden rounded-2xl bg-card",
-        "transition-transform duration-200 hover:-translate-y-1",
+        "group flex h-full flex-col overflow-hidden rounded-2xl bg-card shadow-e1",
+        "transition-[transform,box-shadow] duration-300 ease-out-quint hover:-translate-y-1.5 hover:shadow-pop",
         className,
       )}
     >

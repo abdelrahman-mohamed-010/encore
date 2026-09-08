@@ -5,7 +5,7 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 /* ===========================================================================
-   Tazkarti design system — "Convene"
+   Encore design system — "Convene"
    ---------------------------------------------------------------------------
    Three layers, in order. Never reach past a layer:
 

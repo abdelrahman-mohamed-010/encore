@@ -75,7 +75,7 @@ export function DesignGallery() {
   return (
     <div className="container-page space-y-12 py-12">
       <header className="space-y-2">
-        <p className="eyebrow">Tazkarti</p>
+        <p className="eyebrow">Encore</p>
         <h1 className="display-2">Design system</h1>
         <p className="max-w-2xl text-md leading-relaxed text-ink-2">
           Every control below is built from Radix behaviour and our own tokens. No native{" "}

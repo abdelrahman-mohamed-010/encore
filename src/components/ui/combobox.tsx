@@ -113,7 +113,7 @@ export function Combobox({
           aria-describedby={describedBy}
           disabled={disabled}
           className={cn(
-            "flex h-(--size-field) w-full items-center justify-between gap-2 rounded-md bg-sunken px-3.5 text-md font-medium text-ink",
+            "flex h-(--size-field) w-full cursor-pointer items-center justify-between gap-2 rounded-md bg-sunken px-3.5 text-md font-medium text-ink",
             "transition-[background-color,box-shadow] duration-150 hover:bg-sunken-2",
             "focus-visible:bg-card focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--color-focus)]",
             "data-[state=open]:bg-card data-[state=open]:shadow-[0_0_0_2px_var(--color-focus)]",

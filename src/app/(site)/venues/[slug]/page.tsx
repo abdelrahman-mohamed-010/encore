@@ -34,11 +34,18 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const venue = await loadVenue(slug);
   if (!venue) return { title: "Venue" };
 
+  const description =
+    venue.description ?? `What's on at ${venue.name}${venue.city ? ` in ${venue.city}` : ""}.`;
+
   return {
     title: venue.name,
-    description:
-      venue.description ??
-      `What's on at ${venue.name}${venue.city ? ` in ${venue.city}` : ""}.`,
+    description,
+    openGraph: {
+      title: venue.name,
+      description,
+      type: "website",
+      images: venue.image_url ? [venue.image_url] : undefined,
+    },
   };
 }
 

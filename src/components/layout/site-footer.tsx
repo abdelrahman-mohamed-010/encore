@@ -26,7 +26,7 @@ export function SiteFooter() {
       <div className="container-page">
         <div className="flex flex-col gap-6 py-8 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-            <Logo />
+            <Logo showWordmark />
             {LINKS.map((link) => (
               <Link
                 key={link.href}
@@ -40,7 +40,7 @@ export function SiteFooter() {
 
           <div className="flex items-center gap-5 text-ink-3">
             <a
-              href="mailto:hello@tazkarti.app"
+              href="mailto:hello@encore.app"
               aria-label="Email us"
               className="transition-colors hover:text-ink"
             >
@@ -49,7 +49,7 @@ export function SiteFooter() {
             <Link href="/help" aria-label="Help" className="transition-colors hover:text-ink">
               <MessageCircle className="size-[18px]" />
             </Link>
-            <Link href="/" aria-label="Tazkarti home" className="transition-colors hover:text-ink">
+            <Link href="/" aria-label="Encore home" className="transition-colors hover:text-ink">
               <AtSign className="size-[18px]" />
             </Link>
           </div>
@@ -57,7 +57,7 @@ export function SiteFooter() {
 
         <div className="flex flex-col gap-2 pb-10 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-ink-3">
-            © {new Date().getFullYear()} Tazkarti. Built with Next.js, Supabase and Stripe.
+            © {new Date().getFullYear()} Encore. Built with Next.js, Supabase and Stripe.
           </p>
           <div className="flex items-center gap-5 text-sm text-ink-3">
             {LEGAL.map((link) => (

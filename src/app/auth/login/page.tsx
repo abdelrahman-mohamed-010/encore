@@ -20,7 +20,7 @@ export default async function LoginPage({
       description="Sign in to see your tickets and manage your events."
       footer={
         <>
-          New to Tazkarti?{" "}
+          New to Encore?{" "}
           <Link
             href={`/auth/register${next ? `?next=${encodeURIComponent(next)}` : ""}`}
             className="font-medium text-ink underline underline-offset-4"

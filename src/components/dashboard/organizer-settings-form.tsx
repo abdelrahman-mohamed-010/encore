@@ -14,6 +14,7 @@ import { organizerSchema, type OrganizerData, type OrganizerValues } from "@/lib
 import { Button } from "@/components/ui/button";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Input, Textarea, Label } from "@/components/ui/input";
+import { Tooltip } from "@/components/ui/tooltip";
 import type { Organizer } from "@/lib/types";
 
 export function OrganizerSettingsForm({ organizer }: { organizer: Organizer }) {
@@ -240,13 +241,14 @@ function LogoUpload({
           </div>
         )}
       </div>
-      <button
-        type="button"
-        className="absolute -bottom-1 -right-1 grid size-8 place-items-center rounded-full bg-solid text-on-solid shadow-pop transition-transform group-hover:scale-110"
-        title="Upload organization logo"
-      >
-        <ArrowUp className="size-4" />
-      </button>
+      <Tooltip content="Upload organization logo">
+        <button
+          type="button"
+          className="absolute -bottom-1 -right-1 grid size-8 cursor-pointer place-items-center rounded-full bg-solid text-on-solid shadow-pop transition-transform group-hover:scale-110"
+        >
+          <ArrowUp className="size-4" />
+        </button>
+      </Tooltip>
     </div>
   );
 }

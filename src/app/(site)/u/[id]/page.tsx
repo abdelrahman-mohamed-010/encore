@@ -30,10 +30,16 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   if (!host) return { title: "Host" };
 
   const name = host.full_name ?? "Host";
+  const description = host.bio ?? `Events hosted by ${name} on Encore.`;
   return {
     title: name,
-    description: host.bio ?? `Events hosted by ${name} on Tazkarti.`,
-    openGraph: { title: name, images: host.avatar_url ? [host.avatar_url] : undefined },
+    description,
+    openGraph: {
+      title: name,
+      description,
+      type: "profile",
+      images: host.avatar_url ? [host.avatar_url] : undefined,
+    },
   };
 }
 

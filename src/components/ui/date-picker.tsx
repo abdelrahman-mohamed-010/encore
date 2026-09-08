@@ -46,7 +46,7 @@ const TIME_OPTIONS = Array.from({ length: 96 }, (_, i) => {
 });
 
 const segment = cn(
-  "flex h-9 items-center gap-2 rounded-lg bg-card px-2.5 text-md font-medium text-ink shadow-e1 transition-colors",
+  "flex h-9 cursor-pointer items-center gap-2 rounded-lg bg-card px-2.5 text-md font-medium text-ink shadow-e1 transition-colors",
   "hover:bg-paper focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus",
   "data-[state=open]:bg-paper disabled:cursor-not-allowed disabled:opacity-60",
 );
@@ -226,7 +226,7 @@ export function DateField({
           data-invalid={ariaInvalid || undefined}
           aria-describedby={describedBy}
           className={cn(
-            "flex h-(--size-field) w-full items-center gap-2 rounded-md bg-sunken px-3.5 text-md font-medium text-ink",
+            "flex h-(--size-field) w-full cursor-pointer items-center gap-2 rounded-md bg-sunken px-3.5 text-md font-medium text-ink",
             "transition-[background-color,box-shadow] duration-150 hover:bg-sunken-2",
             "focus-visible:bg-card focus-visible:outline-none focus-visible:shadow-[0_0_0_2px_var(--color-focus)]",
             "data-[state=open]:bg-card data-[state=open]:shadow-[0_0_0_2px_var(--color-focus)]",

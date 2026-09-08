@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Averia_Serif_Libre, Inter } from "next/font/google";
 import { Toaster } from "sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider, themeScript } from "@/contexts/theme-context";
 import "./globals.css";
 
@@ -33,16 +34,16 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "Tazkarti — Find your next night out",
-    template: "%s · Tazkarti",
+    default: "Encore — Find your next night out",
+    template: "%s · Encore",
   },
   description:
-    "Tazkarti is a modern ticketing platform: discover concerts, theatre, conferences and festivals, buy in seconds, and manage your own events with real-time sales and check-in.",
+    "Encore is a modern ticketing platform: discover concerts, theatre, conferences and festivals, buy in seconds, and manage your own events with real-time sales and check-in.",
   keywords: ["tickets", "events", "concerts", "theatre", "festivals", "ticketing", "Cairo"],
   openGraph: {
     type: "website",
-    siteName: "Tazkarti",
-    title: "Tazkarti — Find your next night out",
+    siteName: "Encore",
+    title: "Encore — Find your next night out",
     description: "Discover and book events. Sell tickets with real-time sales and check-in.",
     url: siteUrl,
   },
@@ -72,7 +73,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
       </head>
       <body className="antialiased">
         <ThemeProvider>
-          {children}
+          <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
           {/*
             The reference's toast is a dark slab in light mode — deliberately
             the inverse of the page, so it reads as a system message rather

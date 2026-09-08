@@ -125,8 +125,55 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
   const totalLeft = availability.reduce((sum, t) => sum + t.available, 0);
   const soldOut = totalLeft <= 0;
 
+  const prices = availability.map((t) => t.price_cents / 100);
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: event.title,
+    description: event.subtitle ?? event.description?.slice(0, 300) ?? undefined,
+    startDate: event.starts_at,
+    endDate: event.ends_at,
+    eventStatus: isCancelled
+      ? "https://schema.org/EventCancelled"
+      : "https://schema.org/EventScheduled",
+    eventAttendanceMode: event.is_online
+      ? "https://schema.org/OnlineEventAttendanceMode"
+      : "https://schema.org/OfflineEventAttendanceMode",
+    image: event.cover_image_url ? [event.cover_image_url] : undefined,
+    location: event.is_online
+      ? { "@type": "VirtualLocation", url: `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/events/${slug}` }
+      : {
+          "@type": "Place",
+          name: event.venue?.name,
+          address: {
+            "@type": "PostalAddress",
+            streetAddress: event.venue?.address_line1 ?? undefined,
+            addressLocality: event.venue?.city ?? undefined,
+            addressCountry: event.venue?.country ?? undefined,
+          },
+        },
+    organizer: event.organizer
+      ? { "@type": "Organization", name: event.organizer.name }
+      : undefined,
+    offers: prices.length
+      ? {
+          "@type": "AggregateOffer",
+          priceCurrency: availability[0]?.currency ?? "USD",
+          lowPrice: Math.min(...prices),
+          highPrice: Math.max(...prices),
+          availability: soldOut ? "https://schema.org/SoldOut" : "https://schema.org/InStock",
+          url: `${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/events/${slug}`,
+        }
+      : undefined,
+  };
+
   return (
     <div className="container-narrow py-8 md:py-14">
+      <script
+        type="application/ld+json"
+        // eslint-disable-next-line react/no-danger
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="grid gap-10 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-14">
         {/* ---- Left rail: poster, organizer, venue ------------------------- */}
         <div className="lg:sticky lg:top-24 lg:self-start">

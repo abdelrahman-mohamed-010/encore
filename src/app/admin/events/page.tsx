@@ -1,40 +1,19 @@
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
 import { SectionHeader } from "@/components/ui/surface";
-import { EventReviewShell, type ReviewEvent } from "@/components/admin/event-review-list";
+import { EventReviewShell } from "@/components/admin/event-review-list";
+import { EventReviewRows } from "@/components/admin/event-review-rows";
 
 export const metadata: Metadata = { title: "Event review" };
 
-export default async function AdminEventsPage() {
-  const supabase = await createClient();
+const PAGE_SIZE = 10;
 
-  const eventsPromise = supabase
-    .from("events")
-    .select(
-      `id, title, slug, status, starts_at, cover_image_url, subtitle, created_at,
-       organizer:organizers(id, name, slug),
-       venue:venues(name, city),
-       ticket_types(price_cents, quantity_total)`,
-    )
-    .in("status", ["pending_review", "published", "draft", "paused"])
-    .order("created_at", { ascending: false })
-    .limit(100)
-    .then(
-      ({ data }) =>
-        (data ?? []).map((event) => ({
-          id: event.id,
-          title: event.title,
-          slug: event.slug,
-          status: event.status,
-          subtitle: event.subtitle,
-          startsAt: event.starts_at,
-          coverImageUrl: event.cover_image_url,
-          organizerName: event.organizer?.name ?? "",
-          venueLabel: [event.venue?.name, event.venue?.city].filter(Boolean).join(" · "),
-          tiers: (event.ticket_types ?? []).length,
-          capacity: (event.ticket_types ?? []).reduce((sum, t) => sum + t.quantity_total, 0),
-        })) as ReviewEvent[],
-    );
+export default async function AdminEventsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; status?: string; page?: string }>;
+}) {
+  const { q, status, page: pageParam } = await searchParams;
+  const page = Math.max(1, Number(pageParam) || 1);
 
   return (
     <div className="space-y-6">
@@ -43,7 +22,9 @@ export default async function AdminEventsPage() {
         title="Event review"
         description="Approve events before they go on sale, or pull one down."
       />
-      <EventReviewShell eventsPromise={eventsPromise} />
+      <EventReviewShell>
+        <EventReviewRows query={q} status={status} page={page} pageSize={PAGE_SIZE} />
+      </EventReviewShell>
     </div>
   );
 }

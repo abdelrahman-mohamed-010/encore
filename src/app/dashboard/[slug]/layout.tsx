@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ExternalLink, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { requireOrganizer, getMyOrganizers, getProfile } from "@/lib/auth";
 import { SessionProvider } from "@/contexts";
 import { SiteHeader } from "@/components/layout/site-header";
@@ -8,7 +8,6 @@ import { OrganizerSwitcher } from "@/components/dashboard/organizer-switcher";
 import { DashboardTabs } from "@/components/dashboard/dashboard-nav";
 import { Avatar } from "@/components/ui/misc";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 
 export default async function DashboardLayout({
   children,
@@ -43,25 +42,11 @@ export default async function DashboardLayout({
                   className="rounded-2xl"
                 />
                 <div className="min-w-0">
-                  <div className="flex items-center gap-2.5">
-                    <h1 className="display-3 truncate text-ink">{organizer.name}</h1>
-                    <Badge tone="neutral" size="xs">
-                      {role}
-                    </Badge>
-                  </div>
-                  <p className="mt-1 truncate text-sm text-ink-3">
-                    /{organizer.slug}
-                  </p>
+                  <OrganizerSwitcher current={organizer} memberships={memberships} />
                 </div>
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                <OrganizerSwitcher current={organizer} memberships={memberships} />
-                <Button asChild variant="outline" size="md">
-                  <Link href={`/organizers/${organizer.slug}`} target="_blank">
-                    <ExternalLink /> Public page
-                  </Link>
-                </Button>
                 {/* organizer_stats refuses anyone below staff, so a scanner
                     would only ever get an error from this. */}
                 {canCreate && <ReportDownload slug={organizer.slug} />}

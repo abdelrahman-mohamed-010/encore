@@ -39,7 +39,7 @@ function mapStatus(status: Stripe.PaymentIntent.Status): PaymentStatus {
 
 /**
  * Charges on the organizer's own connected account using a destination charge:
- * the customer pays, the organizer receives the funds, and Tazkarti keeps
+ * the customer pays, the organizer receives the funds, and Encore keeps
  * `application_fee_amount`. The organizer's Stripe account — not ours — is the
  * merchant of record for the ticket sale.
  */
@@ -61,7 +61,7 @@ export const stripeProvider: PaymentProvider = {
         application_fee_amount: order.application_fee_cents || undefined,
         transfer_data: { destination: connectedAccountId },
         receipt_email: order.buyer_email,
-        description: `Tazkarti order ${order.order_number}`,
+        description: `Encore order ${order.order_number}`,
         metadata: {
           order_id: order.id,
           order_number: order.order_number,

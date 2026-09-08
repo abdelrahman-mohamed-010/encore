@@ -1,26 +1,32 @@
 import Link from "next/link";
 import { SearchX } from "lucide-react";
-import { EventCard } from "@/components/events/event-card";
 import { EmptyState } from "@/components/ui/misc";
 import { Button } from "@/components/ui/button";
+import { LoadMoreEvents } from "@/components/events/load-more-events";
 import { formatNumber } from "@/lib/format";
 import type { EventSearchResult } from "@/lib/types";
-
-const PAGE_SIZE = 24;
+import type { EventSearchParams } from "@/lib/event-search-params";
 
 export async function EventsResults({
   resultsPromise,
   params,
-  page,
+  pageSize,
 }: {
   resultsPromise: PromiseLike<{ data: EventSearchResult[] | null }>;
-  params: Record<string, string | string[] | undefined>;
-  page: number;
+  params: EventSearchParams;
+  pageSize: number;
 }) {
   const { data: rows } = await resultsPromise;
   const events = (rows ?? []) as EventSearchResult[];
   const total = Number(events[0]?.total_count ?? 0);
-  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  // The same filters the initial fetch used, minus paging — "load more"
+  // appends an `offset` of its own on top of this.
+  const filterParams = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) {
+    if (!value || key === "offset") continue;
+    filterParams.set(key, Array.isArray(value) ? value[0] : value);
+  }
 
   return (
     <>
@@ -43,35 +49,12 @@ export async function EventsResults({
           }
         />
       ) : (
-        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {events.map((event, index) => (
-            <EventCard key={event.id} event={event} priority={index < 3} />
-          ))}
-        </div>
-      )}
-
-      {totalPages > 1 && (
-        <nav className="mt-10 flex items-center justify-center gap-2" aria-label="Pagination">
-          <Button asChild variant="outline" size="sm" disabled={page <= 1}>
-            <Link
-              href={`/events?${new URLSearchParams({ ...(params as Record<string, string>), page: String(page - 1) })}`}
-              aria-disabled={page <= 1}
-            >
-              Previous
-            </Link>
-          </Button>
-          <span className="px-3 text-sm text-ink-3 tabular">
-            Page {page} of {totalPages}
-          </span>
-          <Button asChild variant="outline" size="sm" disabled={page >= totalPages}>
-            <Link
-              href={`/events?${new URLSearchParams({ ...(params as Record<string, string>), page: String(page + 1) })}`}
-              aria-disabled={page >= totalPages}
-            >
-              Next
-            </Link>
-          </Button>
-        </nav>
+        <LoadMoreEvents
+          initialEvents={events}
+          total={total}
+          pageSize={pageSize}
+          searchParamsString={filterParams.toString()}
+        />
       )}
     </>
   );

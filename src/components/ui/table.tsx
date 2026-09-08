@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -46,7 +47,7 @@ export function TH({
     <th
       scope="col"
       className={cn(
-        "px-4 py-3 text-left text-2xs font-semibold uppercase tracking-[0.06em] text-ink-3",
+        "px-5 py-3.5 text-left text-2xs font-semibold uppercase tracking-[0.06em] text-ink-3",
         numeric && "text-right",
         className,
       )}
@@ -62,7 +63,7 @@ export function TD({
 }: React.TdHTMLAttributes<HTMLTableCellElement> & { numeric?: boolean }) {
   return (
     <td
-      className={cn("px-4 py-3 align-middle text-ink", numeric && "text-right tnum", className)}
+      className={cn("px-5 py-3.5 align-middle text-ink", numeric && "text-right tnum", className)}
       {...props}
     />
   );
@@ -109,7 +110,7 @@ export function TablePagination({
   return (
     <div
       className={cn(
-        "flex flex-wrap items-center justify-between gap-3 border-t border-hairline-soft px-4 py-3 text-xs text-ink-3",
+        "flex flex-wrap items-center justify-between gap-3 border-t border-hairline-soft px-5 py-3.5 text-xs text-ink-3",
         className,
       )}
     >
@@ -165,7 +166,7 @@ export function TablePagination({
                 type="button"
                 onClick={() => onPageChange(p)}
                 className={cn(
-                  "size-7 rounded-lg text-xs font-semibold transition-colors",
+                  "size-7 cursor-pointer rounded-lg text-xs font-semibold transition-colors",
                   p === currentPage
                     ? "bg-solid text-on-solid shadow-xs"
                     : "text-ink-2 hover:bg-sunken hover:text-ink",
@@ -214,12 +215,71 @@ export function TableRowsSkeleton({
     <tbody>
       {Array.from({ length: rows }).map((_, i) => (
         <tr key={i} className="border-b border-hairline-soft last:border-b-0">
-          <td colSpan={columns} className="px-4 py-3">
+          <td colSpan={columns} className="px-5 py-3.5">
             <Shimmer className={cn(rowHeight, "rounded-lg")} />
           </td>
         </tr>
       ))}
     </tbody>
+  );
+}
+
+/** A `<tr>` that navigates on click — for tables whose row IS the primary action. */
+export function RowLink({
+  href,
+  className,
+  children,
+  ...props
+}: React.HTMLAttributes<HTMLTableRowElement> & { href: string }) {
+  const router = useRouter();
+  return (
+    <tr
+      onClick={() => router.push(href)}
+      className={cn(
+        "cursor-pointer border-b border-hairline-soft last:border-b-0 transition-colors hover:bg-sunken/70",
+        className,
+      )}
+      {...props}
+    >
+      {children}
+    </tr>
+  );
+}
+
+/**
+ * Drives `TablePagination` off the URL's `page` param instead of client
+ * state — for server-rendered tables where the page itself re-fetches.
+ */
+export function PaginationRow({
+  page,
+  totalPages,
+  total,
+  pageSize,
+}: {
+  page: number;
+  totalPages: number;
+  total: number;
+  pageSize: number;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  function goToPage(next: number) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next <= 1) params.delete("page");
+    else params.set("page", String(next));
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  }
+
+  return (
+    <TablePagination
+      currentPage={page}
+      totalPages={totalPages}
+      totalItems={total}
+      pageSize={pageSize}
+      onPageChange={goToPage}
+    />
   );
 }
 
