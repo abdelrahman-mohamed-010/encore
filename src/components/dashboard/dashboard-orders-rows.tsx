@@ -1,5 +1,6 @@
+import { Receipt } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { PaginationRow } from "@/components/ui/table";
+import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { RefundButton } from "@/components/dashboard/refund-button";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime, formatMoney } from "@/lib/format";
@@ -72,18 +73,16 @@ export async function OrdersRows({
 
   if (orders.length === 0) {
     return (
-      <tbody>
-        <tr>
-          <td colSpan={columnCount} className="px-5 py-16 text-center">
-            <p className="text-sm font-medium text-ink">No orders found</p>
-            <p className="mt-1 text-sm text-ink-3">
-              {total === 0 && !query && (!status || status === "all")
-                ? "Sales and registrations will appear here as they happen."
-                : "Try adjusting your search or status filter."}
-            </p>
-          </td>
-        </tr>
-      </tbody>
+      <TableEmptyRow
+        icon={Receipt}
+        columns={columnCount}
+        title="No orders found"
+        description={
+          total === 0 && !query && (!status || status === "all")
+            ? "Sales and registrations will appear here as they happen."
+            : "Try adjusting your search or status filter."
+        }
+      />
     );
   }
 

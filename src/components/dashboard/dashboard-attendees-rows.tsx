@@ -1,5 +1,6 @@
+import { Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { PaginationRow } from "@/components/ui/table";
+import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
 import { formatDateTime } from "@/lib/format";
 
@@ -37,16 +38,12 @@ export async function AttendeeRows({
 
   if (scoped.length === 0) {
     return (
-      <tbody>
-        <tr>
-          <td colSpan={ATTENDEES_COLUMN_COUNT} className="px-5 py-16 text-center">
-            <p className="text-sm font-medium text-ink">No attendees found</p>
-            <p className="mt-1 text-sm text-ink-3">
-              Once tickets are sold, attendees will appear here with their check-in state.
-            </p>
-          </td>
-        </tr>
-      </tbody>
+      <TableEmptyRow
+        icon={Users}
+        columns={ATTENDEES_COLUMN_COUNT}
+        title="No attendees found"
+        description="Once tickets are sold, attendees will appear here with their check-in state."
+      />
     );
   }
 
@@ -79,14 +76,12 @@ export async function AttendeeRows({
 
   if (tickets.length === 0) {
     return (
-      <tbody>
-        <tr>
-          <td colSpan={ATTENDEES_COLUMN_COUNT} className="px-5 py-16 text-center">
-            <p className="text-sm font-medium text-ink">No attendees found</p>
-            <p className="mt-1 text-sm text-ink-3">Try adjusting your search or status filter.</p>
-          </td>
-        </tr>
-      </tbody>
+      <TableEmptyRow
+        icon={Users}
+        columns={ATTENDEES_COLUMN_COUNT}
+        title="No attendees found"
+        description="Try adjusting your search or status filter."
+      />
     );
   }
 

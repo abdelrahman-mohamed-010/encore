@@ -1,6 +1,7 @@
+import { Search } from "lucide-react";
 import { Avatar } from "@/components/ui/misc";
 import { Badge } from "@/components/ui/badge";
-import { PaginationRow } from "@/components/ui/table";
+import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/format";
 import { RoleSelect, BanToggleButton } from "@/components/admin/user-row-actions";
@@ -44,14 +45,12 @@ export async function UserRows({
 
   if (profiles.length === 0) {
     return (
-      <tbody>
-        <tr>
-          <td colSpan={USERS_COLUMN_COUNT} className="px-5 py-16 text-center">
-            <p className="text-sm font-medium text-ink">No users found</p>
-            <p className="mt-1 text-sm text-ink-3">Try a different search term.</p>
-          </td>
-        </tr>
-      </tbody>
+      <TableEmptyRow
+        icon={Search}
+        columns={USERS_COLUMN_COUNT}
+        title="No users found"
+        description="Try a different search term."
+      />
     );
   }
 

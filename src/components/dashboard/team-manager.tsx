@@ -67,7 +67,7 @@ export function TeamShell({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState(searchParams.get("new") === "1");
   const [roleInfoOpen, setRoleInfoOpen] = React.useState(false);
   const { value: query, onChange: setQuery } = useDebouncedSearchParam("q");
   const roleFilter = searchParams.get("role") ?? "all";

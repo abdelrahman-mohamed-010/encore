@@ -1,7 +1,8 @@
+import Link from "next/link";
 import { Avatar } from "@/components/ui/misc";
-import { PaginationRow } from "@/components/ui/table";
+import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { UserPlus } from "lucide-react";
+import { Users, UserPlus } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { TeamRoleSelect, TeamRemoveButton } from "@/components/dashboard/team-row-actions";
 import type { OrgMemberRole } from "@/lib/types";
@@ -69,23 +70,25 @@ export async function TeamRows({
 
   if (members.length === 0) {
     return (
-      <tbody>
-        <tr>
-          <td colSpan={TEAM_COLUMN_COUNT} className="px-5 py-16 text-center">
-            <p className="text-sm font-medium text-ink">No team members found</p>
-            <p className="mt-1 text-sm text-ink-3">
-              {total === 0
-                ? "Invite collaborators to help manage events, scan tickets, or view sales."
-                : "Try adjusting your search or role filter."}
-            </p>
-            {total === 0 && (
-              <Button variant="solid" size="md" className="mt-4" disabled>
+      <TableEmptyRow
+        icon={Users}
+        columns={TEAM_COLUMN_COUNT}
+        title="No team members found"
+        description={
+          total === 0
+            ? "Invite collaborators to help manage events, scan tickets, or view sales."
+            : "Try adjusting your search or role filter."
+        }
+        action={
+          total === 0 ? (
+            <Button asChild variant="solid" size="md">
+              <Link href="?new=1">
                 <UserPlus /> Add member
-              </Button>
-            )}
-          </td>
-        </tr>
-      </tbody>
+              </Link>
+            </Button>
+          ) : undefined
+        }
+      />
     );
   }
 

@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
-const STATIC_ROUTES = ["", "/events", "/categories", "/pricing", "/legal/terms", "/legal/privacy"];
+const STATIC_ROUTES = ["", "/events", "/pricing", "/legal/terms", "/legal/privacy"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const supabase = await createClient();

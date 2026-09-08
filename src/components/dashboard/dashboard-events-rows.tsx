@@ -1,11 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ExternalLink } from "lucide-react";
+import { CalendarDays, ExternalLink } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Meter } from "@/components/ui/misc";
 import { Tooltip } from "@/components/ui/tooltip";
-import { PaginationRow, RowLink } from "@/components/ui/table";
+import { PaginationRow, RowLink, TableEmptyRow } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";
 import type { EventStatus } from "@/lib/types";
@@ -78,18 +78,16 @@ export async function EventsRows({
 
   if (events.length === 0) {
     return (
-      <tbody>
-        <tr>
-          <td colSpan={EVENTS_COLUMN_COUNT} className="px-5 py-16 text-center">
-            <p className="text-sm font-medium text-ink">No events found</p>
-            <p className="mt-1 text-sm text-ink-3">
-              {total === 0 && !query && (!status || status === "all")
-                ? "Create your first event to start selling tickets."
-                : "Try adjusting your search or status filter."}
-            </p>
-          </td>
-        </tr>
-      </tbody>
+      <TableEmptyRow
+        icon={CalendarDays}
+        columns={EVENTS_COLUMN_COUNT}
+        title="No events found"
+        description={
+          total === 0 && !query && (!status || status === "all")
+            ? "Create your first event to start selling tickets."
+            : "Try adjusting your search or status filter."
+        }
+      />
     );
   }
 

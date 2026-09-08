@@ -196,6 +196,40 @@ export function TablePagination({
   );
 }
 
+/** A table's "no rows" state — same icon-chip + title + description shape as `EmptyState`, just inside a `<tbody>`. */
+export function TableEmptyRow({
+  icon: Icon,
+  title,
+  description,
+  columns,
+  action,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  title: string;
+  description: string;
+  columns: number;
+  action?: React.ReactNode;
+}) {
+  return (
+    <tbody>
+      <tr>
+        <td colSpan={columns} className="px-5 py-16 text-center">
+          <div className="flex flex-col items-center gap-4">
+            <span className="grid size-12 place-items-center rounded-xl bg-sunken text-ink-3">
+              <Icon className="size-5" />
+            </span>
+            <div className="space-y-1.5">
+              <p className="text-md font-medium text-ink">{title}</p>
+              <p className="mx-auto max-w-sm text-sm leading-relaxed text-ink-3">{description}</p>
+            </div>
+            {action}
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  );
+}
+
 /**
  * Suspense fallback for a table body: one flat block per row, spanning every
  * column, the same height as a real row. Use as the `fallback` for a

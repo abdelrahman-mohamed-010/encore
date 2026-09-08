@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Ticket } from "lucide-react";
+import { Search, Ticket } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { PaginationRow } from "@/components/ui/table";
+import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate } from "@/lib/format";
 import { EventReviewActions } from "@/components/admin/event-review-actions";
@@ -67,14 +67,12 @@ export async function EventReviewRows({
 
   if (events.length === 0) {
     return (
-      <tbody>
-        <tr>
-          <td colSpan={EVENT_REVIEW_COLUMN_COUNT} className="px-5 py-16 text-center">
-            <p className="text-sm font-medium text-ink">No events found</p>
-            <p className="mt-1 text-sm text-ink-3">Try a different search term or filter.</p>
-          </td>
-        </tr>
-      </tbody>
+      <TableEmptyRow
+        icon={Search}
+        columns={EVENT_REVIEW_COLUMN_COUNT}
+        title="No events found"
+        description="Try a different search term or filter."
+      />
     );
   }
 

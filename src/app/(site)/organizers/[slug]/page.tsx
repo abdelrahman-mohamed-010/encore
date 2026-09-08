@@ -176,8 +176,9 @@ export default async function OrganizerPage({ params }: { params: Promise<{ slug
 
                 return (
                   <div key={dayKey} className="relative mb-10 last:mb-0">
-                    {/* Timeline Node Dot */}
-                    <span className="absolute -left-6 sm:-left-8 top-1.5 size-3 rounded-full border-2 border-paper bg-line-2 shadow-xs" />
+                    {/* Timeline Node Dot — centered on the rail (before:left-2 + half its
+                        w-0.5), not just nudged left by the row's own padding. */}
+                    <span className="absolute -left-3.75 top-1.5 size-3 -translate-x-1/2 rounded-full border-2 border-paper bg-line-2 shadow-xs sm:-left-5.75" />
 
                     {/* Day Header */}
                     <div className="mb-4 flex items-baseline gap-2">

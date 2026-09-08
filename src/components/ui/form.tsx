@@ -41,7 +41,15 @@ export function Form<TIn extends FieldValues, TOut extends FieldValues = TIn>({
 } & Omit<React.FormHTMLAttributes<HTMLFormElement>, "onSubmit" | "children">) {
   return (
     <FormProvider {...form}>
-      <form noValidate className={className} onSubmit={form.handleSubmit(onSubmit)} {...props}>
+      {/* flex/min-h-0 so a DialogBody inside can scroll independently of a
+          DialogHeader/DialogFooter sibling — otherwise this <form> (a plain
+          block box) breaks the flex chain the dialog relies on. */}
+      <form
+        noValidate
+        className={cn("flex min-h-0 flex-1 flex-col", className)}
+        onSubmit={form.handleSubmit(onSubmit)}
+        {...props}
+      >
         {children}
       </form>
     </FormProvider>

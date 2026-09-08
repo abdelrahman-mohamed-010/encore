@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Building2, Heart, LogOut, Plus, Settings, ShieldCheck, Ticket, Receipt,
+  Heart, LogOut, Plus, Settings, ShieldCheck, Ticket, Receipt,
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
@@ -75,7 +75,7 @@ export function UserMenu({
             {memberships.map(({ organizer, role }) => (
               <DropdownItem key={organizer.id} asChild>
                 <Link href={`/dashboard/${organizer.slug}`}>
-                  <Building2 />
+                  <Avatar src={organizer.logo_url} name={organizer.name} size="xs" />
                   <span className="min-w-0 flex-1 truncate">{organizer.name}</span>
                   <span className="shrink-0 text-xs font-semibold uppercase tracking-[0.06em] text-ink-3">
                     {role}
