@@ -1,14 +1,9 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
+import { paginate, type Paged } from "@/lib/pagination";
 import type { EventStatus, OrderStatus, OrganizerStats } from "@/lib/types";
-import type { SalesPoint } from "@/features/dashboard/components/sales-chart";
 
-export type Paged<T> = { rows: T[]; total: number; totalPages: number };
-
-function paginate<T>(rows: T[] | null, count: number | null, pageSize: number): Paged<T> {
-  const total = count ?? 0;
-  return { rows: rows ?? [], total, totalPages: Math.max(1, Math.ceil(total / pageSize)) };
-}
+export type SalesPoint = { day: string; gross_cents: number; orders: number; tickets: number };
 
 export type DashboardEventItem = {
   id: string;

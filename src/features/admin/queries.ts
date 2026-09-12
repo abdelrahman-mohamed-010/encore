@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import type { Paged } from "@/features/dashboard/queries";
+import type { Paged } from "@/lib/pagination";
 import type { EventStatus, Profile } from "@/lib/types";
 
 export type UserProfile = Pick<

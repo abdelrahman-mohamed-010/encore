@@ -6,7 +6,9 @@ import {
 } from "recharts";
 import { formatMoney, formatNumber } from "@/lib/format";
 
-export type SalesPoint = { day: string; gross_cents: number; orders: number; tickets: number };
+import type { SalesPoint } from "@/features/dashboard/queries";
+
+export type { SalesPoint };
 
 const AXIS_STYLE = { fontSize: 12, fill: "var(--viz-axis)" } as const;
 
