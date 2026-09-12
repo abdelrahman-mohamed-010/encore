@@ -2,15 +2,11 @@ import { Search } from "lucide-react";
 import { Avatar } from "@/components/ui/misc";
 import { Badge } from "@/components/ui/badge";
 import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
-import { createClient } from "@/lib/supabase/server";
+import { listUsers, type UserProfile } from "@/features/admin/queries";
 import { formatDate } from "@/lib/format";
 import { RoleSelect, BanToggleButton } from "@/components/admin/user-row-actions";
-import type { Profile } from "@/lib/types";
 
-export type UserProfile = Pick<
-  Profile,
-  "id" | "email" | "full_name" | "avatar_url" | "role" | "is_banned" | "created_at"
->;
+export type { UserProfile };
 
 export const USERS_COLUMN_COUNT = 5;
 
@@ -23,25 +19,7 @@ export async function UserRows({
   page: number;
   pageSize: number;
 }) {
-  const supabase = await createClient();
-
-  let dbQuery = supabase
-    .from("profiles")
-    .select("id, email, full_name, avatar_url, role, is_banned, created_at", { count: "exact" });
-
-  if (query?.trim()) {
-    const term = `%${query.trim()}%`;
-    dbQuery = dbQuery.or(`email.ilike.${term},full_name.ilike.${term}`);
-  }
-
-  const from = (page - 1) * pageSize;
-  const { data, count } = await dbQuery
-    .order("created_at", { ascending: false })
-    .range(from, from + pageSize - 1);
-
-  const profiles = (data ?? []) as UserProfile[];
-  const total = count ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const { rows: profiles, total, totalPages } = await listUsers({ query, page, pageSize });
 
   if (profiles.length === 0) {
     return (

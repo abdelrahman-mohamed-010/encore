@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Meter } from "@/components/ui/misc";
 import { Tooltip } from "@/components/ui/tooltip";
 import { PaginationRow, RowLink, TableEmptyRow } from "@/components/ui/table";
-import { createClient } from "@/lib/supabase/server";
+import { listOrganizerEvents, type DashboardEventItem } from "@/features/dashboard/queries";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";
 import type { EventStatus } from "@/lib/types";
 
@@ -19,22 +19,7 @@ const STATUS_TONE: Record<EventStatus, "positive" | "caution" | "neutral" | "cri
   completed: "neutral",
 };
 
-export type DashboardEventItem = {
-  id: string;
-  title: string;
-  slug: string;
-  status: EventStatus;
-  starts_at: string;
-  cover_image_url: string | null;
-  seating_type: string | null;
-  ticket_types?: {
-    price_cents: number;
-    currency: string;
-    quantity_total: number;
-    quantity_sold: number;
-    quantity_reserved: number;
-  }[];
-};
+export type { DashboardEventItem };
 
 export const EVENTS_COLUMN_COUNT = 7;
 
@@ -53,28 +38,11 @@ export async function EventsRows({
   page: number;
   pageSize: number;
 }) {
-  const supabase = await createClient();
-
-  let dbQuery = supabase
-    .from("events")
-    .select(
-      `id, title, slug, status, starts_at, cover_image_url, seating_type,
-       ticket_types(price_cents, currency, quantity_total, quantity_sold, quantity_reserved)`,
-      { count: "exact" },
-    )
-    .eq("organizer_id", organizerId);
-
-  if (query?.trim()) dbQuery = dbQuery.ilike("title", `%${query.trim()}%`);
-  if (status && status !== "all") dbQuery = dbQuery.eq("status", status as EventStatus);
-
-  const from = (page - 1) * pageSize;
-  const { data, count } = await dbQuery
-    .order("starts_at", { ascending: false })
-    .range(from, from + pageSize - 1);
-
-  const events = (data ?? []) as unknown as DashboardEventItem[];
-  const total = count ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const {
+    rows: events,
+    total,
+    totalPages,
+  } = await listOrganizerEvents({ organizerId, query, status, page, pageSize });
 
   if (events.length === 0) {
     return (

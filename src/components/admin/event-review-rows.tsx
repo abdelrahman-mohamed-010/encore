@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Search, Ticket } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
-import { createClient } from "@/lib/supabase/server";
+import { listEventsForReview } from "@/features/admin/queries";
 import { formatDate } from "@/lib/format";
 import { EventReviewActions } from "@/components/admin/event-review-actions";
 import type { EventStatus } from "@/lib/types";
@@ -30,28 +30,9 @@ export async function EventReviewRows({
   page: number;
   pageSize: number;
 }) {
-  const supabase = await createClient();
+  const { rows, total, totalPages } = await listEventsForReview({ query, status, page, pageSize });
 
-  let dbQuery = supabase
-    .from("events")
-    .select(
-      `id, title, slug, status, starts_at, cover_image_url, subtitle, created_at,
-       organizer:organizers(id, name, slug),
-       venue:venues(name, city),
-       ticket_types(price_cents, quantity_total)`,
-      { count: "exact" },
-    )
-    .in("status", ["pending_review", "published", "draft", "paused"]);
-
-  if (status && status !== "all") dbQuery = dbQuery.eq("status", status as EventStatus);
-  if (query?.trim()) dbQuery = dbQuery.ilike("title", `%${query.trim()}%`);
-
-  const from = (page - 1) * pageSize;
-  const { data, count } = await dbQuery
-    .order("created_at", { ascending: false })
-    .range(from, from + pageSize - 1);
-
-  const events = (data ?? []).map((event) => ({
+  const events = rows.map((event) => ({
     id: event.id,
     title: event.title,
     slug: event.slug,
@@ -62,8 +43,6 @@ export async function EventReviewRows({
     venueLabel: [event.venue?.name, event.venue?.city].filter(Boolean).join(" · "),
     tiers: (event.ticket_types ?? []).length,
   }));
-  const total = count ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   if (events.length === 0) {
     return (

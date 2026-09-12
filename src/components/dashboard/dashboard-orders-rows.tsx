@@ -2,7 +2,7 @@ import { Receipt } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { RefundButton } from "@/components/dashboard/refund-button";
-import { createClient } from "@/lib/supabase/server";
+import { listOrganizerOrders } from "@/features/dashboard/queries";
 import { formatDateTime, formatMoney } from "@/lib/format";
 import type { OrderStatus } from "@/lib/types";
 
@@ -31,45 +31,12 @@ export async function OrdersRows({
   pageSize: number;
 }) {
   const columnCount = canRefund ? 7 : 6;
-  const supabase = await createClient();
 
-  let dbQuery = supabase
-    .from("orders")
-    .select(
-      `id, order_number, status, total_cents, refunded_cents, currency, created_at,
-       buyer_name, buyer_email, payment_provider,
-       event:events(title),
-       tickets:tickets(count)`,
-      { count: "exact" },
-    )
-    .eq("organizer_id", organizerId);
-
-  if (status && status !== "all") dbQuery = dbQuery.eq("status", status as OrderStatus);
-  if (query?.trim()) {
-    const term = `%${query.trim()}%`;
-    dbQuery = dbQuery.or(`order_number.ilike.${term},buyer_name.ilike.${term},buyer_email.ilike.${term}`);
-  }
-
-  const from = (page - 1) * pageSize;
-  const { data, count } = await dbQuery
-    .order("created_at", { ascending: false })
-    .range(from, from + pageSize - 1);
-
-  const orders = (data ?? []) as unknown as {
-    id: string;
-    order_number: string;
-    status: OrderStatus;
-    total_cents: number;
-    refunded_cents: number;
-    currency: string;
-    created_at: string;
-    buyer_name: string;
-    buyer_email: string;
-    event: { title: string } | null;
-    tickets: unknown;
-  }[];
-  const total = count ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const {
+    rows: orders,
+    total,
+    totalPages,
+  } = await listOrganizerOrders({ organizerId, query, status, page, pageSize });
 
   if (orders.length === 0) {
     return (
@@ -90,7 +57,7 @@ export async function OrdersRows({
     <>
       <tbody>
         {orders.map((order) => {
-          const count = (order.tickets as unknown as { count: number }[])?.[0]?.count ?? 0;
+          const count = order.ticketCount;
 
           return (
             <tr

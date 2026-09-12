@@ -1,20 +1,13 @@
 import { Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
-import { createClient } from "@/lib/supabase/server";
+import {
+  listOrganizerAttendees,
+  type DashboardAttendeeItem,
+} from "@/features/dashboard/queries";
 import { formatDateTime } from "@/lib/format";
 
-export type DashboardAttendeeItem = {
-  id: string;
-  ticket_code: string;
-  attendee_name: string | null;
-  attendee_email: string | null;
-  seat_label: string | null;
-  status: string;
-  checked_in_at: string | null;
-  ticket_type: { name: string } | null;
-  event: { title: string } | null;
-};
+export type { DashboardAttendeeItem };
 
 export const ATTENDEES_COLUMN_COUNT = 5;
 
@@ -33,7 +26,6 @@ export async function AttendeeRows({
   page: number;
   pageSize: number;
 }) {
-  const supabase = await createClient();
   const scoped = eventFilter && eventFilter !== "all" && eventIds.includes(eventFilter) ? [eventFilter] : eventIds;
 
   if (scoped.length === 0) {
@@ -47,32 +39,11 @@ export async function AttendeeRows({
     );
   }
 
-  let dbQuery = supabase
-    .from("tickets")
-    .select(
-      `id, ticket_code, attendee_name, attendee_email, seat_label, status, checked_in_at,
-       ticket_type:ticket_types(name),
-       event:events(title)`,
-      { count: "exact" },
-    )
-    .in("event_id", scoped);
-
-  if (statusFilter === "checked_in") dbQuery = dbQuery.eq("status", "used");
-  else if (statusFilter === "not_scanned") dbQuery = dbQuery.eq("status", "valid");
-
-  if (query?.trim()) {
-    const term = `%${query.trim()}%`;
-    dbQuery = dbQuery.or(`attendee_name.ilike.${term},attendee_email.ilike.${term},ticket_code.ilike.${term}`);
-  }
-
-  const from = (page - 1) * pageSize;
-  const { data, count } = await dbQuery
-    .order("issued_at", { ascending: false })
-    .range(from, from + pageSize - 1);
-
-  const tickets = (data ?? []) as unknown as DashboardAttendeeItem[];
-  const total = count ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const {
+    rows: tickets,
+    total,
+    totalPages,
+  } = await listOrganizerAttendees({ eventIds: scoped, query, statusFilter, page, pageSize });
 
   if (tickets.length === 0) {
     return (
