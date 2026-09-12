@@ -10,8 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, Divider } from "@/components/ui/surface";
 import { FieldRow } from "@/components/ui/field-row";
-import { SummaryLine } from "@/components/ui/misc";
-import { OrderCelebration } from "./celebration";
+
+import { SummaryLine } from "@/components/ui/stat-tile";import { OrderCelebration } from "./celebration";
 import { formatDateTime, formatEventStamp, formatMoney } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Order" };

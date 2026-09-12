@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Avatar } from "@/components/ui/misc";
-import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
+
+import { Avatar } from "@/components/ui/avatar";import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Users, UserPlus } from "lucide-react";
 import { listTeamMembers, type Member } from "@/features/team/queries";

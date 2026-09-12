@@ -5,8 +5,8 @@ import { ReportDownload } from "@/features/organizers/components/report-download
 import { OrganizerSwitcher } from "@/features/dashboard/components/organizer-switcher";
 import { DashboardTabs } from "@/features/dashboard/components/dashboard-nav";
 import { EventFormDrawer } from "@/features/events/components/event-form-drawer";
-import { Avatar } from "@/components/ui/misc";
-import { Button } from "@/components/ui/button";
+
+import { Avatar } from "@/components/ui/avatar";import { Button } from "@/components/ui/button";
 
 export default async function DashboardLayout({
   children,

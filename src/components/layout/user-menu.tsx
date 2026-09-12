@@ -8,8 +8,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { Avatar } from "@/components/ui/misc";
-import {
+
+import { Avatar } from "@/components/ui/avatar";import {
   Dropdown, DropdownContent, DropdownItem, DropdownLabel, DropdownSeparator, DropdownTrigger,
 } from "@/components/ui/dropdown";
 import { NewOrganizationModal } from "@/features/organizers/components/new-organization-modal";

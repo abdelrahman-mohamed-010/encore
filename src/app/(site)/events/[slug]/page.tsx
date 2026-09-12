@@ -8,8 +8,8 @@ import {
 import { getEventBySlug, getEventSocialCounts } from "@/features/events/queries";
 import { getUser } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/misc";
-import { VerifiedBadge } from "@/components/ui/verified-badge";
+
+import { Avatar } from "@/components/ui/avatar";import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { Card, Divider } from "@/components/ui/surface";
 import { FieldRow, InfoRow } from "@/components/ui/field-row";
 import { TicketPicker } from "@/features/events/components/ticket-picker";

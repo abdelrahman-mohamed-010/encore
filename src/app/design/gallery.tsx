@@ -14,8 +14,10 @@ import { SelectField } from "@/components/ui/select";
 import { Combobox } from "@/components/ui/combobox";
 import { DateField, DateTimeField, formatLocalDateTime } from "@/components/ui/date-picker";
 import { ColorPicker } from "@/components/ui/color-picker";
-import { EmptyState, Meter, StatTile } from "@/components/ui/misc";
-import { Table, TBody, TD, TH, THead, TR, TableWrap } from "@/components/ui/table";
+
+import { Meter } from "@/components/ui/meter";
+import { EmptyState } from "@/components/ui/empty-state";
+import { StatTile } from "@/components/ui/stat-tile";import { Table, TBody, TD, TH, THead, TR, TableWrap } from "@/components/ui/table";
 import { Pagination, Steps } from "@/components/ui/nav";
 import { Kbd } from "@/components/ui/button";
 import {

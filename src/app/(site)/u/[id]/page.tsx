@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CalendarDays, MapPin } from "lucide-react";
 import { getHostEvents, getHostProfile } from "@/features/organizers/queries";
-import { Avatar } from "@/components/ui/misc";
-import { Card } from "@/components/ui/surface";
+
+import { Avatar } from "@/components/ui/avatar";import { Card } from "@/components/ui/surface";
 import { DateBlock } from "@/components/ui/field-row";
 import { formatDate, formatDateTime, formatMoney } from "@/lib/format";
 import type { Functions } from "@/lib/types";

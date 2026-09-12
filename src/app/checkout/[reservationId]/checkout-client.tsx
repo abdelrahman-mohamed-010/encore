@@ -17,8 +17,8 @@ import { Card, Divider } from "@/components/ui/surface";
 import { Badge } from "@/components/ui/badge";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { SummaryLine } from "@/components/ui/misc";
-import { cn } from "@/lib/utils";
+
+import { SummaryLine } from "@/components/ui/stat-tile";import { cn } from "@/lib/utils";
 import { expireReservations } from "@/features/checkout/actions";
 
 type Line = {

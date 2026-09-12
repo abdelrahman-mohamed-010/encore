@@ -3,8 +3,8 @@
 import * as React from "react";
 import { Building2, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/misc";
-import { NewOrganizationModal } from "@/features/organizers/components/new-organization-modal";
+
+import { EmptyState } from "@/components/ui/empty-state";import { NewOrganizationModal } from "@/features/organizers/components/new-organization-modal";
 
 export function DashboardEmptyState({ autoOpen = false }: { autoOpen?: boolean }) {
   const [open, setOpen] = React.useState(autoOpen);

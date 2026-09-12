@@ -3,8 +3,8 @@ import { EventStatusBadge } from "@/components/ui/status-badge";
 import Image from "next/image";
 import { CalendarDays, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Meter } from "@/components/ui/misc";
-import { Tooltip } from "@/components/ui/tooltip";
+
+import { Meter } from "@/components/ui/meter";import { Tooltip } from "@/components/ui/tooltip";
 import { PaginationRow, RowLink, TableEmptyRow } from "@/components/ui/table";
 import { listOrganizerEvents, type DashboardEventItem } from "@/features/dashboard/queries";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";

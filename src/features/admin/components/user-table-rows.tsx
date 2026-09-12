@@ -1,6 +1,6 @@
 import { Search } from "lucide-react";
-import { Avatar } from "@/components/ui/misc";
-import { Badge } from "@/components/ui/badge";
+
+import { Avatar } from "@/components/ui/avatar";import { Badge } from "@/components/ui/badge";
 import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { listUsers, type UserProfile } from "@/features/admin/queries";
 import { formatDate } from "@/lib/format";

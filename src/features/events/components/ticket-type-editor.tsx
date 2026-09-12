@@ -19,8 +19,9 @@ import { AffixInput, Input, Switch, Textarea, Label } from "@/components/ui/inpu
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Badge } from "@/components/ui/badge";
 import { Combobox } from "@/components/ui/combobox";
-import { EmptyState, Meter } from "@/components/ui/misc";
-import { formatMoney, formatNumber } from "@/lib/format";
+
+import { Meter } from "@/components/ui/meter";
+import { EmptyState } from "@/components/ui/empty-state";import { formatMoney, formatNumber } from "@/lib/format";
 import type { SeatingType, TicketType } from "@/lib/types";
 
 const EMPTY: TicketTypeValues = {

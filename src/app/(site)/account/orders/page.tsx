@@ -6,8 +6,8 @@ import { CalendarDays, MapPin, Receipt, Ticket } from "lucide-react";
 import { listMyOrders } from "@/features/account/queries";
 import { requireUser } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/misc";
-import { formatEventStamp, formatMoney, pluralize } from "@/lib/format";
+
+import { EmptyState } from "@/components/ui/empty-state";import { formatEventStamp, formatMoney, pluralize } from "@/lib/format";
 
 export const metadata: Metadata = { title: "Orders" };
 
