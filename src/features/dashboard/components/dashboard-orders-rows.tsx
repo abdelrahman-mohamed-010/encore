@@ -1,7 +1,7 @@
 import { Receipt } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
-import { RefundButton } from "@/components/dashboard/refund-button";
+import { RefundButton } from "@/features/dashboard/components/refund-button";
 import { listOrganizerOrders } from "@/features/dashboard/queries";
 import { formatDateTime, formatMoney } from "@/lib/format";
 import type { OrderStatus } from "@/lib/types";

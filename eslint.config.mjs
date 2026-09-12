@@ -36,12 +36,12 @@ const eslintConfig = defineConfig([
     // uploads and edge-function invokes stream straight from the client.
     files: [
       "src/app/auth/**/*.tsx",
-      "src/components/auth/**/*.tsx",
+      "src/features/auth/components/**/*.tsx",
       "src/components/layout/user-menu.tsx",
       "src/components/ui/image-upload.tsx",
       "src/app/(site)/account/settings/settings-form.tsx",
-      "src/components/dashboard/organizer-settings-form.tsx",
-      "src/components/dashboard/report-download.tsx",
+      "src/features/organizers/components/organizer-settings-form.tsx",
+      "src/features/organizers/components/report-download.tsx",
       "src/lib/supabase/client.ts",
     ],
     rules: { "no-restricted-imports": "off" },

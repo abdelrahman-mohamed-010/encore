@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SectionHeader } from "@/components/ui/surface";
-import { EventReviewShell } from "@/components/admin/event-review-list";
-import { EventReviewRows } from "@/components/admin/event-review-rows";
+import { EventReviewShell } from "@/features/admin/components/event-review-list";
+import { EventReviewRows } from "@/features/admin/components/event-review-rows";
 
 export const metadata: Metadata = { title: "Event review" };
 

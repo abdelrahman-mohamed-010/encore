@@ -1,6 +1,6 @@
 "use client";
 
-import { PromoShell } from "@/components/dashboard/promo-manager";
+import { PromoShell } from "@/features/promos/components/promo-manager";
 import { Shimmer } from "@/components/ui/skeleton";
 
 /** See events/loading.tsx — exists to make this dynamic route prefetchable. */

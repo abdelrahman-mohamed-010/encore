@@ -1,7 +1,7 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { DashboardEventsShell } from "@/components/dashboard/dashboard-events-table";
+import { DashboardEventsShell } from "@/features/dashboard/components/dashboard-events-table";
 import { TableRowsSkeleton } from "@/components/ui/table";
 
 /**

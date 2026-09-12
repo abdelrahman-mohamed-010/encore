@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { listUsers, type UserProfile } from "@/features/admin/queries";
 import { formatDate } from "@/lib/format";
-import { RoleSelect, BanToggleButton } from "@/components/admin/user-row-actions";
+import { RoleSelect, BanToggleButton } from "@/features/admin/components/user-row-actions";
 
 export type { UserProfile };
 

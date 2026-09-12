@@ -6,7 +6,7 @@ import { EmptyState } from "@/components/ui/misc";
 import { PaginationRow } from "@/components/ui/table";
 import { listPromos } from "@/features/promos/queries";
 import { formatMoney, formatNumber } from "@/lib/format";
-import { PromoRowActions } from "@/components/dashboard/promo-row-actions";
+import { PromoRowActions } from "@/features/promos/components/promo-row-actions";
 
 export async function PromoRows({
   organizerId,

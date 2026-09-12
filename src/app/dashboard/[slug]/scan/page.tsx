@@ -3,7 +3,7 @@ import { listScannableEvents } from "@/features/dashboard/queries";
 import { requireOrganizer } from "@/lib/auth";
 import { EmptyState } from "@/components/ui/misc";
 import { CalendarDays } from "lucide-react";
-import { Scanner } from "@/components/dashboard/scanner";
+import { Scanner } from "@/features/scan/components/scanner";
 
 export const metadata: Metadata = { title: "Check-in" };
 

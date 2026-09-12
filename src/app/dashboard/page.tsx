@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { getMyOrganizers, requireUser } from "@/lib/auth";
-import { DashboardEmptyState } from "@/components/dashboard/dashboard-empty-state";
+import { DashboardEmptyState } from "@/features/dashboard/components/dashboard-empty-state";
 
 export const metadata: Metadata = { title: "Dashboard" };
 

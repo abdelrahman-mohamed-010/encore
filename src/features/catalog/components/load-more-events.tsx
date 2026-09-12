@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { EventCard } from "@/components/events/event-card";
+import { EventCard } from "@/features/catalog/components/event-card";
 import type { EventSearchResult } from "@/lib/types";
 
 export function LoadMoreEvents({

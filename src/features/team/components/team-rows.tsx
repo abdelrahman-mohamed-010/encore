@@ -4,7 +4,7 @@ import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Users, UserPlus } from "lucide-react";
 import { listTeamMembers, type Member } from "@/features/team/queries";
-import { TeamRoleSelect, TeamRemoveButton } from "@/components/dashboard/team-row-actions";
+import { TeamRoleSelect, TeamRemoveButton } from "@/features/team/components/team-row-actions";
 
 export type { Member };
 

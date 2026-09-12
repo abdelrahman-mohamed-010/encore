@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Compass, Map as MapIcon, MapPin } from "lucide-react";
-import { EventMap } from "@/components/map/event-map";
+import { EventMap } from "@/features/map/components/event-map";
 import { Button } from "@/components/ui/button";
 import { Card, SectionHeader } from "@/components/ui/surface";
 import { Callout } from "@/components/ui/callout";

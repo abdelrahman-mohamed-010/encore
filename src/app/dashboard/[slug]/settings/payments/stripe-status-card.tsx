@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle, CardDescription } from "@/components/ui/surface";
 import { FieldRow } from "@/components/ui/field-row";
-import { DisconnectStripeButton } from "@/components/dashboard/disconnect-stripe";
+import { DisconnectStripeButton } from "@/features/organizers/components/disconnect-stripe";
 import { formatDate } from "@/lib/format";
 import type { Tables } from "@/lib/types";
 

@@ -4,7 +4,7 @@ import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
 import { getEditEventFormOptions, getOrganizerEvent } from "@/features/events/queries";
 import { requireOrganizer } from "@/lib/auth";
-import { EventForm } from "@/components/dashboard/event-form";
+import { EventForm } from "@/features/events/components/event-form";
 
 export const metadata: Metadata = { title: "Edit event" };
 

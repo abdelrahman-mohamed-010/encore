@@ -5,7 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { getOrganizerBySlug } from "@/features/organizers/queries";
 import { fetchEventPins } from "@/lib/events-map";
 import { getEdgeLocation } from "@/lib/geo-server";
-import { MapExplorer } from "@/components/map/map-explorer";
+import { MapExplorer } from "@/features/map/components/map-explorer";
 import { Button } from "@/components/ui/button";
 
 type Params = { params: Promise<{ slug: string }> };

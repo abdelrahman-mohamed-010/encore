@@ -1,4 +1,4 @@
-import { EventCardSkeleton } from "@/components/events/event-card";
+import { EventCardSkeleton } from "@/features/catalog/components/event-card";
 
 export default function SavedLoading() {
   return (

@@ -12,7 +12,7 @@ import { Avatar } from "@/components/ui/misc";
 import {
   Dropdown, DropdownContent, DropdownItem, DropdownLabel, DropdownSeparator, DropdownTrigger,
 } from "@/components/ui/dropdown";
-import { NewOrganizationModal } from "@/components/dashboard/new-organization-modal";
+import { NewOrganizationModal } from "@/features/organizers/components/new-organization-modal";
 import type { MembershipWithOrganizer } from "@/lib/auth";
 import type { Profile } from "@/lib/types";
 

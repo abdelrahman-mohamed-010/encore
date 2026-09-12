@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { listEventsForReview } from "@/features/admin/queries";
 import { formatDate } from "@/lib/format";
-import { EventReviewActions } from "@/components/admin/event-review-actions";
+import { EventReviewActions } from "@/features/admin/components/event-review-actions";
 import type { EventStatus } from "@/lib/types";
 
 const TONE: Record<EventStatus, "positive" | "caution" | "neutral" | "critical"> = {

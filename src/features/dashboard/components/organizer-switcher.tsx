@@ -8,7 +8,7 @@ import {
   Dropdown, DropdownContent, DropdownItem, DropdownLabel, DropdownSeparator, DropdownTrigger,
 } from "@/components/ui/dropdown";
 import { Avatar } from "@/components/ui/misc";
-import { NewOrganizationModal } from "@/components/dashboard/new-organization-modal";
+import { NewOrganizationModal } from "@/features/organizers/components/new-organization-modal";
 import type { MembershipWithOrganizer } from "@/lib/auth";
 import type { Organizer } from "@/lib/types";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { DashboardAttendeesShell } from "@/components/dashboard/dashboard-attendees-table";
+import { DashboardAttendeesShell } from "@/features/dashboard/components/dashboard-attendees-table";
 import { TableRowsSkeleton } from "@/components/ui/table";
 
 /** See events/loading.tsx — exists to make this dynamic route prefetchable. */

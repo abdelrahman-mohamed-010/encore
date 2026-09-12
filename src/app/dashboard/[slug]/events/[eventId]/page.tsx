@@ -8,10 +8,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/surface";
 import { Meter, StatTile } from "@/components/ui/misc";
-import { TicketTypeEditor } from "@/components/dashboard/ticket-type-editor";
-import { SeatingEditor, type SeatingSection } from "@/components/dashboard/seating-editor";
-import { EventStatusControl } from "@/components/dashboard/event-status-control";
-import { EventFormDrawer } from "@/components/dashboard/event-form-drawer";
+import { TicketTypeEditor } from "@/features/events/components/ticket-type-editor";
+import { SeatingEditor, type SeatingSection } from "@/features/seating/components/seating-editor";
+import { EventStatusControl } from "@/features/events/components/event-status-control";
+import { EventFormDrawer } from "@/features/events/components/event-form-drawer";
 import { formatDateTime, formatMoney, formatNumber } from "@/lib/format";
 import type { EventStatus } from "@/lib/types";
 

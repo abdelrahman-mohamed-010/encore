@@ -1,10 +1,10 @@
 import { Plus } from "lucide-react";
 import { requireOrganizer, getMyOrganizers } from "@/lib/auth";
 import { SiteHeader } from "@/components/layout/site-header";
-import { ReportDownload } from "@/components/dashboard/report-download";
-import { OrganizerSwitcher } from "@/components/dashboard/organizer-switcher";
-import { DashboardTabs } from "@/components/dashboard/dashboard-nav";
-import { EventFormDrawer } from "@/components/dashboard/event-form-drawer";
+import { ReportDownload } from "@/features/organizers/components/report-download";
+import { OrganizerSwitcher } from "@/features/dashboard/components/organizer-switcher";
+import { DashboardTabs } from "@/features/dashboard/components/dashboard-nav";
+import { EventFormDrawer } from "@/features/events/components/event-form-drawer";
 import { Avatar } from "@/components/ui/misc";
 import { Button } from "@/components/ui/button";
 

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { listOrganizerEventOptions } from "@/features/dashboard/queries";
 import { requireOrganizer } from "@/lib/auth";
-import { DashboardAttendeesShell } from "@/components/dashboard/dashboard-attendees-table";
-import { AttendeeRows } from "@/components/dashboard/dashboard-attendees-rows";
+import { DashboardAttendeesShell } from "@/features/dashboard/components/dashboard-attendees-table";
+import { AttendeeRows } from "@/features/dashboard/components/dashboard-attendees-rows";
 
 export const metadata: Metadata = { title: "Attendees" };
 

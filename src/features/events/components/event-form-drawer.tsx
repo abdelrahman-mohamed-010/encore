@@ -10,7 +10,7 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer";
-import { EventForm } from "@/components/dashboard/event-form";
+import { EventForm } from "@/features/events/components/event-form";
 import type { EventRow } from "@/lib/types";
 
 type Option = { id: string; name: string; city?: string | null };

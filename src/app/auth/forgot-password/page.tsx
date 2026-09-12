@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { AuthCard } from "@/components/auth/auth-card";
+import { AuthCard } from "@/features/auth/components/auth-card";
 import { ForgotPasswordForm } from "./forgot-password-form";
 
 export const metadata: Metadata = { title: "Reset your password" };

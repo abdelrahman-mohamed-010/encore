@@ -12,10 +12,10 @@ import { Avatar } from "@/components/ui/misc";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { Card, Divider } from "@/components/ui/surface";
 import { FieldRow, InfoRow } from "@/components/ui/field-row";
-import { TicketPicker } from "@/components/events/ticket-picker";
-import { SeatMap } from "@/components/events/seat-map";
-import { FavoriteButton } from "@/components/events/favorite-button";
-import { ShareButton } from "@/components/events/share-button";
+import { TicketPicker } from "@/features/events/components/ticket-picker";
+import { SeatMap } from "@/features/events/components/seat-map";
+import { FavoriteButton } from "@/features/account/components/favorite-button";
+import { ShareButton } from "@/features/events/components/share-button";
 import { formatDate, formatTime, pluralize } from "@/lib/format";
 
 export async function generateMetadata({

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import { getNewEventFormOptions } from "@/features/events/queries";
 import { requireOrganizer } from "@/lib/auth";
-import { EventForm } from "@/components/dashboard/event-form";
+import { EventForm } from "@/features/events/components/event-form";
 
 export const metadata: Metadata = { title: "New event" };
 

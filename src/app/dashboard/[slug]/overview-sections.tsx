@@ -6,9 +6,9 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/surface";
 import { StatTile } from "@/components/ui/misc";
-import { PlainCard } from "@/components/dashboard/tiles";
-import { EventFormDrawer } from "@/components/dashboard/event-form-drawer";
-import { RevenueChart, TicketsChart, type SalesPoint } from "@/components/dashboard/sales-chart";
+import { PlainCard } from "@/features/dashboard/components/tiles";
+import { EventFormDrawer } from "@/features/events/components/event-form-drawer";
+import { RevenueChart, TicketsChart, type SalesPoint } from "@/features/dashboard/components/sales-chart";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";
 import type { EventStatus, OrganizerStats } from "@/lib/types";
 

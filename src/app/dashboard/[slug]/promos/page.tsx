@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { requireOrganizer } from "@/lib/auth";
 import { listPromoEventOptions } from "@/features/promos/queries";
-import { PromoShell } from "@/components/dashboard/promo-manager";
-import { PromoRows } from "@/components/dashboard/promo-rows";
+import { PromoShell } from "@/features/promos/components/promo-manager";
+import { PromoRows } from "@/features/promos/components/promo-rows";
 
 export const metadata: Metadata = { title: "Promo codes" };
 

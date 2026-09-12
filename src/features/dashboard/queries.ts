@@ -1,7 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import type { EventStatus, OrderStatus, OrganizerStats } from "@/lib/types";
-import type { SalesPoint } from "@/components/dashboard/sales-chart";
+import type { SalesPoint } from "@/features/dashboard/components/sales-chart";
 
 export type Paged<T> = { rows: T[]; total: number; totalPages: number };
 

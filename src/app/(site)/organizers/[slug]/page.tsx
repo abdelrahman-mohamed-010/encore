@@ -5,9 +5,9 @@ import type { Metadata } from "next";
 import { Globe, Mail } from "lucide-react";
 import { getOrganizerBySlug, getOrganizerPublicPage } from "@/features/organizers/queries";
 import { Avatar } from "@/components/ui/misc";
-import { NearbyEvents } from "@/components/map/nearby-events";
+import { NearbyEvents } from "@/features/map/components/nearby-events";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
-import { EventTimeline } from "@/components/organizers/event-timeline";
+import { EventTimeline } from "@/features/organizers/components/event-timeline";
 
 export const revalidate = 120;
 

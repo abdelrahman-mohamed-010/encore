@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select";
 import { TableRowsSkeleton } from "@/components/ui/table";
 import { useDebouncedSearchParam } from "@/hooks";
-import { EventFormDrawer } from "@/components/dashboard/event-form-drawer";
+import { EventFormDrawer } from "@/features/events/components/event-form-drawer";
 
 // Matches the column count in dashboard-events-rows.tsx's <thead>/<tbody> —
 // kept as a literal (not a shared import) so this client shell never pulls

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { listAllCategories } from "@/features/admin/queries";
 import { SectionHeader } from "@/components/ui/surface";
-import { CategoryManager } from "@/components/admin/category-manager";
+import { CategoryManager } from "@/features/admin/components/category-manager";
 
 export const metadata: Metadata = { title: "Categories" };
 

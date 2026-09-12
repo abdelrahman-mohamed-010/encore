@@ -8,7 +8,7 @@ import { renderTicketQr } from "@/lib/qr";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/misc";
-import { TicketQrModal } from "@/components/events/ticket-qr-modal";
+import { TicketQrModal } from "@/features/account/components/ticket-qr-modal";
 import { formatEventStamp } from "@/lib/format";
 import { cn } from "@/lib/utils";
 

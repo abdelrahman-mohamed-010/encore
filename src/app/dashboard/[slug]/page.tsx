@@ -7,7 +7,7 @@ import { requireOrganizer } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/ui/surface";
 import { Shimmer } from "@/components/ui/skeleton";
-import { QuickAction, SectionBlock } from "@/components/dashboard/tiles";
+import { QuickAction, SectionBlock } from "@/features/dashboard/components/tiles";
 import {
   PaymentBanner,
   RecentEventsSection,

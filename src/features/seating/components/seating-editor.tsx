@@ -14,7 +14,7 @@ import { Form, FormError, FormField } from "@/components/ui/form";
 import { AffixInput, Input } from "@/components/ui/input";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { EmptyState } from "@/components/ui/misc";
-import { SeatMapPreviewButton } from "@/components/dashboard/seat-map-preview";
+import { SeatMapPreviewButton } from "@/features/seating/components/seat-map-preview";
 import { formatMoney, formatNumber } from "@/lib/format";
 import type { SeatingType } from "@/lib/types";
 

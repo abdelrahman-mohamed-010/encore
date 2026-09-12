@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight, CalendarDays, MapPin, X } from "lucide-react";
 import { Group, Panel, Separator } from "react-resizable-panels";
-import { EventMap } from "@/components/map/event-map";
+import { EventMap } from "@/features/map/components/event-map";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { EmptyState } from "@/components/ui/misc";
