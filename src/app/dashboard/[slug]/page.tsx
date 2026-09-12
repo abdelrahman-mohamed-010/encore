@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { ArrowUpRight, Megaphone, QrCode, Share2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getOrganizerOverview } from "@/features/dashboard/queries";
 import { requireOrganizer } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Divider } from "@/components/ui/surface";
@@ -13,10 +13,7 @@ import {
   RecentEventsSection,
   SalesSection,
   StatsSection,
-  type RecentEvent,
 } from "./overview-sections";
-import type { OrganizerStats } from "@/lib/types";
-import type { SalesPoint } from "@/components/dashboard/sales-chart";
 
 export const metadata: Metadata = { title: "Overview" };
 
@@ -27,29 +24,12 @@ export default async function DashboardOverview({
 }) {
   const { slug } = await params;
   const { organizer } = await requireOrganizer(slug, "scanner");
-  const supabase = await createClient();
-
-  // None of these are awaited here: the quick actions render instantly, and
-  // each section below suspends independently on its own promise.
-  const statsPromise = supabase
-    .rpc("organizer_stats", { p_organizer_id: organizer.id })
-    .then(({ data }) => (data ?? {}) as unknown as OrganizerStats);
-  const seriesPromise = supabase
-    .rpc("organizer_sales_series", { p_organizer_id: organizer.id, p_days: 14 })
-    .then(({ data }) => (data ?? []) as unknown as SalesPoint[]);
-  const eventsPromise = supabase
-    .from("events")
-    .select("id, title, slug, status, starts_at, cover_image_url")
-    .eq("organizer_id", organizer.id)
-    .order("starts_at", { ascending: true })
-    .limit(6)
-    .then(({ data }) => (data ?? []) as unknown as RecentEvent[]);
-  const accountPromise = supabase
-    .from("payment_accounts")
-    .select("charges_enabled, stripe_account_id")
-    .eq("organizer_id", organizer.id)
-    .maybeSingle()
-    .then(({ data }) => data);
+  const {
+    stats: statsPromise,
+    series: seriesPromise,
+    events: eventsPromise,
+    account: accountPromise,
+  } = await getOrganizerOverview(organizer.id);
 
   return (
     <div className="space-y-8">

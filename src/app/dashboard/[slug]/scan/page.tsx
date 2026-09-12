@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { listScannableEvents } from "@/features/dashboard/queries";
 import { requireOrganizer } from "@/lib/auth";
 import { EmptyState } from "@/components/ui/misc";
 import { CalendarDays } from "lucide-react";
@@ -14,15 +14,7 @@ function scanWindowStart() {
 export default async function ScanPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const { organizer } = await requireOrganizer(slug, "scanner");
-  const supabase = await createClient();
-
-  const { data: events } = await supabase
-    .from("events")
-    .select("id, title, starts_at")
-    .eq("organizer_id", organizer.id)
-    .eq("status", "published")
-    .gte("ends_at", scanWindowStart())
-    .order("starts_at", { ascending: true });
+  const events = await listScannableEvents(organizer.id, scanWindowStart());
 
   return (
     <div className="space-y-6">

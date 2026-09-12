@@ -87,3 +87,13 @@ export async function getCheckoutContext(reservationId: string, userId: string) 
 
   return { lines, profile, settings };
 }
+
+export async function getOrderForPayment(orderId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("orders")
+    .select("id, user_id, status, total_cents, currency, order_number, payment_provider")
+    .eq("id", orderId)
+    .maybeSingle();
+  return data;
+}

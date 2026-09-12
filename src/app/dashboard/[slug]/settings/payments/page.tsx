@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getPaymentAccount } from "@/features/dashboard/queries";
 import { requireOrganizer } from "@/lib/auth";
 import { isStripeConnectConfigured } from "@/lib/payments/stripe";
 import { Card, CardBody } from "@/components/ui/surface";
@@ -20,16 +20,8 @@ export default async function PaymentsSettingsPage({
   const { slug } = await params;
   const { connected, error } = await searchParams;
   const { organizer } = await requireOrganizer(slug, "admin");
-  const supabase = await createClient();
-
-  // Not awaited: the heading and the status card below stream in
-  // independently, so the page never blocks on this one lookup.
-  const accountPromise = supabase
-    .from("payment_accounts")
-    .select("*")
-    .eq("organizer_id", organizer.id)
-    .maybeSingle()
-    .then(({ data }) => data);
+  // Not awaited: the heading and the status card stream in independently.
+  const accountPromise = getPaymentAccount(organizer.id);
 
   const connectConfigured = isStripeConnectConfigured();
 

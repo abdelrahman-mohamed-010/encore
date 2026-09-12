@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CalendarDays, MapPin } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getHostEvents, getHostProfile } from "@/features/organizers/queries";
 import { Avatar } from "@/components/ui/misc";
 import { Card } from "@/components/ui/surface";
 import { DateBlock } from "@/components/ui/field-row";
@@ -15,18 +15,10 @@ type Params = { params: Promise<{ id: string }> };
 type HostEvent = Functions["host_events"]["Returns"][number];
 
 /** A uuid, or there is no such person — checked before it reaches the query. */
-const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-async function loadHost(id: string) {
-  if (!UUID.test(id)) return null;
-  const supabase = await createClient();
-  const { data } = await supabase.rpc("host_profile", { p_id: id });
-  return data?.[0] ?? null;
-}
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { id } = await params;
-  const host = await loadHost(id);
+  const host = await getHostProfile(id);
   if (!host) return { title: "Host" };
 
   const name = host.full_name ?? "Host";
@@ -75,14 +67,10 @@ function EventRow({ event }: { event: HostEvent }) {
 
 export default async function HostProfilePage({ params }: Params) {
   const { id } = await params;
-  const host = await loadHost(id);
+  const host = await getHostProfile(id);
   if (!host) notFound();
 
-  const supabase = await createClient();
-  const [{ data: upcoming }, { data: past }] = await Promise.all([
-    supabase.rpc("host_events", { p_id: id, p_past: false, p_limit: 12 }),
-    supabase.rpc("host_events", { p_id: id, p_past: true, p_limit: 6 }),
-  ]);
+  const { upcoming, past } = await getHostEvents(id);
 
   const organizers = (host.organizers ?? []) as {
     slug: string;

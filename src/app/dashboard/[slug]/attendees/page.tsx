@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { listOrganizerEventOptions } from "@/features/dashboard/queries";
 import { requireOrganizer } from "@/lib/auth";
 import { DashboardAttendeesShell } from "@/components/dashboard/dashboard-attendees-table";
 import { AttendeeRows } from "@/components/dashboard/dashboard-attendees-rows";
@@ -18,16 +18,9 @@ export default async function AttendeesPage({
   const { slug } = await params;
   const { event: eventFilter, q, status, page: pageParam } = await searchParams;
   const { organizer } = await requireOrganizer(slug, "scanner");
-  const supabase = await createClient();
   const page = Math.max(1, Number(pageParam) || 1);
-
-  const { data: events } = await supabase
-    .from("events")
-    .select("id, title")
-    .eq("organizer_id", organizer.id)
-    .order("starts_at", { ascending: false });
-
-  const eventIds = (events ?? []).map((e) => e.id);
+  const events = await listOrganizerEventOptions(organizer.id);
+  const eventIds = events.map((e) => e.id);
 
   return (
     <div className="space-y-4">

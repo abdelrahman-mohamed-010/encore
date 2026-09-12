@@ -94,3 +94,9 @@ export async function listEventsForReview({
     totalPages: Math.max(1, Math.ceil(total / pageSize)),
   };
 }
+
+export async function listAllCategories() {
+  const supabase = await createClient();
+  const { data } = await supabase.from("categories").select("*").order("sort_order");
+  return data ?? [];
+}

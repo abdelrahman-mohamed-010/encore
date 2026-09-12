@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getNewEventFormOptions } from "@/features/events/queries";
 import { requireOrganizer } from "@/lib/auth";
 import { EventForm } from "@/components/dashboard/event-form";
 
@@ -10,17 +10,7 @@ export const metadata: Metadata = { title: "New event" };
 export default async function NewEventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const { organizer } = await requireOrganizer(slug, "staff");
-  const supabase = await createClient();
-
-  const [{ data: categories }, { data: venues }] = await Promise.all([
-    supabase.from("categories").select("id, name").eq("is_active", true).order("sort_order"),
-    supabase
-      .from("venues")
-      .select("id, name, city, seating_type")
-      .or(`organizer_id.eq.${organizer.id},organizer_id.is.null`)
-      .eq("is_active", true)
-      .order("name"),
-  ]);
+  const { categories, venues } = await getNewEventFormOptions(organizer.id);
 
   return (
     <div className="max-w-3xl space-y-6 px-5 py-8 md:px-8">

@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { getOrderForPayment } from "@/features/checkout/queries";
 import { requireUser } from "@/lib/auth";
 import { isStripeConfigured } from "@/lib/payments";
 import { CompleteClient } from "./complete-client";
@@ -16,13 +16,7 @@ export default async function CheckoutCompletePage({
   if (!orderId) redirect("/events");
 
   const user = await requireUser();
-  const supabase = await createClient();
-
-  const { data: order } = await supabase
-    .from("orders")
-    .select("id, user_id, status, total_cents, currency, order_number, payment_provider")
-    .eq("id", orderId)
-    .maybeSingle();
+  const order = await getOrderForPayment(orderId);
 
   if (!order || order.user_id !== user.id) redirect("/account/orders");
   if (order.status === "paid") redirect(`/account/orders/${order.id}?celebrate=1`);

@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import type { EventSeat, TicketAvailability, VenueSeat, VenueSection } from "@/lib/types";
+import type { EventSeat, EventStats, TicketAvailability, VenueSeat, VenueSection } from "@/lib/types";
 
 export type SeatWithPlace = EventSeat & {
   seat:
@@ -86,4 +86,96 @@ export async function getEventSocialCounts(eventId: string, userId: string | nul
   ]);
 
   return { favorited: Boolean(favorite), attendeeCount: attendeeCount ?? 0 };
+}
+
+function activeCategories(supabase: Awaited<ReturnType<typeof createClient>>) {
+  return supabase.from("categories").select("id, name").eq("is_active", true).order("sort_order");
+}
+
+/** Venues the organizer owns, plus the shared public ones. */
+export async function getNewEventFormOptions(organizerId: string) {
+  const supabase = await createClient();
+
+  const [{ data: categories }, { data: venues }] = await Promise.all([
+    activeCategories(supabase),
+    supabase
+      .from("venues")
+      .select("id, name, city, seating_type")
+      .or(`organizer_id.eq.${organizerId},organizer_id.is.null`)
+      .eq("is_active", true)
+      .order("name"),
+  ]);
+
+  return { categories: categories ?? [], venues: venues ?? [] };
+}
+
+export async function getEditEventFormOptions(organizerId: string) {
+  const supabase = await createClient();
+
+  const [{ data: categories }, { data: venues }] = await Promise.all([
+    activeCategories(supabase),
+    supabase
+      .from("venues")
+      .select("id, name, city")
+      .or(`organizer_id.eq.${organizerId},organizer_id.is.null`)
+      .eq("is_active", true)
+      .order("name"),
+  ]);
+
+  return { categories: categories ?? [], venues: venues ?? [] };
+}
+
+export async function getOrganizerEvent(eventId: string, organizerId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("events")
+    .select("*")
+    .eq("id", eventId)
+    .eq("organizer_id", organizerId)
+    .maybeSingle();
+  return data;
+}
+
+export async function getEventDetail(eventId: string, organizerId: string) {
+  const supabase = await createClient();
+
+  const { data: event } = await supabase
+    .from("events")
+    .select("*, venue:venues(id, name, city), category:categories(name)")
+    .eq("id", eventId)
+    .eq("organizer_id", organizerId)
+    .maybeSingle();
+
+  if (!event) return null;
+
+  const [{ data: statsData }, { data: ticketTypes }, { data: venueSections }, { count: soldOrHeld }] =
+    await Promise.all([
+      supabase.rpc("event_stats", { p_event_id: eventId }),
+      supabase.from("ticket_types").select("*").eq("event_id", eventId).order("sort_order"),
+      event.venue_id
+        ? supabase
+            .from("venue_sections")
+            .select("id, name, color, venue_seats(count)")
+            .eq("venue_id", event.venue_id)
+            .order("sort_order")
+        : Promise.resolve({ data: [] }),
+      supabase
+        .from("event_seats")
+        .select("id", { count: "exact", head: true })
+        .eq("event_id", eventId)
+        .neq("status", "available"),
+    ]);
+
+  return {
+    event,
+    stats: (statsData ?? {}) as EventStats,
+    ticketTypes: ticketTypes ?? [],
+    venueSections: (venueSections ?? []) as {
+      id: string;
+      name: string;
+      color: string;
+      venue_seats: { count: number }[];
+    }[],
+    soldOrHeld: soldOrHeld ?? 0,
+  };
 }

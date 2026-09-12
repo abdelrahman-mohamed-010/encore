@@ -3,24 +3,13 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { Globe, Mail } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getOrganizerBySlug, getOrganizerPublicPage } from "@/features/organizers/queries";
 import { Avatar } from "@/components/ui/misc";
 import { NearbyEvents } from "@/components/map/nearby-events";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { EventTimeline } from "@/components/organizers/event-timeline";
-import type { EventSearchResult } from "@/lib/types";
 
 export const revalidate = 120;
-
-async function loadOrganizer(slug: string) {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("organizers")
-    .select("*")
-    .eq("slug", slug)
-    .maybeSingle();
-  return data;
-}
 
 export async function generateMetadata({
   params,
@@ -28,7 +17,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const organizer = await loadOrganizer(slug);
+  const organizer = await getOrganizerBySlug(slug);
   if (!organizer) return { title: "Organizer not found" };
   const description = organizer.description ?? `Events by ${organizer.name} on Encore.`;
   return {
@@ -45,17 +34,10 @@ export async function generateMetadata({
 
 export default async function OrganizerPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const organizer = await loadOrganizer(slug);
+  const organizer = await getOrganizerBySlug(slug);
   if (!organizer) notFound();
 
-  const supabase = await createClient();
-  const [{ data: events }, { data: ownerRows }] = await Promise.all([
-    supabase.rpc("search_events", { p_organizer_slug: slug, p_limit: 50 }),
-    supabase.from("public_profiles").select("id, full_name").eq("id", organizer.owner_id).limit(1),
-  ]);
-
-  const rows = (events ?? []) as EventSearchResult[];
-  const owner = ownerRows?.[0] ?? null;
+  const { events: rows, owner } = await getOrganizerPublicPage(slug, organizer.owner_id);
 
   const jsonLd = {
     "@context": "https://schema.org",

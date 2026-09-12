@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getEditEventFormOptions, getOrganizerEvent } from "@/features/events/queries";
 import { requireOrganizer } from "@/lib/auth";
 import { EventForm } from "@/components/dashboard/event-form";
 
@@ -15,17 +15,9 @@ export default async function EditEventPage({
 }) {
   const { slug, eventId } = await params;
   const { organizer } = await requireOrganizer(slug, "staff");
-  const supabase = await createClient();
-
-  const [{ data: event }, { data: categories }, { data: venues }] = await Promise.all([
-    supabase.from("events").select("*").eq("id", eventId).eq("organizer_id", organizer.id).maybeSingle(),
-    supabase.from("categories").select("id, name").eq("is_active", true).order("sort_order"),
-    supabase
-      .from("venues")
-      .select("id, name, city")
-      .or(`organizer_id.eq.${organizer.id},organizer_id.is.null`)
-      .eq("is_active", true)
-      .order("name"),
+  const [event, { categories, venues }] = await Promise.all([
+    getOrganizerEvent(eventId, organizer.id),
+    getEditEventFormOptions(organizer.id),
   ]);
 
   if (!event) notFound();

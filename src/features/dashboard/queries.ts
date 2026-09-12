@@ -1,6 +1,7 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import type { EventStatus, OrderStatus } from "@/lib/types";
+import type { EventStatus, OrderStatus, OrganizerStats } from "@/lib/types";
+import type { SalesPoint } from "@/components/dashboard/sales-chart";
 
 export type Paged<T> = { rows: T[]; total: number; totalPages: number };
 
@@ -176,4 +177,82 @@ export async function listOrganizerAttendees({
     .range(from, from + pageSize - 1);
 
   return paginate(data as DashboardAttendeeItem[] | null, count, pageSize);
+}
+
+export type RecentEvent = {
+  id: string;
+  title: string;
+  slug: string;
+  status: EventStatus;
+  starts_at: string;
+  cover_image_url: string | null;
+};
+
+export type OverviewPromises = {
+  stats: PromiseLike<OrganizerStats>;
+  series: PromiseLike<SalesPoint[]>;
+  events: PromiseLike<RecentEvent[]>;
+  account: PromiseLike<{ charges_enabled: boolean; stripe_account_id: string | null } | null>;
+};
+
+/**
+ * Deliberately returns promises rather than awaiting: the overview's quick
+ * actions render instantly and each section suspends on its own.
+ */
+export async function getOrganizerOverview(organizerId: string): Promise<OverviewPromises> {
+  const supabase = await createClient();
+
+  return {
+    stats: supabase
+      .rpc("organizer_stats", { p_organizer_id: organizerId })
+      .then(({ data }) => (data ?? {}) as OrganizerStats),
+    series: supabase
+      .rpc("organizer_sales_series", { p_organizer_id: organizerId, p_days: 14 })
+      .then(({ data }) => (data ?? []) as SalesPoint[]),
+    events: supabase
+      .from("events")
+      .select("id, title, slug, status, starts_at, cover_image_url")
+      .eq("organizer_id", organizerId)
+      .order("starts_at", { ascending: true })
+      .limit(6)
+      .then(({ data }) => (data ?? []) as RecentEvent[]),
+    account: supabase
+      .from("payment_accounts")
+      .select("charges_enabled, stripe_account_id")
+      .eq("organizer_id", organizerId)
+      .maybeSingle()
+      .then(({ data }) => data),
+  };
+}
+
+export async function listOrganizerEventOptions(organizerId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("events")
+    .select("id, title")
+    .eq("organizer_id", organizerId)
+    .order("starts_at", { ascending: false });
+  return data ?? [];
+}
+
+export async function listScannableEvents(organizerId: string, windowStart: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("events")
+    .select("id, title, starts_at")
+    .eq("organizer_id", organizerId)
+    .eq("status", "published")
+    .gte("ends_at", windowStart)
+    .order("starts_at", { ascending: true });
+  return data ?? [];
+}
+
+export async function getPaymentAccount(organizerId: string) {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("payment_accounts")
+    .select("*")
+    .eq("organizer_id", organizerId)
+    .maybeSingle();
+  return data;
 }
