@@ -1,11 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
 import { Check, ExternalLink, X } from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { useAction } from "next-safe-action/hooks";
+import { setEventReviewStatus } from "@/features/admin/actions";
 import { Button } from "@/components/ui/button";
 import { Tooltip } from "@/components/ui/tooltip";
 import type { EventStatus } from "@/lib/types";
@@ -23,32 +22,22 @@ export function EventReviewActions({
   status: EventStatus;
   tiers: number;
 }) {
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
-
-  function setStatus(next: EventStatus, reason?: string) {
-    startTransition(async () => {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from("events")
-        .update({ status: next, rejection_reason: reason ?? null })
-        .eq("id", id);
-
-      if (error) {
-        toast.error("Could not update the event", { description: error.message });
-        return;
-      }
-
+  const review = useAction(setEventReviewStatus, {
+    onSuccess: ({ input }) =>
       toast.success(
-        next === "published"
+        input.status === "published"
           ? `${title} is live`
-          : next === "draft"
+          : input.status === "draft"
             ? `${title} returned to draft`
-            : `${title} moved to ${next.replace("_", " ")}`,
-      );
-      router.refresh();
-    });
-  }
+            : `${title} moved to ${input.status.replace("_", " ")}`,
+      ),
+    onError: ({ error }) =>
+      toast.error("Could not update the event", { description: error.serverError }),
+  });
+
+  const pending = review.isPending;
+  const setStatus = (status: EventStatus, reason?: string) =>
+    review.execute({ id, status, reason });
 
   return (
     <div className="flex items-center justify-end gap-1.5">

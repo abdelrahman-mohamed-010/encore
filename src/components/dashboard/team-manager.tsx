@@ -6,7 +6,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Info, Search, UserPlus } from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { addTeamMember } from "@/features/team/actions";
 import { useAsyncAction, useDebouncedSearchParam } from "@/hooks";
 import { teamMemberSchema, type TeamMemberData, type TeamMemberValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
@@ -56,11 +56,11 @@ const TEAM_COLUMN_COUNT = 4;
 
 /** Static shell: search, role filter, "Role info" / "Add member". Server-driven — never a skeleton itself. */
 export function TeamShell({
-  organizerId,
+  organizerSlug,
   viewerRole,
   children,
 }: {
-  organizerId: string;
+  organizerSlug: string;
   viewerRole: OrgMemberRole;
   children: React.ReactNode;
 }) {
@@ -90,34 +90,12 @@ export function TeamShell({
   const selectedRole = useWatch({ control: form.control, name: "role" });
 
   const addMember = useAsyncAction(async (values: TeamMemberData) => {
-    const supabase = createClient();
-
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id")
-      .ilike("email", values.email)
-      .maybeSingle();
-
-    if (!profile) {
-      throw new Error(
-        "Nobody with that email has an Encore account yet. Ask them to sign up first.",
-      );
-    }
-
-    const { error } = await supabase
-      .from("organizer_members")
-      .insert({ organizer_id: organizerId, user_id: profile.id, role: values.role });
-
-    if (error) {
-      throw new Error(
-        error.code === "23505" ? "That person is already on the team." : error.message,
-      );
-    }
+    const result = await addTeamMember({ ...values, organizerSlug });
+    if (result?.serverError) throw new Error(result.serverError);
 
     toast.success("Team member added");
     setOpen(false);
     form.reset();
-    router.refresh();
   });
 
   return (

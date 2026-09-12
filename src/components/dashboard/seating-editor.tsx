@@ -125,7 +125,11 @@ export function SeatingEditor({
               {formatNumber(venueSeats)} seats at {venue?.name ?? "this venue"}.
             </CardDescription>
           </div>
-          <SeatMapPreviewButton eventId={eventId} venueName={venue?.name ?? "this venue"} />
+          <SeatMapPreviewButton
+            eventId={eventId}
+            organizerSlug={organizerSlug}
+            venueName={venue?.name ?? "this venue"}
+          />
         </CardHeader>
         <CardBody>
           <div className="flex flex-wrap gap-x-6 gap-y-3">

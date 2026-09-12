@@ -3,7 +3,8 @@
 import { useCallback, useState } from "react";
 import { Camera, CameraOff, CheckCircle2, KeyRound, XCircle } from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { scanTicket, type ScanOutcomeData } from "@/features/scan/actions";
+import type { ScanResult } from "@/lib/types";
 import { useAsyncAction, useQrScanner } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/surface";
@@ -13,16 +14,8 @@ import { Badge } from "@/components/ui/badge";
 import { parseTicketPayload } from "@/lib/qr";
 import { formatTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
-import type { ScanResult } from "@/lib/types";
 
-type ScanOutcome = {
-  result: ScanResult;
-  ticket_code: string;
-  attendee_name: string | null;
-  ticket_type: string | null;
-  seat_label: string | null;
-  at: number;
-};
+type ScanOutcome = ScanOutcomeData & { at: number };
 
 const COPY: Record<ScanResult, { label: string; tone: "positive" | "caution" | "critical" }> = {
   valid: { label: "Admitted", tone: "positive" },
@@ -45,20 +38,19 @@ export function Scanner({ events }: { events: { id: string; title: string }[] })
     }
     if (!eventId) return;
 
-    const supabase = createClient();
-    const { data, error } = await supabase.rpc("scan_ticket", {
-      p_ticket_code: parsed.ticketCode,
-      p_qr_secret: parsed.qrSecret,
-      p_event_id: eventId,
-      p_device_info: navigator.userAgent.slice(0, 120),
+    const result = await scanTicket({
+      eventId,
+      ticketCode: parsed.ticketCode,
+      qrSecret: parsed.qrSecret,
+      deviceInfo: navigator.userAgent.slice(0, 120),
     });
 
-    if (error) {
-      toast.error("Scan failed", { description: error.message });
+    if (result?.serverError || !result?.data) {
+      toast.error("Scan failed", { description: result?.serverError });
       return;
     }
 
-    const outcome = { ...(data as unknown as Omit<ScanOutcome, "at">), at: Date.now() };
+    const outcome = { ...result.data, at: Date.now() };
     setHistory((prev) => [outcome, ...prev].slice(0, 25));
 
     if (outcome.result === "valid") {

@@ -116,7 +116,9 @@ export default async function ManageEventPage({
               trigger={<Button variant="outline" size="sm">Edit details</Button>}
             />
           )}
-          {canEdit && <EventStatusControl eventId={eventId} status={event.status} />}
+          {canEdit && (
+            <EventStatusControl eventId={eventId} organizerSlug={slug} status={event.status} />
+          )}
         </div>
       </div>
 
@@ -180,6 +182,7 @@ export default async function ManageEventPage({
       {canEdit && (
         <TicketTypeEditor
           eventId={eventId}
+          organizerSlug={slug}
           ticketTypes={ticketTypes ?? []}
           seatingType={event.seating_type}
           sections={sections}

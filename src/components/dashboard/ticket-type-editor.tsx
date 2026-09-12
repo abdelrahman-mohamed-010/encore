@@ -1,12 +1,12 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { useAction } from "next-safe-action/hooks";
+import { deleteTicketType, saveTicketType } from "@/features/events/actions";
 import { useAsyncAction } from "@/hooks";
 import { ticketTypeSchema, type TicketTypeData, type TicketTypeValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
@@ -49,17 +49,18 @@ function toValues(tier: TicketType): TicketTypeValues {
 
 export function TicketTypeEditor({
   eventId,
+  organizerSlug,
   ticketTypes,
   seatingType,
   sections = [],
 }: {
   eventId: string;
+  organizerSlug: string;
   ticketTypes: TicketType[];
   seatingType: SeatingType;
   /** The venue's seating sections, when it has a seat map. */
   sections?: { id: string; name: string }[];
 }) {
-  const router = useRouter();
   // `editing` holds which tier the dialog is bound to: null = closed,
   // "new" = creating. The field values themselves live in the form.
   const [editing, setEditing] = useState<TicketType | "new" | null>(null);
@@ -78,44 +79,28 @@ export function TicketTypeEditor({
   }, [editing, form]);
 
   const save = useAsyncAction(async (values: TicketTypeData) => {
-    const priceCents = Math.round(Number(values.price) * 100);
-    const quantity = Number(values.quantityTotal);
     const existing = editing !== "new" && editing !== null ? editing : null;
 
-    // Capacity can be lowered, but never below what is already committed.
-    if (existing) {
-      const committed = existing.quantity_sold + existing.quantity_reserved;
-      if (quantity < committed) {
-        throw new Error(
-          `You cannot go below ${committed} — that many are already sold or held.`,
-        );
-      }
+    const result = await saveTicketType({
+      ...values,
+      eventId,
+      organizerSlug,
+      id: existing?.id,
+      sortOrder: existing?.sort_order ?? ticketTypes.length,
+    });
+
+    if (result?.serverError) throw new Error(result.serverError);
+    if (!result?.data && result?.validationErrors) {
+      throw new Error("Check the form and try again.");
     }
-
-    const payload = {
-      event_id: eventId,
-      name: values.name,
-      description: values.description || null,
-      price_cents: priceCents,
-      quantity_total: quantity,
-      min_per_order: Number(values.minPerOrder),
-      max_per_order: Number(values.maxPerOrder),
-      is_hidden: values.isHidden,
-      // A seated tier prices one section; a general-admission one prices none.
-      section_id: values.sectionId || null,
-      sort_order: existing?.sort_order ?? ticketTypes.length,
-    };
-
-    const supabase = createClient();
-    const { error } = existing
-      ? await supabase.from("ticket_types").update(payload).eq("id", existing.id)
-      : await supabase.from("ticket_types").insert(payload);
-
-    if (error) throw new Error(error.message);
 
     toast.success(existing ? "Ticket type saved" : "Ticket type added");
     setEditing(null);
-    router.refresh();
+  });
+
+  const removeAction = useAction(deleteTicketType, {
+    onSuccess: () => toast.success("Ticket type deleted"),
+    onError: ({ error }) => toast.error("Could not delete", { description: error.serverError }),
   });
 
   async function remove(tier: TicketType) {
@@ -125,14 +110,7 @@ export function TicketTypeEditor({
       });
       return;
     }
-
-    const { error } = await createClient().from("ticket_types").delete().eq("id", tier.id);
-    if (error) {
-      toast.error("Could not delete", { description: error.message });
-      return;
-    }
-    toast.success("Ticket type deleted");
-    router.refresh();
+    await removeAction.executeAsync({ id: tier.id, eventId, organizerSlug });
   }
 
   return (

@@ -7,6 +7,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowUp, Globe, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { updateProfile } from "@/features/account/actions";
 import { createClient } from "@/lib/supabase/client";
 import { useAsyncAction } from "@/hooks";
 import { profileSchema, type ProfileData, type ProfileValues } from "@/lib/validation";
@@ -76,26 +77,13 @@ export function SettingsForm({ profile }: { profile: Profile }) {
   const avatarUrl = useWatch({ control: form.control, name: "avatarUrl" });
 
   const save = useAsyncAction(async (values: ProfileData) => {
-    const combinedName = `${firstName} ${lastName}`.trim() || values.fullName || null;
+    const result = await updateProfile({
+      ...values,
+      fullName: `${firstName} ${lastName}`.trim() || values.fullName || "",
+    });
 
-    const { error } = await createClient()
-      .from("profiles")
-      .update({
-        full_name: combinedName,
-        phone: values.phone || null,
-        bio: values.bio || null,
-        avatar_url: values.avatarUrl || null,
-        website: values.website || null,
-        instagram: values.instagram || null,
-        twitter: values.twitter || null,
-        youtube: values.youtube || null,
-        linkedin: values.linkedin || null,
-      })
-      .eq("id", profile.id);
-
-    if (error) throw new Error(error.message);
+    if (result?.serverError) throw new Error(result.serverError);
     toast.success("Profile saved");
-    router.refresh();
   });
 
   const handleSendPasswordReset = async () => {

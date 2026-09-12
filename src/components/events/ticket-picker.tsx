@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Minus, Plus } from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { createReservation } from "@/features/checkout/actions";
 import { useAsyncAction, useTicketSelection } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
@@ -35,22 +35,21 @@ export function TicketPicker({
       return;
     }
 
-    const { data, error } = await createClient().rpc("create_reservation", {
-      p_event_id: eventId,
-      p_items: selection.lines,
-      p_seat_ids: [],
+    const result = await createReservation({
+      eventId,
+      items: selection.lines,
+      seatIds: [],
     });
 
-    if (error) {
+    if (result?.serverError || !result?.data) {
       // Someone else may have taken the last ticket while this page was open.
-      toast.error("Could not hold those tickets", { description: error.message });
+      toast.error("Could not hold those tickets", { description: result?.serverError });
       selection.clear();
       router.refresh();
       return;
     }
 
-    const reservation = data as { reservation_id: string };
-    router.push(`/checkout/${reservation.reservation_id}`);
+    router.push(`/checkout/${result.data.reservation_id}`);
   });
 
   if (availability.length === 0) {

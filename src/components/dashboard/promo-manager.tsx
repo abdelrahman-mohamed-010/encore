@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Search } from "lucide-react";
@@ -30,7 +30,6 @@ export function PromoShell({
   events: { id: string; title: string }[];
   children: React.ReactNode;
 }) {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const [open, setOpen] = React.useState(searchParams.get("new") === "1");
   const { value: query, onChange: setQuery } = useDebouncedSearchParam("q");

@@ -8,6 +8,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowUp, CreditCard } from "lucide-react";
 import { toast } from "sonner";
+import { updateOrganizer } from "@/features/organizers/actions";
 import { createClient } from "@/lib/supabase/client";
 import { useAsyncAction } from "@/hooks";
 import { organizerSchema, type OrganizerData, type OrganizerValues } from "@/lib/validation";
@@ -35,20 +36,10 @@ export function OrganizerSettingsForm({ organizer }: { organizer: Organizer }) {
   const logoUrl = useWatch({ control: form.control, name: "logoUrl" });
 
   const save = useAsyncAction(async (values: OrganizerData) => {
-    const { error } = await createClient()
-      .from("organizers")
-      .update({
-        name: values.name,
-        description: values.description || null,
-        logo_url: values.logoUrl || null,
-        website: values.website || null,
-        support_email: values.supportEmail || null,
-      })
-      .eq("id", organizer.id);
+    const result = await updateOrganizer({ ...values, organizerSlug: organizer.slug });
+    if (result?.serverError) throw new Error(result.serverError);
 
-    if (error) throw new Error(error.message);
     toast.success("Organization settings saved");
-    router.refresh();
   });
 
   return (

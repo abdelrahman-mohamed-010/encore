@@ -21,9 +21,10 @@ export default async function TeamPage({
   const canManageOwners = role === "owner";
 
   return (
-    <TeamShell organizerId={organizer.id} viewerRole={role}>
+    <TeamShell organizerSlug={organizer.slug} viewerRole={role}>
       <TeamRows
         organizerId={organizer.id}
+        organizerSlug={organizer.slug}
         canManageOwners={canManageOwners}
         query={q}
         roleFilter={roleFilter}

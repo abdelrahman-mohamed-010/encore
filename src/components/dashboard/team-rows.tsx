@@ -19,6 +19,7 @@ export const TEAM_COLUMN_COUNT = 4;
 
 export async function TeamRows({
   organizerId,
+  organizerSlug,
   canManageOwners,
   query,
   roleFilter,
@@ -26,6 +27,7 @@ export async function TeamRows({
   pageSize,
 }: {
   organizerId: string;
+  organizerSlug: string;
   canManageOwners: boolean;
   query?: string;
   roleFilter?: string;
@@ -111,7 +113,7 @@ export async function TeamRows({
 
             <td className="px-5 py-3.5">
               <TeamRoleSelect
-                organizerId={organizerId}
+                organizerSlug={organizerSlug}
                 userId={member.userId}
                 email={member.email}
                 role={member.role}
@@ -121,7 +123,7 @@ export async function TeamRows({
 
             <td className="px-5 py-3.5 text-right">
               {!(member.role === "owner" && !canManageOwners) && (
-                <TeamRemoveButton organizerId={organizerId} userId={member.userId} email={member.email} />
+                <TeamRemoveButton organizerSlug={organizerSlug} userId={member.userId} email={member.email} />
               )}
             </td>
           </tr>

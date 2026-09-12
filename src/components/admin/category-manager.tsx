@@ -1,19 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
-import { useAsyncAction } from "@/hooks";
+import { useAction } from "next-safe-action/hooks";
 import {
-  categorySchema,
-  slugify,
-  type CategoryData,
-  type CategoryValues,
-} from "@/lib/validation";
+  createCategory,
+  deleteCategory,
+  setCategoryActive,
+} from "@/features/admin/actions";
+import { useAsyncAction } from "@/hooks";
+import { categorySchema, type CategoryData, type CategoryValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Card } from "@/components/ui/surface";
@@ -23,60 +21,27 @@ import { Form, FormError, FormField } from "@/components/ui/form";
 import type { Category } from "@/lib/types";
 
 export function CategoryManager({ categories }: { categories: Category[] }) {
-  const router = useRouter();
-  const [, startTransition] = useTransition();
-
   const form = useForm<CategoryValues, unknown, CategoryData>({
     resolver: zodResolver(categorySchema),
     defaultValues: { name: "", color: "#2a78d6" },
   });
 
-  const add = useAsyncAction(async (values: CategoryData) => {
-    const { error } = await createClient().from("categories").insert({
-      name: values.name,
-      slug: slugify(values.name),
-      color: values.color,
-      sort_order: categories.length + 1,
-    });
+  const toggle = useAction(setCategoryActive, {
+    onError: ({ error }) => toast.error("Could not update", { description: error.serverError }),
+  });
 
-    if (error) {
-      throw new Error(
-        error.code === "23505" ? "That category already exists." : error.message,
-      );
-    }
+  const remove = useAction(deleteCategory, {
+    onSuccess: () => toast.success("Category deleted"),
+    onError: ({ error }) => toast.error("Could not delete", { description: error.serverError }),
+  });
+
+  const add = useAsyncAction(async (values: CategoryData) => {
+    const result = await createCategory({ ...values, sortOrder: categories.length + 1 });
+    if (result?.serverError) throw new Error(result.serverError);
 
     toast.success("Category added");
     form.reset({ name: "", color: values.color });
-    router.refresh();
   });
-
-  function toggle(category: Category) {
-    startTransition(async () => {
-      const supabase = createClient();
-      const { error } = await supabase
-        .from("categories")
-        .update({ is_active: !category.is_active })
-        .eq("id", category.id);
-      if (error) {
-        toast.error("Could not update", { description: error.message });
-        return;
-      }
-      router.refresh();
-    });
-  }
-
-  async function remove(category: Category) {
-    const supabase = createClient();
-    const { error } = await supabase.from("categories").delete().eq("id", category.id);
-    if (error) {
-      toast.error("Could not delete", {
-        description: "Events may still reference this category. Deactivate it instead.",
-      });
-      return;
-    }
-    toast.success("Category deleted");
-    router.refresh();
-  }
 
   return (
     <div className="space-y-5">
@@ -97,7 +62,7 @@ export function CategoryManager({ categories }: { categories: Category[] }) {
             </div>
             <Switch
               checked={category.is_active}
-              onCheckedChange={() => toggle(category)}
+              onCheckedChange={(next) => toggle.execute({ id: category.id, isActive: next })}
               label={`Toggle ${category.name}`}
             />
             <ConfirmDialog
@@ -109,7 +74,9 @@ export function CategoryManager({ categories }: { categories: Category[] }) {
               title={`Delete ${category.name}?`}
               description="This can't be undone. If events still reference this category the delete will fail — deactivate it instead."
               confirmLabel="Delete category"
-              onConfirm={() => remove(category)}
+              onConfirm={async () => {
+                await remove.executeAsync({ id: category.id });
+              }}
             />
           </div>
         ))}

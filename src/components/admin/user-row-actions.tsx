@@ -1,21 +1,23 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { useAction } from "next-safe-action/hooks";
+import { updateUser } from "@/features/admin/actions";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { SelectField } from "@/components/ui/select";
 import type { UserRole } from "@/lib/types";
 
-function update(id: string, patch: { role?: UserRole; is_banned?: boolean }) {
-  return createClient().from("profiles").update(patch).eq("id", id);
+function useUpdateUser(successMessage: (input: { isBanned?: boolean }) => string) {
+  return useAction(updateUser, {
+    onSuccess: ({ input }) => toast.success(successMessage(input)),
+    onError: ({ error }) =>
+      toast.error("Could not update the user", { description: error.serverError }),
+  });
 }
 
 export function RoleSelect({ id, email, role }: { id: string; email: string; role: UserRole }) {
-  const router = useRouter();
-  const [, startTransition] = useTransition();
+  const update = useUpdateUser(() => "Role updated");
 
   return (
     <SelectField
@@ -23,17 +25,7 @@ export function RoleSelect({ id, email, role }: { id: string; email: string; rol
       aria-label={`Role for ${email}`}
       size="sm"
       className="w-32"
-      onChange={(value) =>
-        startTransition(async () => {
-          const { error } = await update(id, { role: value as UserRole });
-          if (error) {
-            toast.error("Could not update the user", { description: error.message });
-            return;
-          }
-          toast.success("Role updated");
-          router.refresh();
-        })
-      }
+      onChange={(value) => update.execute({ id, role: value as "attendee" | "organizer" | "admin" })}
       options={[
         { value: "attendee", label: "Attendee" },
         { value: "organizer", label: "Organizer" },
@@ -44,23 +36,12 @@ export function RoleSelect({ id, email, role }: { id: string; email: string; rol
 }
 
 export function BanToggleButton({ id, isBanned }: { id: string; isBanned: boolean }) {
-  const router = useRouter();
-  const [, startTransition] = useTransition();
-
-  async function toggle() {
-    const { error } = await update(id, { is_banned: !isBanned });
-    if (error) {
-      toast.error("Could not update the user", { description: error.message });
-      return;
-    }
-    toast.success(isBanned ? "User unbanned" : "User banned");
-    router.refresh();
-  }
+  const update = useUpdateUser((input) => (input.isBanned ? "User banned" : "User unbanned"));
 
   // Unbanning is restorative, not destructive — only banning needs a gate.
   if (isBanned) {
     return (
-      <Button variant="ghost" size="xs" onClick={() => startTransition(toggle)}>
+      <Button variant="ghost" size="xs" onClick={() => update.execute({ id, isBanned: false })}>
         Unban
       </Button>
     );
@@ -76,7 +57,9 @@ export function BanToggleButton({ id, isBanned }: { id: string; isBanned: boolea
       title="Ban this user?"
       description="They immediately lose the ability to sign in and use the app."
       confirmLabel="Ban user"
-      onConfirm={toggle}
+      onConfirm={async () => {
+        await update.executeAsync({ id, isBanned: true });
+      }}
     />
   );
 }

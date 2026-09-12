@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Armchair } from "lucide-react";
 import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
-import { createClient } from "@/lib/supabase/client";
+import { loadEventSeatMap, type PreviewSeat } from "@/features/events/loaders";
 import {
   Dialog,
   DialogBody,
@@ -17,24 +17,22 @@ import { Button } from "@/components/ui/button";
 import { buildSeatPlan, SEAT_SIZE, type PlanSeat } from "@/lib/seat-plan";
 import { cn } from "@/lib/utils";
 
-type SeatRow = {
-  id: string;
-  status: string;
-  seat: {
-    row_label: string;
-    seat_number: string;
-    pos_x: number;
-    pos_y: number;
-    section: { id: string; name: string; color: string } | null;
-  } | null;
-};
+type SeatRow = PreviewSeat;
 
 /**
  * A read-only preview of the venue's seat layout for organizers — no
  * selection or booking, just "how does this look to buyers". Replaces
  * navigating to the public event page in a new tab.
  */
-export function SeatMapPreviewButton({ eventId, venueName }: { eventId: string; venueName: string }) {
+export function SeatMapPreviewButton({
+  eventId,
+  organizerSlug,
+  venueName,
+}: {
+  eventId: string;
+  organizerSlug: string;
+  venueName: string;
+}) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [seats, setSeats] = useState<SeatRow[] | null>(null);
@@ -43,16 +41,8 @@ export function SeatMapPreviewButton({ eventId, venueName }: { eventId: string; 
     setOpen(next);
     if (next && !seats) {
       setLoading(true);
-      const supabase = createClient();
-      const { data } = await supabase
-        .from("event_seats")
-        .select(
-          `id, status,
-           seat:venue_seats(row_label, seat_number, pos_x, pos_y,
-             section:venue_sections(id, name, color))`,
-        )
-        .eq("event_id", eventId);
-      setSeats((data ?? []) as unknown as SeatRow[]);
+      const result = await loadEventSeatMap({ eventId, organizerSlug });
+      setSeats(result?.data?.seats ?? []);
       setLoading(false);
     }
   }

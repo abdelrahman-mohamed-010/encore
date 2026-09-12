@@ -1,29 +1,17 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { useAction } from "next-safe-action/hooks";
+import { disconnectStripe } from "@/features/organizers/actions";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 
-export function DisconnectStripeButton({ organizerId }: { organizerId: string }) {
-  const router = useRouter();
-
-  async function disconnect() {
-    const supabase = createClient();
-    const { error } = await supabase
-      .from("payment_accounts")
-      .delete()
-      .eq("organizer_id", organizerId);
-
-    if (error) {
-      toast.error("Could not disconnect", { description: error.message });
-      return;
-    }
-
-    toast.success("Stripe disconnected");
-    router.refresh();
-  }
+export function DisconnectStripeButton({ organizerSlug }: { organizerSlug: string }) {
+  const disconnect = useAction(disconnectStripe, {
+    onSuccess: () => toast.success("Stripe disconnected"),
+    onError: ({ error }) =>
+      toast.error("Could not disconnect", { description: error.serverError }),
+  });
 
   return (
     <ConfirmDialog
@@ -41,7 +29,9 @@ export function DisconnectStripeButton({ organizerId }: { organizerId: string })
         </>
       }
       confirmLabel="Disconnect"
-      onConfirm={disconnect}
+      onConfirm={async () => {
+        await disconnect.executeAsync({ organizerSlug });
+      }}
     />
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { loadEventFormOptions } from "@/features/events/loaders";
 import {
   Drawer,
   DrawerContent,
@@ -42,17 +42,11 @@ export function EventFormDrawer({
     setOpen(next);
     if (next && !data) {
       setLoading(true);
-      const supabase = createClient();
-      const [{ data: categories }, { data: venues }] = await Promise.all([
-        supabase.from("categories").select("id, name").eq("is_active", true).order("sort_order"),
-        supabase
-          .from("venues")
-          .select("id, name, city, seating_type")
-          .or(`organizer_id.eq.${organizerId},organizer_id.is.null`)
-          .eq("is_active", true)
-          .order("name"),
-      ]);
-      setData({ categories: categories ?? [], venues: venues ?? [] });
+      const result = await loadEventFormOptions({ organizerSlug });
+      setData({
+        categories: result?.data?.categories ?? [],
+        venues: result?.data?.venues ?? [],
+      });
       setLoading(false);
     }
   }

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { saveEvent } from "@/features/events/actions";
 import { useAsyncAction } from "@/hooks";
 import { eventSchema, type EventData, type EventValues } from "@/lib/validation/event";
 import { Button } from "@/components/ui/button";
@@ -75,36 +75,21 @@ export function EventForm({
 
   // `values` arrives already parsed and transformed by the schema, so there is
   // no second validation pass and no hand-rolled coercion here.
-  const save = useAsyncAction(async (parsed: EventData) => {
-    const supabase = createClient();
-
-    const payload = {
-      organizer_id: organizerId,
-      title: parsed.title,
-      subtitle: parsed.subtitle || null,
-      description: parsed.description || null,
-      category_id: parsed.categoryId || null,
-      venue_id: parsed.isOnline ? null : parsed.venueId || null,
-      is_online: parsed.isOnline,
-      online_url: parsed.isOnline ? parsed.onlineUrl : null,
-      starts_at: new Date(parsed.startsAt).toISOString(),
-      ends_at: new Date(parsed.endsAt).toISOString(),
-      cover_image_url: parsed.coverImageUrl || null,
-      tags: parsed.tags,
-      refund_policy: parsed.refundPolicy || null,
-      min_age: parsed.minAge ? Number(parsed.minAge) : null,
+  // The action re-parses the raw form values, so the server never trusts a
+  // transform the browser claims to have run.
+  const save = useAsyncAction(async () => {
+    const result = await saveEvent({
+      ...form.getValues(),
+      organizerSlug,
+      eventId: editing ? event!.id : undefined,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-    };
+    });
 
-    const { data, error } = editing
-      ? await supabase.from("events").update(payload).eq("id", event!.id).select("id").single()
-      : await supabase.from("events").insert(payload).select("id").single();
-
-    if (error) throw new Error(error.message);
+    if (result?.serverError) throw new Error(result.serverError);
+    if (!result?.data) throw new Error("Check the form and try again.");
 
     toast.success(editing ? "Event saved" : "Event created");
-    router.push(`/dashboard/${organizerSlug}/events/${data.id}`);
-    router.refresh();
+    router.push(`/dashboard/${organizerSlug}/events/${result.data.eventId}`);
   });
 
   const basicsFields = (

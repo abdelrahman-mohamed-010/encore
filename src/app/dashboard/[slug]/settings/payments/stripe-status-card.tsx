@@ -12,10 +12,12 @@ type PaymentAccount = Tables["payment_accounts"]["Row"];
 export async function StripeStatusCard({
   accountPromise,
   organizerId,
+  organizerSlug,
   connectConfigured,
 }: {
   accountPromise: PromiseLike<PaymentAccount | null>;
   organizerId: string;
+  organizerSlug: string;
   connectConfigured: boolean;
 }) {
   const account = await accountPromise;
@@ -78,7 +80,7 @@ export async function StripeStatusCard({
                 Open Stripe <ExternalLink />
               </a>
             </Button>
-            <DisconnectStripeButton organizerId={organizerId} />
+            <DisconnectStripeButton organizerSlug={organizerSlug} />
           </CardBody>
         </>
       ) : (

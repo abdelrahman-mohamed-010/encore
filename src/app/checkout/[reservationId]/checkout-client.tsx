@@ -19,7 +19,7 @@ import { Form, FormError, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { SummaryLine } from "@/components/ui/misc";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { expireReservations } from "@/features/checkout/actions";
 
 type Line = {
   id: string;
@@ -74,7 +74,7 @@ export function CheckoutClient({
     // instant the buyer lands on the event rather than a sweep later. Failing
     // to is not worth blocking the redirect: the sweep will catch it.
     try {
-      await createClient().rpc("expire_reservations", { p_event_id: event.id });
+      await expireReservations({ eventId: event.id });
     } catch {
       // ignored on purpose
     }

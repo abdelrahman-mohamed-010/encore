@@ -59,6 +59,7 @@ export default async function PaymentsSettingsPage({
         <StripeStatusCard
           accountPromise={accountPromise}
           organizerId={organizer.id}
+          organizerSlug={organizer.slug}
           connectConfigured={connectConfigured}
         />
       </Suspense>

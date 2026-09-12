@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Heart } from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { setEventFavorited } from "@/features/account/actions";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -32,17 +32,10 @@ export function FavoriteButton({
     setFavorited(next);
 
     startTransition(async () => {
-      const supabase = createClient();
-      const { data: auth } = await supabase.auth.getUser();
-      if (!auth.user) return;
-
-      const { error } = next
-        ? await supabase.from("favorites").insert({ event_id: eventId, user_id: auth.user.id })
-        : await supabase.from("favorites").delete().eq("event_id", eventId).eq("user_id", auth.user.id);
-
-      if (error) {
+      const result = await setEventFavorited({ eventId, favorited: next });
+      if (result?.serverError) {
         setFavorited(!next);
-        toast.error("Could not update saved events", { description: error.message });
+        toast.error("Could not update saved events", { description: result.serverError });
       }
     });
   }

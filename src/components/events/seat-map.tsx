@@ -10,7 +10,7 @@ import {
   type ReactZoomPanPinchContentRef,
 } from "react-zoom-pan-pinch";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { createReservation } from "@/features/checkout/actions";
 import { useAsyncAction, useSeatSelection, useTicketSelection } from "@/hooks";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
@@ -153,23 +153,22 @@ export function SeatMap({
       return;
     }
 
-    const { data, error } = await createClient().rpc("create_reservation", {
-      p_event_id: eventId,
-      p_items: extras.lines,
-      p_seat_ids: selection.selected,
+    const result = await createReservation({
+      eventId,
+      items: extras.lines,
+      seatIds: selection.selected,
     });
 
-    if (error) {
+    if (result?.serverError || !result?.data) {
       // Another buyer may have taken one of these seats meanwhile.
-      toast.error("Could not hold those seats", { description: error.message });
+      toast.error("Could not hold those seats", { description: result?.serverError });
       selection.clear();
       extras.clear();
       router.refresh();
       return;
     }
 
-    const reservation = data as { reservation_id: string };
-    router.push(`/checkout/${reservation.reservation_id}`);
+    router.push(`/checkout/${result.data.reservation_id}`);
   });
 
   const showLabels = scale >= LABEL_AT_SCALE;

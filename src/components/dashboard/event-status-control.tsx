@@ -1,10 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { useAction } from "next-safe-action/hooks";
+import { setEventStatus } from "@/features/events/actions";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
@@ -33,30 +33,28 @@ const TRANSITIONS: Partial<Record<EventStatus, { to: EventStatus; label: string;
 
 export function EventStatusControl({
   eventId,
+  organizerSlug,
   status,
 }: {
   eventId: string;
+  organizerSlug: string;
   status: EventStatus;
 }) {
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
   const [confirming, setConfirming] = useState<{ to: EventStatus; label: string } | null>(null);
   const options = TRANSITIONS[status] ?? [];
 
+  const change = useAction(setEventStatus, {
+    onSuccess: ({ input }) =>
+      toast.success(`Event moved to ${input.status.replace("_", " ")}`),
+    onError: ({ error }) =>
+      toast.error("Could not change the status", { description: error.serverError }),
+  });
+
+  const pending = change.isPending;
+
   if (options.length === 0) return null;
 
-  async function move(to: EventStatus) {
-    const supabase = createClient();
-    const { error } = await supabase.from("events").update({ status: to }).eq("id", eventId);
-
-    if (error) {
-      toast.error("Could not change the status", { description: error.message });
-      return;
-    }
-
-    toast.success(`Event moved to ${to.replace("_", " ")}`);
-    router.refresh();
-  }
+  const move = (to: EventStatus) => change.executeAsync({ eventId, organizerSlug, status: to });
 
   return (
     <>
@@ -74,7 +72,7 @@ export function EventStatusControl({
             <DropdownItem
               key={option.to}
               onSelect={() =>
-                option.danger ? setConfirming(option) : startTransition(() => move(option.to))
+                option.danger ? setConfirming(option) : move(option.to)
               }
               className={option.danger ? "text-critical focus:text-critical" : undefined}
             >
