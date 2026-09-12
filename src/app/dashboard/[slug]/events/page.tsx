@@ -21,7 +21,7 @@ export default async function DashboardEventsPage({
 
   return (
     <div className="space-y-6">
-      <DashboardEventsShell slug={slug}>
+      <DashboardEventsShell slug={slug} organizerId={organizer.id}>
         <EventsRows
           organizerId={organizer.id}
           slug={slug}

@@ -5,6 +5,7 @@ import { useTransition } from "react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { SelectField } from "@/components/ui/select";
 import type { UserRole } from "@/lib/types";
 
@@ -46,23 +47,36 @@ export function BanToggleButton({ id, isBanned }: { id: string; isBanned: boolea
   const router = useRouter();
   const [, startTransition] = useTransition();
 
+  async function toggle() {
+    const { error } = await update(id, { is_banned: !isBanned });
+    if (error) {
+      toast.error("Could not update the user", { description: error.message });
+      return;
+    }
+    toast.success(isBanned ? "User unbanned" : "User banned");
+    router.refresh();
+  }
+
+  // Unbanning is restorative, not destructive — only banning needs a gate.
+  if (isBanned) {
+    return (
+      <Button variant="ghost" size="xs" onClick={() => startTransition(toggle)}>
+        Unban
+      </Button>
+    );
+  }
+
   return (
-    <Button
-      variant="ghost"
-      size="xs"
-      onClick={() =>
-        startTransition(async () => {
-          const { error } = await update(id, { is_banned: !isBanned });
-          if (error) {
-            toast.error("Could not update the user", { description: error.message });
-            return;
-          }
-          toast.success(isBanned ? "User unbanned" : "User banned");
-          router.refresh();
-        })
+    <ConfirmDialog
+      trigger={
+        <Button variant="ghost" size="xs">
+          Ban
+        </Button>
       }
-    >
-      {isBanned ? "Unban" : "Ban"}
-    </Button>
+      title="Ban this user?"
+      description="They immediately lose the ability to sign in and use the app."
+      confirmLabel="Ban user"
+      onConfirm={toggle}
+    />
   );
 }

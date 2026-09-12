@@ -13,25 +13,17 @@ import { formatEventStamp } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "My tickets" };
-
-const STATUS_TONE = {
-  valid: "positive",
-  used: "neutral",
-  refunded: "critical",
-  void: "critical",
-} as const;
+const STATUS_TONE = { valid: "positive", used: "neutral", refunded: "critical", void: "critical" } as const;
 
 export default async function TicketsPage() {
   const user = await requireUser();
   const supabase = await createClient();
-
   const { data: tickets } = await supabase
     .from("tickets")
     .select(
       `id, ticket_code, qr_secret, status, seat_label, attendee_name, checked_in_at,
        ticket_type:ticket_types(name),
-       event:events(id, title, slug, starts_at, ends_at, timezone, cover_image_url, is_online,
-         venue:venues(name, city))`,
+       event:events(id, title, slug, starts_at, ends_at, timezone, cover_image_url, is_online, venue:venues(name, city))`,
     )
     .eq("owner_user_id", user.id)
     .order("issued_at", { ascending: false });
@@ -41,7 +33,6 @@ export default async function TicketsPage() {
   const upcoming = rows.filter((t) => t.event && new Date(t.event.ends_at) >= now);
   const past = rows.filter((t) => t.event && new Date(t.event.ends_at) < now);
 
-  // QR codes are generated on the server so the secret is never held in client state.
   const qrCodes = new Map<string, string>();
   await Promise.all(
     upcoming
@@ -78,7 +69,6 @@ export default async function TicketsPage() {
           </div>
         </section>
       )}
-
       {past.length > 0 && (
         <section>
           <h2 className="mb-4 text-md font-semibold text-ink">Past</h2>
@@ -93,7 +83,6 @@ export default async function TicketsPage() {
   );
 }
 
-/** Shape of the ticket rows this page selects. */
 type TicketRow = {
   id: string;
   ticket_code: string;
@@ -115,92 +104,60 @@ type TicketRow = {
   } | null;
 };
 
-function TicketCard({
-  ticket,
-  qr,
-  past = false,
-}: {
-  ticket: TicketRow;
-  qr?: string;
-  past?: boolean;
-}) {
+function TicketCard({ ticket, qr, past = false }: { ticket: TicketRow; qr?: string; past?: boolean }) {
   const event = ticket.event;
   if (!event) return null;
 
+  const meta = [ticket.ticket_type?.name ?? "General", ticket.seat_label && `Seat ${ticket.seat_label}`]
+    .filter(Boolean)
+    .join(" · ");
+
   return (
     <article
-      className={cn(
-        "group overflow-hidden rounded-2xl bg-card",
-        past && "opacity-60",
-      )}
+      className={cn("overflow-hidden rounded-2xl bg-card", past && "opacity-60")}
     >
-      <div className="flex gap-4 p-4 sm:p-5">
-        {/* Event thumbnail */}
-        <div className="relative size-16 shrink-0 overflow-hidden rounded-xl bg-sunken sm:size-20">
+      <div className="flex items-center gap-4 p-4 sm:gap-5 sm:p-5">
+        <div className="min-w-0 flex-1">
+          <p className="flex items-center gap-1.5 text-sm font-semibold text-amber">
+            <CalendarDays className="size-3.5 shrink-0" />
+            {formatEventStamp(event.starts_at, event.timezone ?? undefined)}
+          </p>
+          <Link href={`/events/${event.slug}`}>
+            <h3 className="mt-1.5 truncate text-lg font-bold text-ink transition-colors hover:text-ink-2">
+              {event.title}
+            </h3>
+          </Link>
+          <p className="mt-1.5 flex items-center gap-1.5 text-sm text-ink-2">
+            <MapPin className="size-3.5 shrink-0 text-ink-3" />
+            <span className="truncate">
+              {event.is_online
+                ? "Online event"
+                : [event.venue?.name, event.venue?.city].filter(Boolean).join(" · ") || "Venue TBA"}
+            </span>
+          </p>
+          <div className="mt-3 flex flex-wrap items-center gap-2">
+            <Badge tone={STATUS_TONE[ticket.status]} size="xs">
+              {ticket.status === "used" ? "Checked in" : ticket.status}
+            </Badge>
+            <span className="text-xs font-medium text-ink-3">{meta}</span>
+          </div>
+        </div>
+
+        <div className="relative size-20 shrink-0 overflow-hidden rounded-lg bg-sunken sm:size-24">
           {event.cover_image_url ? (
-            <Image
-              src={event.cover_image_url}
-              alt=""
-              fill
-              sizes="80px"
-              className="object-cover"
-            />
+            <Image src={event.cover_image_url} alt="" fill sizes="96px" className="object-cover" />
           ) : (
             <div className="flex size-full items-center justify-center bg-gradient-to-br from-sunken to-sunken-2 text-ink-3">
               <TicketIcon className="size-6 opacity-40" />
             </div>
           )}
         </div>
-
-        {/* Event + ticket info */}
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between gap-3">
-            <Link href={`/events/${event.slug}`} className="min-w-0">
-              <h3 className="truncate font-flourish text-lg leading-tight text-ink transition-colors group-hover:text-ink-2">
-                {event.title}
-              </h3>
-            </Link>
-            <Badge tone={STATUS_TONE[ticket.status]} size="xs" className="shrink-0">
-              {ticket.status === "used" ? "Checked in" : ticket.status}
-            </Badge>
-          </div>
-
-          <div className="mt-2 flex flex-col gap-1 text-sm text-ink-2">
-            <p className="flex items-center gap-1.5">
-              <CalendarDays className="size-3.5 shrink-0 text-ink-3" />
-              {formatEventStamp(event.starts_at, event.timezone ?? undefined)}
-            </p>
-            <p className="flex items-center gap-1.5">
-              <MapPin className="size-3.5 shrink-0 text-ink-3" />
-              <span className="truncate">
-                {event.is_online
-                  ? "Online event"
-                  : [event.venue?.name, event.venue?.city].filter(Boolean).join(" · ") || "Venue TBA"}
-              </span>
-            </p>
-          </div>
-        </div>
       </div>
 
-      {/* Perforation line */}
       <div className="perforation h-px w-full" />
 
-      {/* Bottom row: ticket metadata + QR trigger */}
       <div className="flex items-center justify-between gap-4 px-4 py-3 sm:px-5">
-        <div className="flex min-w-0 flex-wrap items-center gap-2">
-          <Badge tone="neutral" size="xs">
-            {ticket.ticket_type?.name ?? "General"}
-          </Badge>
-          {ticket.seat_label && (
-            <Badge tone="neutral" size="xs">
-              Seat {ticket.seat_label}
-            </Badge>
-          )}
-          <span className="font-mono text-2xs font-medium tracking-wide text-ink-3">
-            {ticket.ticket_code}
-          </span>
-        </div>
-
+        <span className="font-mono text-xs font-medium tracking-wide text-ink-3">{ticket.ticket_code}</span>
         <div className="shrink-0">
           {qr && ticket.status === "valid" ? (
             <TicketQrModal
@@ -211,12 +168,12 @@ function TicketCard({
               seatLabel={ticket.seat_label}
             />
           ) : past ? (
-            <span className="flex items-center gap-1 text-2xs text-ink-3">
+            <span className="flex items-center gap-1 text-xs text-ink-3">
               <Clock className="size-3" />
               Event ended
             </span>
           ) : (
-            <span className="text-2xs text-ink-3">
+            <span className="text-xs text-ink-3">
               {ticket.status === "used" ? "Checked in" : "Not scannable"}
             </span>
           )}

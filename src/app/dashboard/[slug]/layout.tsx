@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Plus } from "lucide-react";
 import { requireOrganizer, getMyOrganizers, getProfile } from "@/lib/auth";
 import { SessionProvider } from "@/contexts";
@@ -6,6 +5,7 @@ import { SiteHeader } from "@/components/layout/site-header";
 import { ReportDownload } from "@/components/dashboard/report-download";
 import { OrganizerSwitcher } from "@/components/dashboard/organizer-switcher";
 import { DashboardTabs } from "@/components/dashboard/dashboard-nav";
+import { EventFormDrawer } from "@/components/dashboard/event-form-drawer";
 import { Avatar } from "@/components/ui/misc";
 import { Button } from "@/components/ui/button";
 
@@ -51,11 +51,15 @@ export default async function DashboardLayout({
                     would only ever get an error from this. */}
                 {canCreate && <ReportDownload slug={organizer.slug} />}
                 {canCreate && (
-                  <Button asChild variant="solid" size="md">
-                    <Link href={`/dashboard/${organizer.slug}/events/new`}>
-                      <Plus /> New event
-                    </Link>
-                  </Button>
+                  <EventFormDrawer
+                    organizerId={organizer.id}
+                    organizerSlug={organizer.slug}
+                    trigger={
+                      <Button variant="solid" size="md">
+                        <Plus /> New event
+                      </Button>
+                    }
+                  />
                 )}
               </div>
             </div>

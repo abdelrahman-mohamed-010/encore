@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { SelectField } from "@/components/ui/select";
 import type { OrgMemberRole } from "@/lib/types";
 
@@ -66,32 +67,34 @@ export function TeamRemoveButton({
   email: string;
 }) {
   const router = useRouter();
-  const [, startTransition] = useTransition();
+
+  async function remove() {
+    const supabase = createClient();
+    const { error } = await supabase
+      .from("organizer_members")
+      .delete()
+      .eq("organizer_id", organizerId)
+      .eq("user_id", userId);
+
+    if (error) {
+      toast.error("Could not remove them", { description: error.message });
+      return;
+    }
+    toast.success("Removed from the team");
+    router.refresh();
+  }
 
   return (
-    <Button
-      variant="ghost"
-      size="icon-sm"
-      aria-label={`Remove ${email}`}
-      onClick={() =>
-        startTransition(async () => {
-          const supabase = createClient();
-          const { error } = await supabase
-            .from("organizer_members")
-            .delete()
-            .eq("organizer_id", organizerId)
-            .eq("user_id", userId);
-
-          if (error) {
-            toast.error("Could not remove them", { description: error.message });
-            return;
-          }
-          toast.success("Removed from the team");
-          router.refresh();
-        })
+    <ConfirmDialog
+      trigger={
+        <Button variant="ghost" size="icon-sm" aria-label={`Remove ${email}`}>
+          <Trash2 className="size-4 text-ink-3 hover:text-critical" />
+        </Button>
       }
-    >
-      <Trash2 className="size-4 text-ink-3 hover:text-critical" />
-    </Button>
+      title={`Remove ${email}?`}
+      description="They'll lose access to this organizer's dashboard immediately."
+      confirmLabel="Remove"
+      onConfirm={remove}
+    />
   );
 }

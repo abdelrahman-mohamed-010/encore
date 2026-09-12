@@ -126,7 +126,7 @@ export default async function DashboardOverview({
             </div>
           }
         >
-          <RecentEventsSection eventsPromise={eventsPromise} slug={slug} />
+          <RecentEventsSection eventsPromise={eventsPromise} slug={slug} organizerId={organizer.id} />
         </Suspense>
       </SectionBlock>
     </div>

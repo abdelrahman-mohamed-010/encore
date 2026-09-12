@@ -326,6 +326,7 @@
 
   .animate-rise { animation: rise 0.4s var(--ease-out-quint) both; }
   .animate-fade { animation: fade 0.25s var(--ease-out-quint) both; }
+  .animate-slide-in-right { animation: slide-in-right 0.35s var(--ease-out-quint) both; }
 
   /* One class for every floating panel, so a menu, a calendar and a search
      list read as the same physical object. */
@@ -348,17 +349,18 @@
     cursor: pointer; user-select: none; outline: none;
     transition: background-color 0.1s linear;
   }
+
   .pop-item[data-highlighted],
-  .pop-item[data-selected="true"]:not([data-disabled]),
-  .pop-item:hover:not([data-disabled]) { background-color: var(--color-btn); }
-  .pop-item[data-disabled] { opacity: 0.45; cursor: not-allowed; }
+  .pop-item[data-selected="true"]:not([data-disabled]:not([data-disabled="false"])),
+  .pop-item:hover:not([data-disabled]:not([data-disabled="false"])) { background-color: var(--color-btn); }
+  .pop-item[data-disabled]:not([data-disabled="false"]) { opacity: 0.45; cursor: not-allowed; }
 
   /* A destructive row tints its own hover, so the colour is a property of the
      action rather than something each call site remembers to add. */
   .pop-item-danger { color: var(--color-critical); }
   .pop-item-danger svg { color: var(--color-critical); }
   .pop-item-danger[data-highlighted],
-  .pop-item-danger:hover:not([data-disabled]) { background-color: var(--color-critical-bg); }
+  .pop-item-danger:hover:not([data-disabled]:not([data-disabled="false"])) { background-color: var(--color-critical-bg); }
 
   /* A two-line row: the item grows to fit rather than clipping the sub-label. */
   .pop-item-sub { height: auto; min-height: 2.75rem; padding-block: 0.5rem; }
@@ -461,6 +463,7 @@
 }
 
 @keyframes rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes slide-in-right { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: none; } }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
 @keyframes toast-timer { from { transform: scaleX(1); } to { transform: scaleX(0); } }

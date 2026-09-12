@@ -11,6 +11,7 @@ import { Meter, StatTile } from "@/components/ui/misc";
 import { TicketTypeEditor } from "@/components/dashboard/ticket-type-editor";
 import { SeatingEditor, type SeatingSection } from "@/components/dashboard/seating-editor";
 import { EventStatusControl } from "@/components/dashboard/event-status-control";
+import { EventFormDrawer } from "@/components/dashboard/event-form-drawer";
 import { formatDateTime, formatMoney, formatNumber } from "@/lib/format";
 import type { EventStats, EventStatus } from "@/lib/types";
 
@@ -76,7 +77,7 @@ export default async function ManageEventPage({
   const currency = ticketTypes?.[0]?.currency ?? "USD";
 
   return (
-    <div className="space-y-6 px-5 py-8 md:px-8">
+    <div className="space-y-6 px-5 md:px-8">
       <Link
         href={`/dashboard/${slug}/events`}
         className="inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
@@ -89,7 +90,7 @@ export default async function ManageEventPage({
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="display-3 text-ink">{event.title}</h1>
-            <Badge tone={STATUS_TONE[event.status]} size="md">
+            <Badge tone={STATUS_TONE[event.status]} size="xs">
               {event.status.replace("_", " ")}
             </Badge>
           </div>
@@ -108,9 +109,12 @@ export default async function ManageEventPage({
             </Button>
           )}
           {canEdit && (
-            <Button asChild variant="outline" size="sm">
-              <Link href={`/dashboard/${slug}/events/${eventId}/edit`}>Edit details</Link>
-            </Button>
+            <EventFormDrawer
+              organizerId={organizer.id}
+              organizerSlug={slug}
+              event={event}
+              trigger={<Button variant="outline" size="sm">Edit details</Button>}
+            />
           )}
           {canEdit && <EventStatusControl eventId={eventId} status={event.status} />}
         </div>
@@ -185,8 +189,6 @@ export default async function ManageEventPage({
       {canEdit && (
         <SeatingEditor
           eventId={eventId}
-          eventSlug={event.slug}
-          eventStatus={event.status}
           seatingType={event.seating_type}
           venue={event.venue ? { id: event.venue.id, name: event.venue.name } : null}
           sections={sections}

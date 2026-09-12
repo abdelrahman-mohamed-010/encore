@@ -4,8 +4,7 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Armchair, ExternalLink, Plus, Trash2 } from "lucide-react";
-import Link from "next/link";
+import { Armchair, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { useAsyncAction } from "@/hooks";
@@ -17,6 +16,7 @@ import { Form, FormError, FormField } from "@/components/ui/form";
 import { AffixInput, Input } from "@/components/ui/input";
 import { ColorPicker } from "@/components/ui/color-picker";
 import { EmptyState } from "@/components/ui/misc";
+import { SeatMapPreviewButton } from "@/components/dashboard/seat-map-preview";
 import { formatMoney, formatNumber } from "@/lib/format";
 import type { SeatingType } from "@/lib/types";
 
@@ -48,8 +48,6 @@ export type SeatingSection = {
  */
 export function SeatingEditor({
   eventId,
-  eventSlug,
-  eventStatus,
   seatingType,
   venue,
   sections,
@@ -57,8 +55,6 @@ export function SeatingEditor({
   soldOrHeld,
 }: {
   eventId: string;
-  eventSlug: string;
-  eventStatus: string;
   seatingType: SeatingType;
   venue: { id: string; name: string } | null;
   /** Sections already on the venue, with how many seats each holds. */
@@ -248,13 +244,7 @@ export function SeatingEditor({
               {formatNumber(venueSeats)} seats at {venue?.name ?? "this venue"}.
             </CardDescription>
           </div>
-          {eventStatus === "published" && (
-            <Button asChild variant="outline" size="sm">
-              <Link href={`/events/${eventSlug}#tickets`} target="_blank">
-                View seat map <ExternalLink />
-              </Link>
-            </Button>
-          )}
+          <SeatMapPreviewButton eventId={eventId} venueName={venue?.name ?? "this venue"} />
         </CardHeader>
         <CardBody>
           <div className="flex flex-wrap gap-x-6 gap-y-3">

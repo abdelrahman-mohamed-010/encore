@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/surface";
 import { StatTile } from "@/components/ui/misc";
 import { PlainCard } from "@/components/dashboard/tiles";
+import { EventFormDrawer } from "@/components/dashboard/event-form-drawer";
 import { RevenueChart, TicketsChart, type SalesPoint } from "@/components/dashboard/sales-chart";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";
 import type { EventStatus, OrganizerStats } from "@/lib/types";
@@ -128,9 +129,11 @@ export type RecentEvent = {
 export async function RecentEventsSection({
   eventsPromise,
   slug,
+  organizerId,
 }: {
   eventsPromise: PromiseLike<RecentEvent[]>;
   slug: string;
+  organizerId: string;
 }) {
   const events = await eventsPromise;
 
@@ -141,11 +144,15 @@ export async function RecentEventsSection({
         tone="violet"
         title="No events yet"
         action={
-          <Button asChild variant="solid" size="sm">
-            <Link href={`/dashboard/${slug}/events/new`}>
-              <Plus /> New event
-            </Link>
-          </Button>
+          <EventFormDrawer
+            organizerId={organizerId}
+            organizerSlug={slug}
+            trigger={
+              <Button variant="solid" size="sm">
+                <Plus /> New event
+              </Button>
+            }
+          />
         }
       >
         Create your first event and start selling.

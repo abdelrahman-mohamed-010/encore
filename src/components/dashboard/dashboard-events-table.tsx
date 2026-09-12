@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select";
 import { TableRowsSkeleton } from "@/components/ui/table";
 import { useDebouncedSearchParam } from "@/hooks";
+import { EventFormDrawer } from "@/components/dashboard/event-form-drawer";
 
 // Matches the column count in dashboard-events-rows.tsx's <thead>/<tbody> —
 // kept as a literal (not a shared import) so this client shell never pulls
@@ -19,9 +19,12 @@ const EVENTS_COLUMN_COUNT = 7;
 /** Static shell: search, status filter, "New event". Server-driven — never a skeleton itself. */
 export function DashboardEventsShell({
   slug,
+  organizerId,
   children,
 }: {
   slug: string;
+  /** Omitted only by the route's loading.tsx, which has no data fetch of its own yet. */
+  organizerId?: string;
   children: React.ReactNode;
 }) {
   const router = useRouter();
@@ -70,11 +73,21 @@ export function DashboardEventsShell({
           />
         </div>
 
-        <Button asChild variant="solid" size="md">
-          <Link href={`/dashboard/${slug}/events/new`}>
+        {organizerId ? (
+          <EventFormDrawer
+            organizerId={organizerId}
+            organizerSlug={slug}
+            trigger={
+              <Button variant="solid" size="md">
+                <Plus /> New event
+              </Button>
+            }
+          />
+        ) : (
+          <Button variant="solid" size="md" disabled>
             <Plus /> New event
-          </Link>
-        </Button>
+          </Button>
+        )}
       </div>
 
       <Card className="overflow-x-auto">

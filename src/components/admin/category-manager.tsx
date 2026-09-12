@@ -15,6 +15,7 @@ import {
   type CategoryValues,
 } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Card } from "@/components/ui/surface";
 import { Input, Switch } from "@/components/ui/input";
 import { ColorPicker } from "@/components/ui/color-picker";
@@ -64,19 +65,17 @@ export function CategoryManager({ categories }: { categories: Category[] }) {
     });
   }
 
-  function remove(category: Category) {
-    startTransition(async () => {
-      const supabase = createClient();
-      const { error } = await supabase.from("categories").delete().eq("id", category.id);
-      if (error) {
-        toast.error("Could not delete", {
-          description: "Events may still reference this category. Deactivate it instead.",
-        });
-        return;
-      }
-      toast.success("Category deleted");
-      router.refresh();
-    });
+  async function remove(category: Category) {
+    const supabase = createClient();
+    const { error } = await supabase.from("categories").delete().eq("id", category.id);
+    if (error) {
+      toast.error("Could not delete", {
+        description: "Events may still reference this category. Deactivate it instead.",
+      });
+      return;
+    }
+    toast.success("Category deleted");
+    router.refresh();
   }
 
   return (
@@ -101,14 +100,17 @@ export function CategoryManager({ categories }: { categories: Category[] }) {
               onCheckedChange={() => toggle(category)}
               label={`Toggle ${category.name}`}
             />
-            <Button
-              variant="ghost"
-              size="icon-sm"
-              aria-label={`Delete ${category.name}`}
-              onClick={() => remove(category)}
-            >
-              <Trash2 />
-            </Button>
+            <ConfirmDialog
+              trigger={
+                <Button variant="ghost" size="icon-sm" aria-label={`Delete ${category.name}`}>
+                  <Trash2 />
+                </Button>
+              }
+              title={`Delete ${category.name}?`}
+              description="This can't be undone. If events still reference this category the delete will fail — deactivate it instead."
+              confirmLabel="Delete category"
+              onConfirm={() => remove(category)}
+            />
           </div>
         ))}
       </Card>

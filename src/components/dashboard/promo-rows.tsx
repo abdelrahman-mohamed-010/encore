@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Plus, Tag } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
 import { EmptyState } from "@/components/ui/misc";

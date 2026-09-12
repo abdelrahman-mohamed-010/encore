@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, useTransition } from "react";
+import { useEffect, useState } from "react";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Pencil, Plus, Trash2 } from "lucide-react";
@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAsyncAction } from "@/hooks";
 import { ticketTypeSchema, type TicketTypeData, type TicketTypeValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/surface";
 import {
   Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
@@ -62,7 +63,6 @@ export function TicketTypeEditor({
   // `editing` holds which tier the dialog is bound to: null = closed,
   // "new" = creating. The field values themselves live in the form.
   const [editing, setEditing] = useState<TicketType | "new" | null>(null);
-  const [, startTransition] = useTransition();
 
   const currency = ticketTypes[0]?.currency ?? "USD";
 
@@ -118,7 +118,7 @@ export function TicketTypeEditor({
     router.refresh();
   });
 
-  function remove(tier: TicketType) {
+  async function remove(tier: TicketType) {
     if (tier.quantity_sold > 0) {
       toast.error("This ticket type has sales and cannot be deleted", {
         description: "Hide it instead so it stops appearing on the event page.",
@@ -126,15 +126,13 @@ export function TicketTypeEditor({
       return;
     }
 
-    startTransition(async () => {
-      const { error } = await createClient().from("ticket_types").delete().eq("id", tier.id);
-      if (error) {
-        toast.error("Could not delete", { description: error.message });
-        return;
-      }
-      toast.success("Ticket type deleted");
-      router.refresh();
-    });
+    const { error } = await createClient().from("ticket_types").delete().eq("id", tier.id);
+    if (error) {
+      toast.error("Could not delete", { description: error.message });
+      return;
+    }
+    toast.success("Ticket type deleted");
+    router.refresh();
   }
 
   return (
@@ -205,14 +203,26 @@ export function TicketTypeEditor({
                     >
                       <Pencil />
                     </Button>
-                    <Button
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label={`Delete ${tier.name}`}
-                      onClick={() => remove(tier)}
-                    >
-                      <Trash2 />
-                    </Button>
+                    <ConfirmDialog
+                      trigger={
+                        <Button variant="ghost" size="icon-sm" aria-label={`Delete ${tier.name}`}>
+                          <Trash2 />
+                        </Button>
+                      }
+                      title={`Delete ${tier.name}?`}
+                      description={
+                        tier.quantity_sold > 0
+                          ? "This type already has sales, so it can't be deleted — hide it instead so it stops appearing on the event page."
+                          : "Buyers will no longer be able to select this ticket type. This can't be undone."
+                      }
+                      confirmLabel={tier.quantity_sold > 0 ? "Hide instead" : "Delete type"}
+                      destructive={tier.quantity_sold === 0}
+                      onConfirm={() =>
+                        tier.quantity_sold > 0
+                          ? Promise.resolve(setEditing(tier))
+                          : remove(tier)
+                      }
+                    />
                   </div>
                 </div>
               );

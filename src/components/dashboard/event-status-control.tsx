@@ -1,11 +1,12 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { ChevronDown } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
+import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import {
   Dropdown, DropdownContent, DropdownItem, DropdownLabel, DropdownTrigger,
 } from "@/components/ui/dropdown";
@@ -39,46 +40,60 @@ export function EventStatusControl({
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
+  const [confirming, setConfirming] = useState<{ to: EventStatus; label: string } | null>(null);
   const options = TRANSITIONS[status] ?? [];
 
   if (options.length === 0) return null;
 
-  function move(to: EventStatus) {
-    startTransition(async () => {
-      const supabase = createClient();
-      const { error } = await supabase.from("events").update({ status: to }).eq("id", eventId);
+  async function move(to: EventStatus) {
+    const supabase = createClient();
+    const { error } = await supabase.from("events").update({ status: to }).eq("id", eventId);
 
-      if (error) {
-        toast.error("Could not change the status", { description: error.message });
-        return;
-      }
+    if (error) {
+      toast.error("Could not change the status", { description: error.message });
+      return;
+    }
 
-      toast.success(`Event moved to ${to.replace("_", " ")}`);
-      router.refresh();
-    });
+    toast.success(`Event moved to ${to.replace("_", " ")}`);
+    router.refresh();
   }
 
   return (
-    <Dropdown>
-      <DropdownTrigger asChild>
-        <Button variant="solid" size="sm" loading={pending}>
-          Change status
-          <ChevronDown />
-        </Button>
-      </DropdownTrigger>
+    <>
+      <Dropdown>
+        <DropdownTrigger asChild>
+          <Button variant="solid" size="sm" loading={pending}>
+            Change status
+            <ChevronDown />
+          </Button>
+        </DropdownTrigger>
 
-      <DropdownContent>
-        <DropdownLabel>Move to</DropdownLabel>
-        {options.map((option) => (
-          <DropdownItem
-            key={option.to}
-            onSelect={() => move(option.to)}
-            className={option.danger ? "text-critical focus:text-critical" : undefined}
-          >
-            {option.label}
-          </DropdownItem>
-        ))}
-      </DropdownContent>
-    </Dropdown>
+        <DropdownContent>
+          <DropdownLabel>Move to</DropdownLabel>
+          {options.map((option) => (
+            <DropdownItem
+              key={option.to}
+              onSelect={() =>
+                option.danger ? setConfirming(option) : startTransition(() => move(option.to))
+              }
+              className={option.danger ? "text-critical focus:text-critical" : undefined}
+            >
+              {option.label}
+            </DropdownItem>
+          ))}
+        </DropdownContent>
+      </Dropdown>
+
+      <ConfirmDialog
+        open={confirming !== null}
+        onOpenChange={(next) => !next && setConfirming(null)}
+        title={confirming?.label ?? ""}
+        description="Sales stop immediately and the event is marked cancelled. This doesn't refund existing orders — do that separately if needed."
+        confirmLabel="Cancel event"
+        onConfirm={async () => {
+          if (confirming) await move(confirming.to);
+        }}
+      />
+    </>
   );
 }

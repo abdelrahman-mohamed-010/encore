@@ -123,7 +123,7 @@ export default async function HostProfilePage({ params }: Params) {
               <li key={organizer.slug}>
                 <Link
                   href={`/organizers/${organizer.slug}`}
-                  className="flex items-center gap-2 rounded-lg bg-card shadow-e1 py-1.5 pl-1.5 pr-3 text-sm font-medium text-ink transition-colors hover:bg-sunken"
+                  className="flex items-center gap-2 rounded-lg bg-card py-1.5 pl-1.5 pr-3 text-sm font-medium text-ink transition-colors hover:bg-sunken"
                 >
                   <Avatar src={organizer.logo_url} name={organizer.name} size="sm" />
                   {organizer.name}
