@@ -3,7 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft, CalendarDays, Download, MapPin, Receipt, Ticket } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getMyOrder } from "@/features/account/queries";
 import { requireUser } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -35,19 +35,7 @@ export default async function OrderDetailPage({
   const { orderId } = await params;
   const { celebrate } = await searchParams;
   const user = await requireUser();
-  const supabase = await createClient();
-
-  const { data: order } = await supabase
-    .from("orders")
-    .select(
-      `*,
-       event:events(title, slug, starts_at, timezone, is_online, cover_image_url, venue:venues(name, city, country)),
-       items:order_items(id, ticket_type_name, seat_label, quantity, unit_price_cents, subtotal_cents),
-       tickets:tickets(id, ticket_code, status, seat_label),
-       refunds:refunds(id, amount_cents, reason, status, created_at)`,
-    )
-    .eq("id", orderId)
-    .maybeSingle();
+  const order = await getMyOrder(orderId);
 
   if (!order || order.user_id !== user.id) notFound();
 

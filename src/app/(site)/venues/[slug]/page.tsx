@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink, MapPin, Users } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getVenueBySlug } from "@/features/catalog/queries";
 import { fetchEventPins } from "@/lib/events-map";
 import { EventMap } from "@/components/map/event-map";
 import { Card, SectionHeader } from "@/components/ui/surface";
@@ -17,21 +17,9 @@ export const revalidate = 300;
 
 type Params = { params: Promise<{ slug: string }> };
 
-async function loadVenue(slug: string) {
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("venues")
-    .select(
-      "id, name, slug, description, address_line1, address_line2, city, state, country, postal_code, latitude, longitude, capacity, image_url, is_active",
-    )
-    .eq("slug", slug)
-    .maybeSingle();
-  return data;
-}
-
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const venue = await loadVenue(slug);
+  const venue = await getVenueBySlug(slug);
   if (!venue) return { title: "Venue" };
 
   const description =
@@ -51,7 +39,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function VenuePage({ params }: Params) {
   const { slug } = await params;
-  const venue = await loadVenue(slug);
+  const venue = await getVenueBySlug(slug);
   if (!venue) notFound();
 
   // Reuses the map query rather than a bespoke one: same filters, same

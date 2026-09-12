@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getHomeData } from "@/features/catalog/queries";
 import { Button } from "@/components/ui/button";
 import { SectionHeader } from "@/components/ui/surface";
 import { EventCard, EventCardSkeleton, EventRow } from "@/components/events/event-card";
@@ -12,7 +12,6 @@ import { ClosingCta } from "@/components/home/closing-cta";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SearchField } from "@/components/layout/search-field";
 import { formatNumber } from "@/lib/format";
-import type { EventSearchResult } from "@/lib/types";
 
 export const revalidate = 60;
 
@@ -26,22 +25,6 @@ export const metadata: Metadata = {
     type: "website",
   },
 };
-
-async function getHomeData() {
-  const supabase = await createClient();
-
-  const [upcoming, categories, counts] = await Promise.all([
-    supabase.rpc("search_events", { p_sort: "soonest", p_limit: 9 }),
-    supabase.from("categories").select("*").eq("is_active", true).order("sort_order"),
-    supabase.rpc("search_events", { p_limit: 1 }),
-  ]);
-
-  return {
-    upcoming: (upcoming.data ?? []) as EventSearchResult[],
-    categories: categories.data ?? [],
-    totalEvents: counts.data?.[0]?.total_count ?? 0,
-  };
-}
 
 export default async function HomePage() {
   const { upcoming, categories, totalEvents } = await getHomeData();

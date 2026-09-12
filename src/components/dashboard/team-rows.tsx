@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { Users, UserPlus } from "lucide-react";
 import { listTeamMembers, type Member } from "@/features/team/queries";
 import { TeamRoleSelect, TeamRemoveButton } from "@/components/dashboard/team-row-actions";
-import type { OrgMemberRole } from "@/lib/types";
 
 export type { Member };
 

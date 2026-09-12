@@ -2,12 +2,12 @@ import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { MapPin } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getEventFilterOptions, searchEvents } from "@/features/catalog/queries";
 import { EventCardSkeleton } from "@/components/events/event-card";
 import { EventFilters } from "@/components/events/event-filters";
 import { CategoryRail } from "@/components/events/category-rail";
 import { Button } from "@/components/ui/button";
-import { single, buildSearchEventsArgs, type EventSearchParams } from "@/lib/event-search-params";
+import { single, type EventSearchParams } from "@/lib/event-search-params";
 import { EventsResults } from "./events-results";
 
 export const metadata: Metadata = {
@@ -23,16 +23,9 @@ export default async function EventsPage({
   searchParams: Promise<EventSearchParams>;
 }) {
   const params = await searchParams;
-  const supabase = await createClient();
   const query = single(params, "q");
-
-  const [{ data: categories }, { data: venues }] = await Promise.all([
-    supabase.from("categories").select("*").eq("is_active", true).order("sort_order"),
-    supabase.from("venues").select("city").eq("is_active", true),
-  ]);
-  const cities = [...new Set((venues ?? []).map((v) => v.city).filter(Boolean))].sort();
-
-  const resultsPromise = supabase.rpc("search_events", buildSearchEventsArgs(params, PAGE_SIZE, 0));
+  const { categories, cities } = await getEventFilterOptions();
+  const resultsPromise = searchEvents(params, PAGE_SIZE, 0);
 
   return (
     <div className="container-page py-10 md:py-12">

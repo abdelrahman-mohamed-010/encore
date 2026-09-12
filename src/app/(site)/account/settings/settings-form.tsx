@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowUp, Globe, Lock } from "lucide-react";
@@ -51,7 +50,6 @@ function LinkedinIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 export function SettingsForm({ profile }: { profile: Profile }) {
-  const router = useRouter();
 
   // Parse first and last names from profile.full_name
   const initialNameParts = (profile.full_name ?? "").trim().split(" ");

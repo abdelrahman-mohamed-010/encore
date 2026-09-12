@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import {
   Clock, MapPin, ShieldCheck, Tag, Ticket, Users, Video,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getEventBySlug, getEventSocialCounts } from "@/features/events/queries";
 import { getUser } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import { Avatar } from "@/components/ui/misc";
@@ -17,69 +17,6 @@ import { SeatMap } from "@/components/events/seat-map";
 import { FavoriteButton } from "@/components/events/favorite-button";
 import { ShareButton } from "@/components/events/share-button";
 import { formatDate, formatTime, pluralize } from "@/lib/format";
-import type { EventSeat, TicketAvailability, VenueSeat, VenueSection } from "@/lib/types";
-
-type SeatWithPlace = EventSeat & {
-  seat: (Pick<VenueSeat, "id" | "row_label" | "seat_number" | "pos_x" | "pos_y"> & {
-    section: Pick<VenueSection, "id" | "name" | "code" | "color"> | null;
-  }) | null;
-};
-
-async function loadEvent(slug: string) {
-  const supabase = await createClient();
-
-  const { data: event } = await supabase
-    .from("events")
-    .select(
-      `*,
-       organizer:organizers(id, name, slug, logo_url, description, verification_status),
-       venue:venues(id, name, slug, address_line1, city, country, timezone, latitude, longitude, image_url),
-       category:categories(id, name, slug, color)`,
-    )
-    .eq("slug", slug)
-    .maybeSingle();
-
-  if (!event) return null;
-
-  // Release any hold whose ten minutes are up before reading the inventory.
-  // A scheduled sweep does this every minute too, but doing it here means the
-  // page a buyer is actually looking at can never show an abandoned checkout's
-  // seats as taken, or count its tickets against what is left.
-  await supabase.rpc("expire_reservations", { p_event_id: event.id });
-
-  const [{ data: availability }, { data: seats }, { data: types }] = await Promise.all([
-    supabase.rpc("event_availability", { p_event_id: event.id }),
-    event.seating_type === "reserved_seating"
-      ? supabase
-          .from("event_seats")
-          .select(
-            `id, status, price_cents, ticket_type_id,
-             seat:venue_seats(id, row_label, seat_number, pos_x, pos_y,
-               section:venue_sections(id, name, code, color))`,
-          )
-          .eq("event_id", event.id)
-      : Promise.resolve({ data: [] as SeatWithPlace[] }),
-    // Which tiers price a seating section, so a seated event can still offer
-    // tiers that have no seats at all.
-    supabase.from("ticket_types").select("id, section_id").eq("event_id", event.id),
-  ]);
-
-  const seatedTypeIds = new Set(
-    ((types ?? []) as { id: string; section_id: string | null }[])
-      .filter((type) => type.section_id)
-      .map((type) => type.id),
-  );
-
-  const all = (availability ?? []) as TicketAvailability[];
-
-  return {
-    event,
-    availability: all,
-    seatedAvailability: all.filter((tier) => seatedTypeIds.has(tier.ticket_type_id)),
-    generalAvailability: all.filter((tier) => !seatedTypeIds.has(tier.ticket_type_id)),
-    seats: (seats ?? []) as unknown as SeatWithPlace[],
-  };
-}
 
 export async function generateMetadata({
   params,
@@ -87,7 +24,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const loaded = await loadEvent(slug);
+  const loaded = await getEventBySlug(slug);
   if (!loaded) return { title: "Event not found" };
 
   const { event } = loaded;
@@ -105,19 +42,12 @@ export async function generateMetadata({
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const loaded = await loadEvent(slug);
+  const loaded = await getEventBySlug(slug);
   if (!loaded) notFound();
 
   const { event, availability, seatedAvailability, generalAvailability, seats } = loaded;
   const user = await getUser();
-  const supabase = await createClient();
-
-  const [{ data: favorite }, { count: attendeeCount }] = await Promise.all([
-    user
-      ? supabase.from("favorites").select("event_id").eq("event_id", event.id).eq("user_id", user.id).maybeSingle()
-      : Promise.resolve({ data: null }),
-    supabase.from("tickets").select("id", { count: "exact", head: true }).eq("event_id", event.id).in("status", ["valid", "used"]),
-  ]);
+  const { favorited, attendeeCount } = await getEventSocialCounts(event.id, user?.id ?? null);
 
   const tz = event.timezone ?? undefined;
   const isPast = new Date(event.ends_at) < new Date();
@@ -246,7 +176,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             <div className="flex gap-2">
               <FavoriteButton
                 eventId={event.id}
-                initialFavorited={Boolean(favorite)}
+                initialFavorited={favorited}
                 signedIn={Boolean(user)}
               />
               <ShareButton title={event.title} />
@@ -309,11 +239,11 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                   : [event.venue?.city, event.venue?.country].filter(Boolean).join(", ") || undefined
               }
             />
-            {(attendeeCount ?? 0) > 0 && (
+            {attendeeCount > 0 && (
               <InfoRow
                 icon={Users}
                 main="Going"
-                sub={pluralize(attendeeCount ?? 0, "person", "people")}
+                sub={pluralize(attendeeCount, "person", "people")}
               />
             )}
           </div>

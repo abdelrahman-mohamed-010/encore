@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { CalendarDays, MapPin, Receipt, Ticket } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { listMyOrders } from "@/features/account/queries";
 import { requireUser } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,17 +23,7 @@ const TONE: Record<OrderStatus, "positive" | "caution" | "critical" | "neutral">
 
 export default async function OrdersPage() {
   const user = await requireUser();
-  const supabase = await createClient();
-
-  const { data: orders } = await supabase
-    .from("orders")
-    .select(
-      `id, order_number, status, total_cents, currency, created_at, refunded_cents,
-       event:events(id, title, slug, cover_image_url, starts_at, ends_at, timezone, is_online, venue:venues(name, city)),
-       tickets:tickets(count)`,
-    )
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  const orders = await listMyOrders(user.id);
 
   if (!orders || orders.length === 0) {
     return (

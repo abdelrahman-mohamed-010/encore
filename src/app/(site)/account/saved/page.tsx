@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Heart } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { listMySavedEvents } from "@/features/account/queries";
 import { requireUser } from "@/lib/auth";
 import { EventCard } from "@/components/events/event-card";
 import { EmptyState } from "@/components/ui/misc";
@@ -12,24 +12,10 @@ export const metadata: Metadata = { title: "Saved events" };
 
 export default async function SavedPage() {
   const user = await requireUser();
-  const supabase = await createClient();
-
-  const { data: favorites } = await supabase
-    .from("favorites")
-    .select(
-      `event_id,
-       event:events(id, slug, title, subtitle, cover_image_url, starts_at, ends_at, timezone,
-         is_online, is_featured,
-         venue:venues(name, city, country),
-         category:categories(name, slug, color),
-         organizer:organizers(name, slug),
-         ticket_types(price_cents, currency, quantity_total, quantity_sold, quantity_reserved, is_hidden))`,
-    )
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  const favorites = await listMySavedEvents(user.id);
 
   // Reshape into the same row the search RPC produces so EventCard stays one component.
-  const events: EventSearchResult[] = (favorites ?? [])
+  const events: EventSearchResult[] = favorites
     .filter((row) => row.event)
     .map((row) => {
       const event = row.event!;

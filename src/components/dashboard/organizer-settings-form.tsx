@@ -3,7 +3,6 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowUp, CreditCard } from "lucide-react";
@@ -19,8 +18,6 @@ import { Tooltip } from "@/components/ui/tooltip";
 import type { Organizer } from "@/lib/types";
 
 export function OrganizerSettingsForm({ organizer }: { organizer: Organizer }) {
-  const router = useRouter();
-
   const form = useForm<OrganizerValues, unknown, OrganizerData>({
     resolver: zodResolver(organizerSchema),
     defaultValues: {
