@@ -1,23 +1,13 @@
 import Link from "next/link";
+import { EventStatusBadge } from "@/components/ui/status-badge";
 import Image from "next/image";
 import { CalendarDays, ExternalLink } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Meter } from "@/components/ui/misc";
 import { Tooltip } from "@/components/ui/tooltip";
 import { PaginationRow, RowLink, TableEmptyRow } from "@/components/ui/table";
 import { listOrganizerEvents, type DashboardEventItem } from "@/features/dashboard/queries";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";
-import type { EventStatus } from "@/lib/types";
-
-const STATUS_TONE: Record<EventStatus, "positive" | "caution" | "neutral" | "critical"> = {
-  published: "positive",
-  draft: "neutral",
-  pending_review: "caution",
-  paused: "caution",
-  cancelled: "critical",
-  completed: "neutral",
-};
 
 export type { DashboardEventItem };
 
@@ -101,9 +91,7 @@ export async function EventsRows({
               </td>
 
               <td className="px-5 py-3.5">
-                <Badge tone={STATUS_TONE[event.status]} size="xs">
-                  {event.status.replace("_", " ")}
-                </Badge>
+                <EventStatusBadge status={event.status} size="xs" />
               </td>
 
               <td className="whitespace-nowrap px-5 py-3.5 text-xs text-ink-2">

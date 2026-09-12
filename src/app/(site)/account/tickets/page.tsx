@@ -1,11 +1,12 @@
 import Image from "next/image";
+import { TicketStatusBadge } from "@/components/ui/status-badge";
+import type { TicketStatus } from "@/lib/types";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { CalendarDays, Clock, MapPin, Ticket as TicketIcon } from "lucide-react";
 import { listMyTickets } from "@/features/account/queries";
 import { requireUser } from "@/lib/auth";
 import { renderTicketQr } from "@/lib/qr";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/misc";
 import { TicketQrModal } from "@/features/account/components/ticket-qr-modal";
@@ -13,7 +14,7 @@ import { formatEventStamp } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "My tickets" };
-const STATUS_TONE = { valid: "positive", used: "neutral", refunded: "critical", void: "critical" } as const;
+
 
 export default async function TicketsPage() {
   const user = await requireUser();
@@ -75,7 +76,7 @@ export default async function TicketsPage() {
 type TicketRow = {
   id: string;
   ticket_code: string;
-  status: keyof typeof STATUS_TONE;
+  status: TicketStatus;
   seat_label: string | null;
   attendee_name: string | null;
   checked_in_at: string | null;
@@ -125,9 +126,7 @@ function TicketCard({ ticket, qr, past = false }: { ticket: TicketRow; qr?: stri
             </span>
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <Badge tone={STATUS_TONE[ticket.status]} size="xs">
-              {ticket.status === "used" ? "Checked in" : ticket.status}
-            </Badge>
+            <TicketStatusBadge status={ticket.status} size="xs" />
             <span className="text-xs font-medium text-ink-3">{meta}</span>
           </div>
         </div>

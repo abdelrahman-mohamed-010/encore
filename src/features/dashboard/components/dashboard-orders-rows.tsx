@@ -1,19 +1,10 @@
 import { Receipt } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { OrderStatusBadge } from "@/components/ui/status-badge";
 import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { RefundButton } from "@/features/dashboard/components/refund-button";
 import { listOrganizerOrders } from "@/features/dashboard/queries";
 import { formatDateTime, formatMoney } from "@/lib/format";
 import type { OrderStatus } from "@/lib/types";
-
-const TONE: Record<OrderStatus, "positive" | "caution" | "critical" | "neutral"> = {
-  paid: "positive",
-  pending: "caution",
-  failed: "critical",
-  cancelled: "neutral",
-  refunded: "critical",
-  partially_refunded: "caution",
-};
 
 export async function OrdersRows({
   organizerId,
@@ -92,9 +83,7 @@ export async function OrdersRows({
               </td>
 
               <td className="px-5 py-3.5">
-                <Badge tone={TONE[order.status]} size="xs">
-                  {order.status.replace("_", " ")}
-                </Badge>
+                <OrderStatusBadge status={order.status} size="xs" />
               </td>
 
               {canRefund && (

@@ -1,10 +1,10 @@
 import Link from "next/link";
+import { EventStatusBadge } from "@/components/ui/status-badge";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft, ExternalLink, Eye, Ticket, TicketCheck, Wallet } from "lucide-react";
 import { getEventDetail } from "@/features/events/queries";
 import { requireOrganizer } from "@/lib/auth";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/surface";
 import { Meter, StatTile } from "@/components/ui/misc";
@@ -13,18 +13,8 @@ import { SeatingEditor, type SeatingSection } from "@/features/seating/component
 import { EventStatusControl } from "@/features/events/components/event-status-control";
 import { EventFormDrawer } from "@/features/events/components/event-form-drawer";
 import { formatDateTime, formatMoney, formatNumber } from "@/lib/format";
-import type { EventStatus } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Manage event" };
-
-const STATUS_TONE: Record<EventStatus, "positive" | "caution" | "neutral" | "critical"> = {
-  published: "positive",
-  draft: "neutral",
-  pending_review: "caution",
-  paused: "caution",
-  cancelled: "critical",
-  completed: "neutral",
-};
 
 export default async function ManageEventPage({
   params,
@@ -61,9 +51,7 @@ export default async function ManageEventPage({
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="display-3 text-ink">{event.title}</h1>
-            <Badge tone={STATUS_TONE[event.status]} size="xs">
-              {event.status.replace("_", " ")}
-            </Badge>
+            <EventStatusBadge status={event.status} size="xs" />
           </div>
           <p className="mt-2 text-sm text-ink-3">
             {formatDateTime(event.starts_at, event.timezone ?? undefined)}

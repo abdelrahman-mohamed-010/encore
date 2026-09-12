@@ -1,21 +1,11 @@
 import Image from "next/image";
+import { EventStatusBadge } from "@/components/ui/status-badge";
 import Link from "next/link";
 import { Search, Ticket } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { listEventsForReview } from "@/features/admin/queries";
 import { formatDate } from "@/lib/format";
 import { EventReviewActions } from "@/features/admin/components/event-review-actions";
-import type { EventStatus } from "@/lib/types";
-
-const TONE: Record<EventStatus, "positive" | "caution" | "neutral" | "critical"> = {
-  published: "positive",
-  draft: "neutral",
-  pending_review: "caution",
-  paused: "caution",
-  cancelled: "critical",
-  completed: "neutral",
-};
 
 export const EVENT_REVIEW_COLUMN_COUNT = 5;
 
@@ -86,9 +76,7 @@ export async function EventReviewRows({
             </td>
             <td className="whitespace-nowrap px-5 py-3.5 text-ink-3">{event.organizerName || "—"}</td>
             <td className="px-5 py-3.5">
-              <Badge tone={TONE[event.status]} size="xs">
-                {event.status.replace("_", " ")}
-              </Badge>
+              <EventStatusBadge status={event.status} size="xs" />
             </td>
             <td className="px-5 py-3.5 text-right">
               <EventReviewActions

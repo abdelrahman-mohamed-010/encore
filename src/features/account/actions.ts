@@ -12,7 +12,7 @@ export const updateProfile = authActionClient
     const { error } = await ctx.supabase
       .from("profiles")
       .update({
-        full_name: parsedInput.fullName || null,
+        full_name: `${parsedInput.firstName ?? ""} ${parsedInput.lastName ?? ""}`.trim() || null,
         phone: parsedInput.phone || null,
         bio: parsedInput.bio || null,
         avatar_url: parsedInput.avatarUrl || null,

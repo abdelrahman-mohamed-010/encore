@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { OrderStatusBadge } from "@/components/ui/status-badge";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -12,18 +13,8 @@ import { FieldRow } from "@/components/ui/field-row";
 import { SummaryLine } from "@/components/ui/misc";
 import { OrderCelebration } from "./celebration";
 import { formatDateTime, formatEventStamp, formatMoney } from "@/lib/format";
-import type { OrderStatus } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Order" };
-
-const TONE: Record<OrderStatus, "positive" | "caution" | "critical" | "neutral"> = {
-  paid: "positive",
-  pending: "caution",
-  failed: "critical",
-  cancelled: "neutral",
-  refunded: "critical",
-  partially_refunded: "caution",
-};
 
 export default async function OrderDetailPage({
   params,
@@ -69,9 +60,7 @@ export default async function OrderDetailPage({
             <p className="mt-1 font-mono text-xs text-white/70">{order.order_number}</p>
           </div>
           <div className="absolute right-4 top-4">
-            <Badge tone={TONE[order.status]} size="md" className="shadow-sm">
-              {order.status.replace("_", " ")}
-            </Badge>
+            <OrderStatusBadge status={order.status} size="md" className="shadow-sm" />
           </div>
         </div>
       )}
@@ -83,9 +72,7 @@ export default async function OrderDetailPage({
             <h1 className="display-3 text-ink">{order.event?.title}</h1>
             <p className="mt-1.5 font-mono text-sm text-ink-3">{order.order_number}</p>
           </div>
-          <Badge tone={TONE[order.status]} size="md">
-            {order.status.replace("_", " ")}
-          </Badge>
+          <OrderStatusBadge status={order.status} size="md" />
         </div>
       )}
 

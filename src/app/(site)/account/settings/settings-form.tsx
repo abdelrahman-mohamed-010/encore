@@ -51,16 +51,15 @@ function LinkedinIcon(props: React.SVGProps<SVGSVGElement>) {
 
 export function SettingsForm({ profile }: { profile: Profile }) {
 
-  // Parse first and last names from profile.full_name
-  const initialNameParts = (profile.full_name ?? "").trim().split(" ");
-  const [firstName, setFirstName] = React.useState(initialNameParts[0] ?? "");
-  const [lastName, setLastName] = React.useState(initialNameParts.slice(1).join(" ") ?? "");
   const [resettingPassword, setResettingPassword] = React.useState(false);
+
+  const nameParts = (profile.full_name ?? "").trim().split(" ");
 
   const form = useForm<ProfileValues, unknown, ProfileData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: profile.full_name ?? "",
+      firstName: nameParts[0] ?? "",
+      lastName: nameParts.slice(1).join(" "),
       phone: profile.phone ?? "",
       bio: profile.bio ?? "",
       avatarUrl: profile.avatar_url ?? "",
@@ -75,11 +74,7 @@ export function SettingsForm({ profile }: { profile: Profile }) {
   const avatarUrl = useWatch({ control: form.control, name: "avatarUrl" });
 
   const save = useAsyncAction(async (values: ProfileData) => {
-    const result = await updateProfile({
-      ...values,
-      fullName: `${firstName} ${lastName}`.trim() || values.fullName || "",
-    });
-
+    const result = await updateProfile(values);
     if (result?.serverError) throw new Error(result.serverError);
     toast.success("Profile saved");
   });
@@ -116,24 +111,12 @@ export function SettingsForm({ profile }: { profile: Profile }) {
             {/* Form Inputs on the left */}
             <div className="space-y-5">
               <div className="grid gap-5 sm:grid-cols-2">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="first-name">First Name</Label>
-                  <Input
-                    id="first-name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="First name"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="last-name">Last Name</Label>
-                  <Input
-                    id="last-name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Last name"
-                  />
-                </div>
+                <FormField<ProfileValues, "firstName"> name="firstName" label="First Name">
+                  {(field) => <Input {...field} placeholder="First name" />}
+                </FormField>
+                <FormField<ProfileValues, "lastName"> name="lastName" label="Last Name">
+                  {(field) => <Input {...field} placeholder="Last name" />}
+                </FormField>
               </div>
 
               <div className="flex flex-col gap-2">

@@ -1,25 +1,15 @@
 import Link from "next/link";
+import { OrderStatusBadge } from "@/components/ui/status-badge";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { CalendarDays, MapPin, Receipt, Ticket } from "lucide-react";
 import { listMyOrders } from "@/features/account/queries";
 import { requireUser } from "@/lib/auth";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/ui/misc";
 import { formatEventStamp, formatMoney, pluralize } from "@/lib/format";
-import type { OrderStatus } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Orders" };
-
-const TONE: Record<OrderStatus, "positive" | "caution" | "critical" | "neutral"> = {
-  paid: "positive",
-  pending: "caution",
-  failed: "critical",
-  cancelled: "neutral",
-  refunded: "critical",
-  partially_refunded: "caution",
-};
 
 export default async function OrdersPage() {
   const user = await requireUser();
@@ -75,9 +65,7 @@ export default async function OrdersPage() {
               )}
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <Badge tone={TONE[order.status]} size="xs">
-                  {order.status.replace("_", " ")}
-                </Badge>
+                <OrderStatusBadge status={order.status} size="xs" />
                 {ticketCount > 0 && (
                   <span className="inline-flex items-center gap-1.5 rounded-md bg-sunken px-2 py-1 text-xs font-medium text-ink-2">
                     <Ticket className="size-3 text-ink-3" />
