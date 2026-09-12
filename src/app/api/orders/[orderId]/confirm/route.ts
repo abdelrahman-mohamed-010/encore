@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
 import { fail, ok, rpcErrorCode } from "@/lib/api";
+import { requireUserJson } from "@/lib/api-guards";
 import { providerForOrder } from "@/lib/payments";
 import { finalizeOrderPayment } from "@/lib/payments/rpc";
 
@@ -14,12 +14,9 @@ export async function POST(
   { params }: { params: Promise<{ orderId: string }> },
 ) {
   const { orderId } = await params;
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return fail("You must be signed in.", 401);
+  const auth = await requireUserJson();
+  if (auth.response) return auth.response;
+  const { supabase, user } = auth.data;
 
   const { data: order } = await supabase.from("orders").select("*").eq("id", orderId).maybeSingle();
   if (!order) return fail("Order not found.", 404);

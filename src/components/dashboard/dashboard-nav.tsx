@@ -9,14 +9,8 @@ import {
   Users,
 } from "lucide-react";
 import { TabNav } from "@/components/ui/tab-nav";
+import { hasOrgRole } from "@/lib/roles";
 import type { OrgMemberRole } from "@/lib/types";
-
-const RANK: Record<OrgMemberRole, number> = {
-  scanner: 0,
-  staff: 1,
-  admin: 2,
-  owner: 3,
-};
 
 export function DashboardTabs({
   slug,
@@ -73,7 +67,7 @@ export function DashboardTabs({
     },
   ];
 
-  const visibleTabs = tabs.filter((t) => RANK[role] >= RANK[t.min]);
+  const visibleTabs = tabs.filter((t) => hasOrgRole(role, t.min));
 
   return <TabNav items={visibleTabs} />;
 }

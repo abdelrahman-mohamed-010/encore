@@ -1,15 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { useFieldArray, useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Armchair, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { adoptVenueSeatMap, buildSeatMap } from "@/features/seating/actions";
 import { useAsyncAction } from "@/hooks";
 import { seatingSchema, type SeatingData, type SeatingValues } from "@/lib/validation";
-import { generateSeats, sectionCode, type SectionSpec } from "@/lib/seat-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardDescription, CardHeader, CardTitle } from "@/components/ui/surface";
 import { Form, FormError, FormField } from "@/components/ui/form";
@@ -48,6 +46,7 @@ export type SeatingSection = {
  */
 export function SeatingEditor({
   eventId,
+  organizerSlug,
   seatingType,
   venue,
   sections,
@@ -55,6 +54,7 @@ export function SeatingEditor({
   soldOrHeld,
 }: {
   eventId: string;
+  organizerSlug: string;
   seatingType: SeatingType;
   venue: { id: string; name: string } | null;
   /** Sections already on the venue, with how many seats each holds. */
@@ -63,7 +63,6 @@ export function SeatingEditor({
   /** Seats already sold or held; setting up again would strand them. */
   soldOrHeld: number;
 }) {
-  const router = useRouter();
   const [building, setBuilding] = useState(false);
 
   const form = useForm<SeatingValues, unknown, SeatingData>({
@@ -88,149 +87,31 @@ export function SeatingEditor({
   const build = useAsyncAction(async (values: SeatingData) => {
     if (!venue) throw new Error("Choose a venue for this event first.");
 
-    const supabase = createClient();
-    const specs: SectionSpec[] = values.sections.map((section) => ({
-      name: section.name,
-      color: section.color,
-      rows: Number(section.rows),
-      seatsPerRow: Number(section.seatsPerRow),
-      priceCents: Math.round(Number(section.price) * 100),
-    }));
-
-    // There is no transaction across these calls, so anything created is
-    // tracked and torn down if a later step fails. Deleting a section cascades
-    // to its seats and their event_seats; ticket types detach instead, so they
-    // are removed explicitly.
-    const createdSections: string[] = [];
-    const createdTicketTypes: string[] = [];
-
     setBuilding(true);
     try {
-      const generated = generateSeats(specs);
+      const result = await buildSeatMap({
+        ...values,
+        eventId,
+        venueId: venue.id,
+        organizerSlug,
+        ticketTypeCount,
+      });
+      if (result?.serverError) throw new Error(result.serverError);
+      if (result?.validationErrors) throw new Error("Check the sections and try again.");
 
-      for (const [index, { section, seats }] of generated.entries()) {
-        const { data: sectionRow, error: sectionError } = await supabase
-          .from("venue_sections")
-          .insert({
-            venue_id: venue.id,
-            name: section.name,
-            code: sectionCode(section.name, index),
-            color: section.color,
-            sort_order: index,
-          })
-          .select("id")
-          .single();
-        if (sectionError) throw new Error(sectionError.message);
-        createdSections.push(sectionRow.id);
-
-        const { data: ticketType, error: typeError } = await supabase
-          .from("ticket_types")
-          .insert({
-            event_id: eventId,
-            section_id: sectionRow.id,
-            name: section.name,
-            price_cents: section.priceCents,
-            quantity_total: seats.length,
-            sort_order: ticketTypeCount + index,
-          })
-          .select("id")
-          .single();
-        if (typeError) throw new Error(typeError.message);
-        createdTicketTypes.push(ticketType.id);
-
-        const { data: seatRows, error: seatError } = await supabase
-          .from("venue_seats")
-          .insert(
-            seats.map((seat) => ({
-              venue_id: venue.id,
-              section_id: sectionRow.id,
-              row_label: seat.rowLabel,
-              seat_number: seat.seatNumber,
-              pos_x: seat.posX,
-              pos_y: seat.posY,
-            })),
-          )
-          .select("id");
-        if (seatError) throw new Error(seatError.message);
-
-        const { error: inventoryError } = await supabase.from("event_seats").insert(
-          (seatRows ?? []).map((seat) => ({
-            event_id: eventId,
-            seat_id: seat.id,
-            ticket_type_id: ticketType.id,
-          })),
-        );
-        if (inventoryError) throw new Error(inventoryError.message);
-      }
-
-      // Only flip the event once its inventory exists, so the public page never
-      // renders a reserved-seating event with no seats to pick.
-      const { error: eventError } = await supabase
-        .from("events")
-        .update({ seating_type: "reserved_seating" })
-        .eq("id", eventId);
-      if (eventError) throw new Error(eventError.message);
-
-      await supabase.from("venues").update({ seating_type: "reserved_seating" }).eq("id", venue.id);
-
-      toast.success(`Seat map created — ${formatNumber(totalSeats)} seats`);
-      router.refresh();
-    } catch (error) {
-      if (createdTicketTypes.length) {
-        await supabase.from("ticket_types").delete().in("id", createdTicketTypes);
-      }
-      if (createdSections.length) {
-        await supabase.from("venue_sections").delete().in("id", createdSections);
-      }
-      throw error;
+      toast.success(`Seat map created — ${formatNumber(result?.data?.seatCount ?? totalSeats)} seats`);
     } finally {
       setBuilding(false);
     }
   });
 
-  /** Point the event back at plain quantity-based tickets. */
   const useExisting = useAsyncAction(async () => {
     if (!venue) return;
-    const supabase = createClient();
 
-    const { data: seats, error } = await supabase
-      .from("venue_seats")
-      .select("id, section_id")
-      .eq("venue_id", venue.id);
-    if (error) throw new Error(error.message);
-
-    const { data: types, error: typeError } = await supabase
-      .from("ticket_types")
-      .select("id, section_id")
-      .eq("event_id", eventId)
-      .not("section_id", "is", null);
-    if (typeError) throw new Error(typeError.message);
-
-    const typeBySection = new Map((types ?? []).map((type) => [type.section_id, type.id]));
-    const missing = (seats ?? []).filter((seat) => !typeBySection.has(seat.section_id));
-    if (missing.length > 0) {
-      throw new Error(
-        "Some sections have no ticket type on this event yet. Add one per section first.",
-      );
-    }
-
-    const { error: insertError } = await supabase.from("event_seats").insert(
-      (seats ?? []).map((seat) => ({
-        event_id: eventId,
-        seat_id: seat.id,
-        ticket_type_id: typeBySection.get(seat.section_id)!,
-      })),
-    );
-    if (insertError) throw new Error(insertError.message);
-
-    const { error: eventError } = await supabase
-      .from("events")
-      .update({ seating_type: "reserved_seating" })
-      .eq("id", eventId);
-    if (eventError) throw new Error(eventError.message);
+    const result = await adoptVenueSeatMap({ eventId, venueId: venue.id, organizerSlug });
+    if (result?.serverError) throw new Error(result.serverError);
 
     toast.success("This event now uses the venue's seat map");
-    router.refresh();
   });
 
   // ---- Already seated ------------------------------------------------------

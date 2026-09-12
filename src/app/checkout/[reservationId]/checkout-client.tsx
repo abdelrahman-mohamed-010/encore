@@ -121,11 +121,7 @@ export function CheckoutClient({
 
     // 2. Settle it on whichever rail the order was created for.
     if (order.provider === "stripe") {
-      const intentResponse = await fetch(`/api/orders/${order.order_id}/intent`, { method: "POST" });
-      const intent = await intentResponse.json();
-      if (!intentResponse.ok) throw new Error(intent.error ?? "Could not start the card payment.");
-
-      router.push(`/checkout/complete?order=${order.order_id}&secret=${intent.clientSecret}`);
+      router.push(`/checkout/complete?order=${order.order_id}`);
       return;
     }
 

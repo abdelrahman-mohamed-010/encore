@@ -1,10 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useTransition } from "react";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
+import { useAction } from "next-safe-action/hooks";
+import { deletePromo, setPromoActive } from "@/features/promos/actions";
 import { Button } from "@/components/ui/button";
 import { ConfirmDialog } from "@/components/ui/confirm-dialog";
 import { Switch } from "@/components/ui/input";
@@ -13,40 +12,31 @@ export function PromoRowActions({
   id,
   code,
   isActive,
+  organizerSlug,
 }: {
   id: string;
   code: string;
   isActive: boolean;
+  organizerSlug: string;
 }) {
-  const router = useRouter();
-  const [, startTransition] = useTransition();
+  const toggle = useAction(setPromoActive, {
+    onError: ({ error }) =>
+      toast.error("Could not update the code", { description: error.serverError }),
+  });
 
-  function toggleActive() {
-    startTransition(async () => {
-      const supabase = createClient();
-      const { error } = await supabase.from("promo_codes").update({ is_active: !isActive }).eq("id", id);
-      if (error) {
-        toast.error("Could not update the code", { description: error.message });
-        return;
-      }
-      router.refresh();
-    });
-  }
-
-  async function remove() {
-    const supabase = createClient();
-    const { error } = await supabase.from("promo_codes").delete().eq("id", id);
-    if (error) {
-      toast.error("Could not delete the code", { description: error.message });
-      return;
-    }
-    toast.success("Promo code deleted");
-    router.refresh();
-  }
+  const remove = useAction(deletePromo, {
+    onSuccess: () => toast.success("Promo code deleted"),
+    onError: ({ error }) =>
+      toast.error("Could not delete the code", { description: error.serverError }),
+  });
 
   return (
     <>
-      <Switch checked={isActive} onCheckedChange={toggleActive} label={`Toggle ${code}`} />
+      <Switch
+        checked={isActive}
+        onCheckedChange={(next) => toggle.execute({ id, isActive: next, organizerSlug })}
+        label={`Toggle ${code}`}
+      />
       <ConfirmDialog
         trigger={
           <Button variant="ghost" size="icon-sm" aria-label={`Delete ${code}`}>
@@ -56,7 +46,9 @@ export function PromoRowActions({
         title={`Delete ${code}?`}
         description="Buyers will no longer be able to redeem this code. This can't be undone."
         confirmLabel="Delete code"
-        onConfirm={remove}
+        onConfirm={async () => {
+          await remove.executeAsync({ id, organizerSlug });
+        }}
       />
     </>
   );

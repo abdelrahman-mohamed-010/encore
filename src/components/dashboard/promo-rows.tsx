@@ -4,38 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
 import { EmptyState } from "@/components/ui/misc";
 import { PaginationRow } from "@/components/ui/table";
-import { createClient } from "@/lib/supabase/server";
+import { listPromos } from "@/features/promos/queries";
 import { formatMoney, formatNumber } from "@/lib/format";
 import { PromoRowActions } from "@/components/dashboard/promo-row-actions";
 
 export async function PromoRows({
   organizerId,
+  organizerSlug,
   query,
   page,
   pageSize,
 }: {
   organizerId: string;
+  organizerSlug: string;
   query?: string;
   page: number;
   pageSize: number;
 }) {
-  const supabase = await createClient();
-
-  let dbQuery = supabase
-    .from("promo_codes")
-    .select("*", { count: "exact" })
-    .eq("organizer_id", organizerId);
-
-  if (query?.trim()) dbQuery = dbQuery.ilike("code", `%${query.trim()}%`);
-
-  const from = (page - 1) * pageSize;
-  const { data, count } = await dbQuery
-    .order("created_at", { ascending: false })
-    .range(from, from + pageSize - 1);
-
-  const promos = data ?? [];
-  const total = count ?? 0;
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const { promos, total, totalPages } = await listPromos({ organizerId, query, page, pageSize });
 
   if (promos.length === 0) {
     return (
@@ -82,7 +68,12 @@ export async function PromoRows({
             </p>
           </div>
 
-          <PromoRowActions id={promo.id} code={promo.code} isActive={promo.is_active} />
+          <PromoRowActions
+            id={promo.id}
+            code={promo.code}
+            isActive={promo.is_active}
+            organizerSlug={organizerSlug}
+          />
         </div>
       ))}
 

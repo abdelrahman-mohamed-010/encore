@@ -6,7 +6,7 @@ import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Plus, Search } from "lucide-react";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { createPromo } from "@/features/promos/actions";
 import { useAsyncAction, useDebouncedSearchParam } from "@/hooks";
 import { promoSchema, type PromoData, type PromoValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
@@ -22,11 +22,11 @@ import { Shimmer } from "@/components/ui/skeleton";
 
 /** Static shell: search + "New code". Server-driven — never a skeleton itself. */
 export function PromoShell({
-  organizerId,
+  organizerSlug,
   events,
   children,
 }: {
-  organizerId: string;
+  organizerSlug: string;
   events: { id: string; title: string }[];
   children: React.ReactNode;
 }) {
@@ -50,28 +50,13 @@ export function PromoShell({
   const discountType = useWatch({ control: form.control, name: "discountType" });
 
   const create = useAsyncAction(async (values: PromoData) => {
-    const numeric = Number(values.value);
-    const { error } = await createClient().from("promo_codes").insert({
-      organizer_id: organizerId,
-      event_id: values.eventId || null,
-      code: values.code,
-      discount_type: values.discountType,
-      // Percentages are stored as typed; fixed amounts are stored in cents.
-      discount_value: values.discountType === "percentage" ? numeric : Math.round(numeric * 100),
-      max_redemptions: values.maxRedemptions ? Number(values.maxRedemptions) : null,
-      min_order_cents: Math.round(Number(values.minOrder || 0) * 100),
-    });
-
-    if (error) {
-      throw new Error(
-        error.code === "23505" ? "You already have a code with that name." : error.message,
-      );
-    }
+    const result = await createPromo({ ...values, organizerSlug });
+    if (result?.serverError) throw new Error(result.serverError);
+    if (result?.validationErrors) throw new Error("Check the form and try again.");
 
     toast.success("Promo code created");
     setOpen(false);
     form.reset();
-    router.refresh();
   });
 
   return (

@@ -189,6 +189,7 @@ export default async function ManageEventPage({
       {canEdit && (
         <SeatingEditor
           eventId={eventId}
+          organizerSlug={slug}
           seatingType={event.seating_type}
           venue={event.venue ? { id: event.venue.id, name: event.venue.name } : null}
           sections={sections}

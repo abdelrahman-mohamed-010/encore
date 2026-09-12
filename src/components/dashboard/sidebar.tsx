@@ -6,9 +6,8 @@ import {
   CalendarDays, LayoutDashboard, QrCode, Receipt, Settings, Tag, Users, Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { hasOrgRole } from "@/lib/roles";
 import type { OrgMemberRole } from "@/lib/types";
-
-const RANK: Record<OrgMemberRole, number> = { scanner: 0, staff: 1, admin: 2, owner: 3 };
 
 type Item = {
   href: string;
@@ -55,7 +54,7 @@ export function DashboardSidebar({ slug, role }: { slug: string; role: OrgMember
   return (
     <nav className="space-y-6" aria-label="Dashboard">
       {GROUPS.map((group) => {
-        const items = group.items.filter((item) => RANK[role] >= RANK[item.min]);
+        const items = group.items.filter((item) => hasOrgRole(role, item.min));
         if (items.length === 0) return null;
 
         return (

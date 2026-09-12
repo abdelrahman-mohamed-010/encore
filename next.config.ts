@@ -18,6 +18,10 @@ const nextConfig: NextConfig = {
   experimental: {
     // Keeps the initial JS small; these are used across nearly every route.
     optimizePackageImports: ["lucide-react", "recharts", "date-fns"],
+
+    // `dynamic` defaults to 0, which re-fetched every auth-cookie route on
+    // back-navigation and re-played its skeleton.
+    staleTimes: { dynamic: 30, static: 180 },
   },
   async redirects() {
     return [

@@ -10,8 +10,12 @@ export const buyerSchema = z.object({
 export type BuyerValues = z.input<typeof buyerSchema>;
 export type BuyerData = z.output<typeof buyerSchema>;
 
-/** Body of POST /api/checkout/order. */
-export const createOrderSchema = buyerSchema.extend({ reservationId: uuid });
+/** Body of POST /api/checkout/order. The checkout posts null for the optionals. */
+export const createOrderSchema = buyerSchema.extend({
+  reservationId: uuid,
+  buyerPhone: optionalPhone.nullable(),
+  promoCode: z.string().trim().max(40).optional().or(z.literal("")).nullable(),
+});
 
 /** Body of POST /api/checkout/promo. */
 export const validatePromoSchema = z.object({
@@ -20,13 +24,17 @@ export const validatePromoSchema = z.object({
   subtotalCents: z.number().int().min(0),
 });
 
-/** Body of POST /api/orders/[orderId]/pay — the sandbox card form. */
+export const sandboxCardNumber = z
+  .string()
+  .trim()
+  .transform((v) => v.replace(/[\s-]/g, ""))
+  .refine((v) => /^\d{12,19}$/.test(v), "Enter a card number.");
+
+/** Body of POST /api/orders/[orderId]/pay. */
+export const sandboxPaySchema = z.object({ cardNumber: sandboxCardNumber });
+
 export const sandboxCardSchema = z.object({
-  cardNumber: z
-    .string()
-    .trim()
-    .transform((v) => v.replace(/[\s-]/g, ""))
-    .refine((v) => /^\d{12,19}$/.test(v), "Enter a card number."),
+  cardNumber: sandboxCardNumber,
   expiry: z
     .string()
     .trim()
