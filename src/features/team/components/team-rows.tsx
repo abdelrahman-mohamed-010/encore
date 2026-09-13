@@ -1,7 +1,8 @@
 import Link from "next/link";
 
 import { Avatar } from "@/components/ui/avatar";
-import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
+import { TableEmptyRow, TableFooterPagination } from "@/components/ui/table";
+import { TEAM_COLUMNS } from "@/features/team/table-columns";
 import { Button } from "@/components/ui/button";
 import { Users, UserPlus } from "lucide-react";
 import { listTeamMembers, type Member } from "@/features/team/queries";
@@ -9,7 +10,7 @@ import { TeamRoleSelect, TeamRemoveButton } from "@/features/team/components/tea
 
 export type { Member };
 
-export const TEAM_COLUMN_COUNT = 4;
+const TEAM_COLUMN_COUNT = TEAM_COLUMNS.length;
 
 export async function TeamRows({
   organizerId,
@@ -93,13 +94,13 @@ export async function TeamRows({
           </tr>
         ))}
       </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan={TEAM_COLUMN_COUNT} className="p-0">
-            <PaginationRow page={page} totalPages={totalPages} total={total} pageSize={pageSize} />
-          </td>
-        </tr>
-      </tfoot>
+      <TableFooterPagination
+        columns={TEAM_COLUMN_COUNT}
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        pageSize={pageSize}
+      />
     </>
   );
 }

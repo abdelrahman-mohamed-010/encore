@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAsyncAction } from "@/hooks";
 import { organizerSchema, type OrganizerData, type OrganizerValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
+import { SettingsRow } from "@/components/ui/settings-row";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Input, Textarea, Label } from "@/components/ui/input";
 import { Tooltip } from "@/components/ui/tooltip";
@@ -139,25 +140,18 @@ export function OrganizerSettingsForm({ organizer }: { organizer: Organizer }) {
           <p className="mt-1 text-sm text-ink-3">Manage bank account connections and payout schedules.</p>
         </div>
 
-        <div className="flex flex-col justify-between gap-4 rounded-2xl border border-hairline/70 bg-card/60 p-4.5 sm:flex-row sm:items-center">
-          <div className="flex items-start gap-3.5">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sunken text-ink-2">
-              <CreditCard className="size-5" />
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-ink">Stripe Connect</h4>
-              <p className="text-xs text-ink-3">
-                Securely process ticket credit cards and receive automatic payouts directly to your bank account.
-              </p>
-            </div>
-          </div>
-
-          <Button asChild variant="outline" size="sm" className="rounded-xl shrink-0">
-            <Link href={`/dashboard/${organizer.slug}/settings/payments`}>
-              Configure Payouts
-            </Link>
-          </Button>
-        </div>
+        <SettingsRow
+          icon={CreditCard}
+          title="Stripe Connect"
+          description="Securely process ticket credit cards and receive automatic payouts directly to your bank account."
+          action={
+            <Button asChild variant="outline" size="sm" className="rounded-xl shrink-0">
+              <Link href={`/dashboard/${organizer.slug}/settings/payments`}>
+                Configure Payouts
+              </Link>
+            </Button>
+          }
+        />
       </section>
     </div>
   );

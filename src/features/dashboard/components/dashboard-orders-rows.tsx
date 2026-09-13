@@ -1,10 +1,10 @@
 import { Receipt } from "lucide-react";
 import { OrderStatusBadge } from "@/components/ui/status-badge";
-import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
+import { TableEmptyRow, TableFooterPagination } from "@/components/ui/table";
+import { orderColumns } from "@/features/dashboard/table-columns";
 import { RefundButton } from "@/features/dashboard/components/refund-button";
 import { listOrganizerOrders } from "@/features/dashboard/queries";
 import { formatDateTime, formatMoney } from "@/lib/format";
-import type { OrderStatus } from "@/lib/types";
 
 export async function OrdersRows({
   organizerId,
@@ -21,7 +21,7 @@ export async function OrdersRows({
   page: number;
   pageSize: number;
 }) {
-  const columnCount = canRefund ? 7 : 6;
+  const columnCount = orderColumns(canRefund).length;
 
   const {
     rows: orders,
@@ -102,13 +102,13 @@ export async function OrdersRows({
           );
         })}
       </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan={columnCount} className="p-0">
-            <PaginationRow page={page} totalPages={totalPages} total={total} pageSize={pageSize} />
-          </td>
-        </tr>
-      </tfoot>
+      <TableFooterPagination
+        columns={columnCount}
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        pageSize={pageSize}
+      />
     </>
   );
 }

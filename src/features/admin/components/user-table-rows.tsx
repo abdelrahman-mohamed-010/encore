@@ -2,14 +2,15 @@ import { Search } from "lucide-react";
 
 import { Avatar } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
+import { TableEmptyRow, TableFooterPagination } from "@/components/ui/table";
 import { listUsers, type UserProfile } from "@/features/admin/queries";
+import { USER_COLUMNS } from "@/features/admin/table-columns";
 import { formatDate } from "@/lib/format";
 import { RoleSelect, BanToggleButton } from "@/features/admin/components/user-row-actions";
 
 export type { UserProfile };
 
-export const USERS_COLUMN_COUNT = 5;
+const USERS_COLUMN_COUNT = USER_COLUMNS.length;
 
 export async function UserRows({
   query,
@@ -64,13 +65,13 @@ export async function UserRows({
           </tr>
         ))}
       </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan={USERS_COLUMN_COUNT} className="p-0">
-            <PaginationRow page={page} totalPages={totalPages} total={total} pageSize={pageSize} />
-          </td>
-        </tr>
-      </tfoot>
+      <TableFooterPagination
+        columns={USERS_COLUMN_COUNT}
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        pageSize={pageSize}
+      />
     </>
   );
 }

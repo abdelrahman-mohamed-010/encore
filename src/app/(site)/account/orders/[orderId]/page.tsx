@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
 import { OrderStatusBadge } from "@/components/ui/status-badge";
 import Image from "next/image";
 import { notFound } from "next/navigation";
@@ -35,13 +36,9 @@ export default async function OrderDetailPage({
     <div className="mx-auto max-w-3xl">
       {celebrate === "1" && order.status === "paid" && <OrderCelebration />}
 
-      <Link
-        href="/account/orders"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
-      >
-        <ArrowLeft className="size-3.5" />
+      <BackLink href="/account/orders" className="mb-6">
         All orders
-      </Link>
+      </BackLink>
 
       {/* Event banner */}
       {order.event?.cover_image_url && (

@@ -2,12 +2,13 @@ import Image from "next/image";
 import { EventStatusBadge } from "@/components/ui/status-badge";
 import Link from "next/link";
 import { Search, Ticket } from "lucide-react";
-import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
+import { TableEmptyRow, TableFooterPagination } from "@/components/ui/table";
+import { EVENT_REVIEW_COLUMNS } from "@/features/admin/table-columns";
 import { listEventsForReview } from "@/features/admin/queries";
 import { formatDate } from "@/lib/format";
 import { EventReviewActions } from "@/features/admin/components/event-review-actions";
 
-export const EVENT_REVIEW_COLUMN_COUNT = 5;
+const EVENT_REVIEW_COLUMN_COUNT = EVENT_REVIEW_COLUMNS.length;
 
 export async function EventReviewRows({
   query,
@@ -90,13 +91,13 @@ export async function EventReviewRows({
           </tr>
         ))}
       </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan={EVENT_REVIEW_COLUMN_COUNT} className="p-0">
-            <PaginationRow page={page} totalPages={totalPages} total={total} pageSize={pageSize} />
-          </td>
-        </tr>
-      </tfoot>
+      <TableFooterPagination
+        columns={EVENT_REVIEW_COLUMN_COUNT}
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        pageSize={pageSize}
+      />
     </>
   );
 }

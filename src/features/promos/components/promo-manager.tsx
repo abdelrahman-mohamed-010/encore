@@ -4,7 +4,8 @@ import * as React from "react";
 import { useSearchParams } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
+import { TableSearch } from "@/components/ui/table-search";
 import { toast } from "sonner";
 import { createPromo } from "@/features/promos/actions";
 import { useAsyncAction, useDebouncedSearchParam } from "@/hooks";
@@ -61,16 +62,7 @@ export function PromoShell({
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative min-w-56 max-w-sm flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search promo codes..."
-            className="pl-9"
-            aria-label="Search promo codes"
-          />
-        </div>
+        <TableSearch value={query} onChange={setQuery} placeholder="Search promo codes..." label="Search promo codes" />
 
         <Button variant="solid" size="md" onClick={() => setOpen(true)}>
           <Plus /> New code

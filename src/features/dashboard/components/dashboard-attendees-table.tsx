@@ -2,16 +2,11 @@
 
 import * as React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search } from "lucide-react";
-import { Card } from "@/components/ui/surface";
-import { Input } from "@/components/ui/input";
+import { TableSearch } from "@/components/ui/table-search";
 import { SelectField } from "@/components/ui/select";
-import { TableRowsSkeleton } from "@/components/ui/table";
+import { DataTableShell } from "@/components/ui/data-table";
+import { ATTENDEE_COLUMNS } from "@/features/dashboard/table-columns";
 import { useDebouncedSearchParam } from "@/hooks";
-
-// Matches dashboard-attendees-rows.tsx's column count — kept as a literal so
-// this client shell never pulls in that server-only component's module graph.
-const ATTENDEES_COLUMN_COUNT = 5;
 
 /** Static shell: search + event/status filters. Server-driven — never a skeleton itself. */
 export function DashboardAttendeesShell({
@@ -37,19 +32,14 @@ export function DashboardAttendeesShell({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <DataTableShell
+      columns={ATTENDEE_COLUMNS}
+      minWidthClass="sm:min-w-[48rem]"
+      skeletonRows={8}
+      toolbar={
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 flex-wrap items-center gap-3">
-          <div className="relative min-w-56 max-w-sm flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by attendee, email, or code..."
-              className="pl-9"
-              aria-label="Search attendees"
-            />
-          </div>
+          <TableSearch value={query} onChange={setQuery} placeholder="Search by attendee, email, or code..." label="Search attendees" />
 
           <SelectField
             value={eventFilter}
@@ -74,27 +64,10 @@ export function DashboardAttendeesShell({
             ]}
           />
         </div>
-      </div>
-
-      <Card className="overflow-x-auto">
-        <table className="table-stack w-full text-left text-sm sm:min-w-[48rem]">
-          <thead>
-            <tr className="border-b border-hairline text-2xs uppercase tracking-[0.06em] text-ink-3">
-              <th scope="col" className="px-5 py-3.5 font-semibold">Attendee</th>
-              <th scope="col" className="px-5 py-3.5 font-semibold">Event</th>
-              <th scope="col" className="px-5 py-3.5 font-semibold">Ticket Type</th>
-              <th scope="col" className="px-5 py-3.5 font-semibold">Ticket Code</th>
-              <th scope="col" className="px-5 py-3.5 font-semibold">Check-in Status</th>
-            </tr>
-          </thead>
-          <React.Suspense
-            key={searchParams.toString()}
-            fallback={<TableRowsSkeleton rows={8} columns={ATTENDEES_COLUMN_COUNT} />}
-          >
-            {children}
-          </React.Suspense>
-        </table>
-      </Card>
-    </div>
+        </div>
+      }
+    >
+      {children}
+    </DataTableShell>
   );
 }

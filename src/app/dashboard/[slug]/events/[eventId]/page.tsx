@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
 import { EventStatusBadge } from "@/components/ui/status-badge";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { ArrowLeft, ExternalLink, Eye, Ticket, TicketCheck, Wallet } from "lucide-react";
+import { ExternalLink, Eye, Ticket, TicketCheck, Wallet } from "lucide-react";
 import { getEventDetail } from "@/features/events/queries";
 import { requireOrganizer } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
@@ -41,13 +42,7 @@ export default async function ManageEventPage({
 
   return (
     <div className="space-y-6 px-5 md:px-8">
-      <Link
-        href={`/dashboard/${slug}/events`}
-        className="inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
-      >
-        <ArrowLeft className="size-3.5" />
-        Events
-      </Link>
+      <BackLink href={`/dashboard/${slug}/events`}>Events</BackLink>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">

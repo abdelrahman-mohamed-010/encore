@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { BackLink } from "@/components/ui/back-link";
 import { Logo } from "@/components/logo";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
@@ -8,13 +8,9 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       <header className="border-b border-hairline">
         <div className="container-page flex h-14 items-center justify-between">
           <Logo />
-          <Link
-            href="/"
-            className="inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
-          >
-            <ArrowLeft className="size-3.5" />
+          <BackLink href="/">
             Back to events
-          </Link>
+          </BackLink>
         </div>
       </header>
 

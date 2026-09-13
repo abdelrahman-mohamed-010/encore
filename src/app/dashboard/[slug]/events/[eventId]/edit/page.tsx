@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowLeft } from "lucide-react";
@@ -24,13 +24,7 @@ export default async function EditEventPage({
 
   return (
     <div className="max-w-3xl space-y-6 px-5 py-8 md:px-8">
-      <Link
-        href={`/dashboard/${slug}/events/${eventId}`}
-        className="inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
-      >
-        <ArrowLeft className="size-3.5" />
-        Back to event
-      </Link>
+      <BackLink href={`/dashboard/${slug}/events/${eventId}`}>Back to event</BackLink>
 
       <h1 className="display-3 text-ink">Edit event</h1>
 

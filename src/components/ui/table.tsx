@@ -352,3 +352,28 @@ export function useTablePagination<T>(items: T[], initialPageSize = 10) {
     },
   };
 }
+
+/** The pagination row every list screen repeated as its own <tfoot>. */
+export function TableFooterPagination({
+  columns,
+  page,
+  totalPages,
+  total,
+  pageSize,
+}: {
+  columns: number;
+  page: number;
+  totalPages: number;
+  total: number;
+  pageSize: number;
+}) {
+  return (
+    <tfoot>
+      <tr>
+        <td colSpan={columns} className="p-0">
+          <PaginationRow page={page} totalPages={totalPages} total={total} pageSize={pageSize} />
+        </td>
+      </tr>
+    </tfoot>
+  );
+}

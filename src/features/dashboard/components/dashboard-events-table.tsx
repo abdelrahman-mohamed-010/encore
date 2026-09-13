@@ -2,19 +2,14 @@
 
 import * as React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
+import { TableSearch } from "@/components/ui/table-search";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/surface";
-import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select";
-import { TableRowsSkeleton } from "@/components/ui/table";
+import { DataTableShell } from "@/components/ui/data-table";
+import { EVENT_COLUMNS } from "@/features/dashboard/table-columns";
 import { useDebouncedSearchParam } from "@/hooks";
 import { EventFormDrawer } from "@/features/events/components/event-form-drawer";
-
-// Matches the column count in dashboard-events-rows.tsx's <thead>/<tbody> —
-// kept as a literal (not a shared import) so this client shell never pulls
-// in that server-only row component's module graph.
-const EVENTS_COLUMN_COUNT = 7;
 
 /** Static shell: search, status filter, "New event". Server-driven — never a skeleton itself. */
 export function DashboardEventsShell({
@@ -42,19 +37,13 @@ export function DashboardEventsShell({
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <DataTableShell
+      columns={EVENT_COLUMNS}
+      minWidthClass="sm:min-w-[50rem]"
+      toolbar={
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 flex-wrap items-center gap-3">
-          <div className="relative min-w-56 max-w-sm flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search events by title..."
-              className="pl-9"
-              aria-label="Search events"
-            />
-          </div>
+          <TableSearch value={query} onChange={setQuery} placeholder="Search events by title..." label="Search events" />
 
           <SelectField
             value={statusFilter}
@@ -88,29 +77,10 @@ export function DashboardEventsShell({
             <Plus /> New event
           </Button>
         )}
-      </div>
-
-      <Card className="overflow-x-auto">
-        <table className="table-stack w-full text-left text-sm sm:min-w-[50rem]">
-          <thead>
-            <tr className="border-b border-hairline text-2xs uppercase tracking-[0.06em] text-ink-3">
-              <th scope="col" className="px-5 py-3.5 font-semibold">Event</th>
-              <th scope="col" className="px-5 py-3.5 font-semibold">Date</th>
-              <th scope="col" className="px-5 py-3.5 font-semibold">Status</th>
-              <th scope="col" className="px-5 py-3.5 font-semibold">Seating</th>
-              <th scope="col" className="px-5 py-3.5 font-semibold">Tickets Sold</th>
-              <th scope="col" className="px-5 py-3.5 text-right font-semibold">Gross</th>
-              <th scope="col" className="px-5 py-3.5 text-right" />
-            </tr>
-          </thead>
-          <React.Suspense
-            key={searchParams.toString()}
-            fallback={<TableRowsSkeleton rows={6} columns={EVENTS_COLUMN_COUNT} />}
-          >
-            {children}
-          </React.Suspense>
-        </table>
-      </Card>
-    </div>
+        </div>
+      }
+    >
+      {children}
+    </DataTableShell>
   );
 }

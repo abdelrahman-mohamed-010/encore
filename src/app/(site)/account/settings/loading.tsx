@@ -1,3 +1,4 @@
+import { SettingsRow } from "@/components/ui/settings-row";
 import { Lock } from "lucide-react";
 import { Label } from "@/components/ui/input";
 import { Shimmer } from "@/components/ui/skeleton";
@@ -72,19 +73,12 @@ export default function Loading() {
           <p className="mt-1 text-sm text-ink-3">Manage your password and authentication.</p>
         </div>
 
-        <div className="flex flex-col justify-between gap-4 rounded-2xl border border-hairline/70 bg-card/60 p-4.5 sm:flex-row sm:items-center">
-          <div className="flex items-start gap-3.5">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sunken text-ink-2">
-              <Lock className="size-5" />
-            </div>
-            <div className="space-y-1.5">
-              <h4 className="text-sm font-semibold text-ink">Account Password</h4>
-              <Shimmer className="h-4 w-48 rounded" />
-            </div>
-          </div>
-
-          <Shimmer className="h-8 w-32 shrink-0 rounded-xl" />
-        </div>
+        <SettingsRow
+          icon={Lock}
+          title="Account Password"
+          description={<Shimmer className="h-4 w-48 rounded" />}
+          action={<Shimmer className="h-8 w-32 shrink-0 rounded-xl" />}
+        />
       </section>
     </div>
   );

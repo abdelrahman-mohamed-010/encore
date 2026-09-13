@@ -4,20 +4,21 @@ import * as React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Info, Search, UserPlus } from "lucide-react";
+import { Info, UserPlus } from "lucide-react";
+import { TableSearch } from "@/components/ui/table-search";
+import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { addTeamMember } from "@/features/team/actions";
 import { useAsyncAction, useDebouncedSearchParam } from "@/hooks";
 import { teamMemberSchema, type TeamMemberData, type TeamMemberValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/surface";
 import {
   Dialog, DialogBody, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { SelectField } from "@/components/ui/select";
 import { Form, FormError, FormField } from "@/components/ui/form";
-import { TableRowsSkeleton } from "@/components/ui/table";
+import { DataTableShell } from "@/components/ui/data-table";
+import { TEAM_COLUMNS } from "@/features/team/table-columns";
 import type { OrgMemberRole } from "@/lib/types";
 
 const ROLES: { role: OrgMemberRole; label: string; desc: string }[] = [
@@ -50,9 +51,6 @@ const ROLE_HELP: Record<OrgMemberRole, string> = {
   scanner: "Check people in at the door. No access to sales.",
 };
 
-// Matches team-rows.tsx's column count — kept as a literal so this client
-// shell never pulls in that server-only component's module graph.
-const TEAM_COLUMN_COUNT = 4;
 
 /** Static shell: search, role filter, "Role info" / "Add member". Server-driven — never a skeleton itself. */
 export function TeamShell({
@@ -99,19 +97,15 @@ export function TeamShell({
   });
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <>
+      <DataTableShell
+        columns={TEAM_COLUMNS}
+        minWidthClass="sm:min-w-[44rem]"
+        skeletonRows={5}
+        toolbar={
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 flex-wrap items-center gap-3">
-          <div className="relative min-w-56 max-w-sm flex-1">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-3" />
-            <Input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by name or email..."
-              className="pl-9"
-              aria-label="Search team members"
-            />
-          </div>
+          <TableSearch value={query} onChange={setQuery} placeholder="Search by name or email..." label="Search team members" />
 
           <SelectField
             value={roleFilter}
@@ -138,24 +132,10 @@ export function TeamShell({
         </div>
       </div>
 
-      <Card className="overflow-x-auto">
-        <table className="table-stack w-full text-left text-sm sm:min-w-[44rem]">
-          <thead>
-            <tr className="border-b border-hairline text-2xs uppercase tracking-[0.06em] text-ink-3">
-              <th scope="col" className="px-5 py-3.5 font-semibold">Member</th>
-              <th scope="col" className="px-5 py-3.5 font-semibold">Email</th>
-              <th scope="col" className="px-5 py-3.5 font-semibold">Role</th>
-              <th scope="col" className="px-5 py-3.5 text-right" />
-            </tr>
-          </thead>
-          <React.Suspense
-            key={searchParams.toString()}
-            fallback={<TableRowsSkeleton rows={5} columns={TEAM_COLUMN_COUNT} />}
-          >
-            {children}
-          </React.Suspense>
-        </table>
-      </Card>
+      }
+    >
+      {children}
+    </DataTableShell>
 
       {/* Role Info Modal */}
       <Dialog open={roleInfoOpen} onOpenChange={setRoleInfoOpen}>
@@ -228,6 +208,6 @@ export function TeamShell({
           </Form>
         </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

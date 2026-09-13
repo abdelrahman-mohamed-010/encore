@@ -11,6 +11,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useAsyncAction } from "@/hooks";
 import { profileSchema, type ProfileData, type ProfileValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
+import { SettingsRow } from "@/components/ui/settings-row";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Input, Textarea, PrefixInput, Label } from "@/components/ui/input";
 import type { Profile } from "@/lib/types";
@@ -222,30 +223,28 @@ export function SettingsForm({ profile }: { profile: Profile }) {
           <p className="mt-1 text-sm text-ink-3">Manage your password and authentication.</p>
         </div>
 
-        <div className="flex flex-col justify-between gap-4 rounded-2xl border border-hairline/70 bg-card/60 p-4.5 sm:flex-row sm:items-center">
-          <div className="flex items-start gap-3.5">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sunken text-ink-2">
-              <Lock className="size-5" />
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-ink">Account Password</h4>
-              <p className="text-xs text-ink-3">
-                Send a secure reset link to <span className="font-medium text-ink">{profile.email}</span>
-              </p>
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleSendPasswordReset}
-            disabled={resettingPassword}
-            className="rounded-xl shrink-0"
-          >
-            {resettingPassword ? "Sending..." : "Reset Password"}
-          </Button>
-        </div>
+        <SettingsRow
+          icon={Lock}
+          title="Account Password"
+          description={
+            <>
+              Send a secure reset link to{" "}
+              <span className="font-medium text-ink">{profile.email}</span>
+            </>
+          }
+          action={
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleSendPasswordReset}
+              disabled={resettingPassword}
+              className="rounded-xl shrink-0"
+            >
+              {resettingPassword ? "Sending..." : "Reset Password"}
+            </Button>
+          }
+        />
       </section>
     </div>
   );

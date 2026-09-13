@@ -1,6 +1,7 @@
 import { Users } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
+import { TableEmptyRow, TableFooterPagination } from "@/components/ui/table";
+import { ATTENDEE_COLUMNS } from "@/features/dashboard/table-columns";
 import {
   listOrganizerAttendees,
   type DashboardAttendeeItem,
@@ -9,7 +10,7 @@ import { formatDateTime } from "@/lib/format";
 
 export type { DashboardAttendeeItem };
 
-export const ATTENDEES_COLUMN_COUNT = 5;
+const ATTENDEES_COLUMN_COUNT = ATTENDEE_COLUMNS.length;
 
 export async function AttendeeRows({
   eventIds,
@@ -99,13 +100,13 @@ export async function AttendeeRows({
           </tr>
         ))}
       </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan={ATTENDEES_COLUMN_COUNT} className="p-0">
-            <PaginationRow page={page} totalPages={totalPages} total={total} pageSize={pageSize} />
-          </td>
-        </tr>
-      </tfoot>
+      <TableFooterPagination
+        columns={ATTENDEES_COLUMN_COUNT}
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        pageSize={pageSize}
+      />
     </>
   );
 }

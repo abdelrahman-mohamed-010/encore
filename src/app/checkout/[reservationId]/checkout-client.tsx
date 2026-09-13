@@ -1,12 +1,12 @@
 "use client";
+import { BackLink } from "@/components/ui/back-link";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { ArrowLeft, CheckCircle2, CreditCard, Timer } from "lucide-react";
+import { CheckCircle2, CreditCard, Timer } from "lucide-react";
 import { toast } from "sonner";
 import { useAsyncAction } from "@/hooks";
 import { useCountdown } from "@/features/checkout/hooks/use-countdown";
@@ -153,13 +153,9 @@ export function CheckoutClient({
 
   return (
     <div className="container-page py-8 md:py-10">
-      <Link
-        href={`/events/${event.slug}`}
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
-      >
-        <ArrowLeft className="size-3.5" />
+      <BackLink href={`/events/${event.slug}`} className="mb-6">
         Back to event
-      </Link>
+      </BackLink>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-12">
         <Form id="checkout-form" form={form} onSubmit={pay.run} className="min-w-0 space-y-6">

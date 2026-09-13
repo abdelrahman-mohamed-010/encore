@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 
 import { Meter } from "@/components/ui/meter";
 import { Tooltip } from "@/components/ui/tooltip";
-import { PaginationRow, RowLink, TableEmptyRow } from "@/components/ui/table";
+import { RowLink, TableEmptyRow, TableFooterPagination } from "@/components/ui/table";
+import { EVENT_COLUMNS } from "@/features/dashboard/table-columns";
 import { listOrganizerEvents, type DashboardEventItem } from "@/features/dashboard/queries";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";
 
 export type { DashboardEventItem };
 
-export const EVENTS_COLUMN_COUNT = 7;
+const EVENTS_COLUMN_COUNT = EVENT_COLUMNS.length;
 
 export async function EventsRows({
   organizerId,
@@ -134,13 +135,13 @@ export async function EventsRows({
           );
         })}
       </tbody>
-      <tfoot>
-        <tr>
-          <td colSpan={EVENTS_COLUMN_COUNT} className="p-0">
-            <PaginationRow page={page} totalPages={totalPages} total={total} pageSize={pageSize} />
-          </td>
-        </tr>
-      </tfoot>
+      <TableFooterPagination
+        columns={EVENTS_COLUMN_COUNT}
+        page={page}
+        totalPages={totalPages}
+        total={total}
+        pageSize={pageSize}
+      />
     </>
   );
 }
