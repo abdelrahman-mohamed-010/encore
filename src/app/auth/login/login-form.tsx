@@ -70,7 +70,7 @@ export function LoginForm({ next }: { next?: string }) {
         name="password"
         label="Password"
         hint={
-          <Link href="/auth/forgot-password" className="text-ink-2 underline underline-offset-4">
+          <Link href="/auth/forgot-password" className="text-ink-2 transition-colors hover:text-ink">
             Forgot your password?
           </Link>
         }

@@ -23,7 +23,7 @@ export default async function LoginPage({
           New to Encore?{" "}
           <Link
             href={`/auth/register${next ? `?next=${encodeURIComponent(next)}` : ""}`}
-            className="font-medium text-ink underline underline-offset-4"
+            className="font-medium text-ink transition-colors hover:text-ink-2"
           >
             Create an account
           </Link>

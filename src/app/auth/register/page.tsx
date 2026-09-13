@@ -23,7 +23,7 @@ export default async function RegisterPage({
           Already have an account?{" "}
           <Link
             href={`/auth/login${next ? `?next=${encodeURIComponent(next)}` : ""}`}
-            className="font-medium text-ink underline underline-offset-4"
+            className="font-medium text-ink transition-colors hover:text-ink-2"
           >
             Sign in
           </Link>
