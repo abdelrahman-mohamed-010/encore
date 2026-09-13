@@ -6,9 +6,8 @@ import {
 } from "recharts";
 import { formatMoney, formatNumber } from "@/lib/format";
 
-import type { SalesPoint } from "@/features/dashboard/queries";
+import type { SalesPoint } from "@/features/dashboard/types";
 
-export type { SalesPoint };
 
 const AXIS_STYLE = { fontSize: 12, fill: "var(--viz-axis)" } as const;
 

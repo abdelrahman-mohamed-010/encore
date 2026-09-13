@@ -1,9 +1,11 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
 import { paginate, type Paged } from "@/lib/pagination";
+import type { RecentEvent, SalesPoint } from "@/features/dashboard/types";
+export type { RecentEvent, SalesPoint };
 import type { EventStatus, OrderStatus, OrganizerStats } from "@/lib/types";
 
-export type SalesPoint = { day: string; gross_cents: number; orders: number; tickets: number };
+
 
 export type DashboardEventItem = {
   id: string;
@@ -174,14 +176,7 @@ export async function listOrganizerAttendees({
   return paginate(data as DashboardAttendeeItem[] | null, count, pageSize);
 }
 
-export type RecentEvent = {
-  id: string;
-  title: string;
-  slug: string;
-  status: EventStatus;
-  starts_at: string;
-  cover_image_url: string | null;
-};
+
 
 export type OverviewPromises = {
   stats: PromiseLike<OrganizerStats>;
