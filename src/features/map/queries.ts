@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import { NEARBY_RADIUS_KM } from "@/lib/geo";
+import { NEARBY_RADIUS_KM } from "@/features/map/geo";
 import type { EventPin } from "@/lib/types";
 
 /**

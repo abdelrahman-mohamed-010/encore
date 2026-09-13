@@ -3,8 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { getOrganizerBySlug } from "@/features/organizers/queries";
-import { fetchEventPins } from "@/lib/events-map";
-import { getEdgeLocation } from "@/lib/geo-server";
+import { fetchEventPins } from "@/features/map/queries";
+import { getEdgeLocation } from "@/features/map/geo-server";
 import { MapExplorer } from "@/features/map/components/map-explorer";
 import { Button } from "@/components/ui/button";
 

@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/ui/empty-state";import { Button } from 
 import { LoadMoreEvents } from "@/features/catalog/components/load-more-events";
 import { formatNumber } from "@/lib/format";
 import type { EventSearchResult } from "@/lib/types";
-import type { EventSearchParams } from "@/lib/event-search-params";
+import type { EventSearchParams } from "@/features/catalog/search-params";
 
 export async function EventsResults({
   resultsPromise,

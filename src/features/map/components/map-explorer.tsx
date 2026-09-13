@@ -9,9 +9,10 @@ import { EventMap } from "@/features/map/components/event-map";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-import { EmptyState } from "@/components/ui/empty-state";import { useMediaQuery } from "@/hooks/use-media-query";
+import { EmptyState } from "@/components/ui/empty-state";
+import { useMediaQuery } from "@/features/map/hooks/use-media-query";
 import { formatDateTime, formatMoney } from "@/lib/format";
-import { formatDistance } from "@/lib/geo";
+import { formatDistance } from "@/features/map/geo";
 import { cn } from "@/lib/utils";
 import type { EventPin } from "@/lib/types";
 

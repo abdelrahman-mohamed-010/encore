@@ -17,5 +17,3 @@ export function useMediaQuery(query: string) {
     () => false,
   );
 }
-
-export const useIsMobile = () => useMediaQuery("(max-width: 767px)");

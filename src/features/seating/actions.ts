@@ -5,7 +5,7 @@ import { z } from "zod";
 import { actionError, authActionClient, requireOrgAccess } from "@/lib/safe-action";
 import { seatingSchema } from "@/lib/validation";
 import { uuid } from "@/lib/validation/common";
-import { generateSeats, sectionCode, type SectionSpec } from "@/lib/seat-layout";
+import { generateSeats, sectionCode, type SectionSpec } from "@/features/seating/seat-layout";
 
 const target = z.object({
   eventId: uuid,

@@ -1,7 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import { buildSearchEventsArgs, type EventSearchParams } from "@/lib/event-search-params";
+import { buildSearchEventsArgs, type EventSearchParams } from "@/features/catalog/search-params";
 import type { Category, EventSearchResult } from "@/lib/types";
 
 export async function getHomeData() {

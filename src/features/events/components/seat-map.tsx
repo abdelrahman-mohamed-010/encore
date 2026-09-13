@@ -11,7 +11,9 @@ import {
 } from "react-zoom-pan-pinch";
 import { toast } from "sonner";
 import { createReservation } from "@/features/checkout/actions";
-import { useAsyncAction, useSeatSelection, useTicketSelection } from "@/hooks";
+import { useAsyncAction } from "@/hooks";
+import { useSeatSelection } from "@/features/events/hooks/use-seat-selection";
+import { useTicketSelection } from "@/features/events/hooks/use-ticket-selection";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
 import { buildSeatPlan, seatInDirection, SEAT_SIZE, type PlanSeat } from "@/lib/seat-plan";

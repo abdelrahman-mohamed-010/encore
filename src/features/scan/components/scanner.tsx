@@ -5,7 +5,8 @@ import { Camera, CameraOff, CheckCircle2, KeyRound, XCircle } from "lucide-react
 import { toast } from "sonner";
 import { scanTicket, type ScanOutcomeData } from "@/features/scan/actions";
 import type { ScanResult } from "@/lib/types";
-import { useAsyncAction, useQrScanner } from "@/hooks";
+import { useAsyncAction } from "@/hooks";
+import { useQrScanner } from "@/features/scan/hooks/use-qr-scanner";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/surface";
 import { Field, Input } from "@/components/ui/input";

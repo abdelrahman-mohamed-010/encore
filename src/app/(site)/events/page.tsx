@@ -7,7 +7,7 @@ import { EventCardSkeleton } from "@/features/catalog/components/event-card";
 import { EventFilters } from "@/features/catalog/components/event-filters";
 import { CategoryRail } from "@/features/catalog/components/category-rail";
 import { Button } from "@/components/ui/button";
-import { single, type EventSearchParams } from "@/lib/event-search-params";
+import { single, type EventSearchParams } from "@/features/catalog/search-params";
 import { EventsResults } from "./events-results";
 
 export const metadata: Metadata = {

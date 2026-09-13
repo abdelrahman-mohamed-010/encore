@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink, MapPin, Users } from "lucide-react";
 import { getVenueBySlug } from "@/features/catalog/queries";
-import { fetchEventPins } from "@/lib/events-map";
+import { fetchEventPins } from "@/features/map/queries";
 import { EventMap } from "@/features/map/components/event-map";
 import { Card, SectionHeader } from "@/components/ui/surface";
 import { Badge } from "@/components/ui/badge";

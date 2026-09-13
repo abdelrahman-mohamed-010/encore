@@ -1,6 +1,6 @@
 import "server-only";
 import { headers } from "next/headers";
-import type { ViewerLocation } from "@/lib/geo";
+import type { ViewerLocation } from "@/features/map/geo";
 
 /**
  * Where the viewer is, inferred without asking them.

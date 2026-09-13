@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { fetchEventPins } from "@/lib/events-map";
-import { getEdgeLocation } from "@/lib/geo-server";
+import { fetchEventPins } from "@/features/map/queries";
+import { getEdgeLocation } from "@/features/map/geo-server";
 import { MapExplorer } from "@/features/map/components/map-explorer";
 import { Button } from "@/components/ui/button";
 

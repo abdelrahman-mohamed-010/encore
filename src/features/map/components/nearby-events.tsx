@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, SectionHeader } from "@/components/ui/surface";
 import { Callout } from "@/components/ui/callout";
 import { useAsyncAction } from "@/hooks";
-import { formatDistance } from "@/lib/geo";
+import { formatDistance } from "@/features/map/geo";
 import type { EventPin } from "@/lib/types";
 
 /**

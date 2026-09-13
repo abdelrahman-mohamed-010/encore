@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { buildSearchEventsArgs, dateWindow, single } from "@/lib/event-search-params";
+import { buildSearchEventsArgs, dateWindow, single } from "@/features/catalog/search-params";
 
 describe("single", () => {
   it("takes the first value when a param repeats", () => {
