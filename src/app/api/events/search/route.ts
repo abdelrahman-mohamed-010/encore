@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { buildSearchEventsArgs } from "@/lib/event-search-params";
+import { buildSearchEventsArgs } from "@/features/catalog/search-params";
 import type { EventSearchResult } from "@/lib/types";
 
 const PAGE_SIZE = 20;

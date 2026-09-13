@@ -18,7 +18,7 @@ export function TableWrap({ className, ...props }: React.HTMLAttributes<HTMLDivE
 }
 
 export function Table({ className, ...props }: React.TableHTMLAttributes<HTMLTableElement>) {
-  return <table className={cn("w-full min-w-160 caption-bottom text-sm", className)} {...props} />;
+  return <table className={cn("table-stack w-full caption-bottom text-sm sm:min-w-160", className)} {...props} />;
 }
 
 export function THead({ className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) {
@@ -351,4 +351,29 @@ export function useTablePagination<T>(items: T[], initialPageSize = 10) {
       setCurrentPage(1);
     },
   };
+}
+
+/** The pagination row every list screen repeated as its own <tfoot>. */
+export function TableFooterPagination({
+  columns,
+  page,
+  totalPages,
+  total,
+  pageSize,
+}: {
+  columns: number;
+  page: number;
+  totalPages: number;
+  total: number;
+  pageSize: number;
+}) {
+  return (
+    <tfoot>
+      <tr>
+        <td colSpan={columns} className="p-0">
+          <PaginationRow page={page} totalPages={totalPages} total={total} pageSize={pageSize} />
+        </td>
+      </tr>
+    </tfoot>
+  );
 }

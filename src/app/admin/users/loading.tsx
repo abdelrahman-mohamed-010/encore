@@ -1,4 +1,4 @@
-import { UserTableShell } from "@/components/admin/user-table";
+import { UserTableShell } from "@/features/admin/components/user-table";
 import { TableRowsSkeleton } from "@/components/ui/table";
 
 /** See dashboard/[slug]/events/loading.tsx — exists to make this dynamic route prefetchable. */

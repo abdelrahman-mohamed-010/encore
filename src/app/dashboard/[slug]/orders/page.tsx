@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { requireOrganizer } from "@/lib/auth";
-import { DashboardOrdersShell } from "@/components/dashboard/dashboard-orders-table";
-import { OrdersRows } from "@/components/dashboard/dashboard-orders-rows";
+import { DashboardOrdersShell } from "@/features/dashboard/components/dashboard-orders-table";
+import { OrdersRows } from "@/features/dashboard/components/dashboard-orders-rows";
 
 export const metadata: Metadata = { title: "Orders" };
 

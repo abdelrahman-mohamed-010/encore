@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/misc";
+
+import { EmptyState } from "@/components/ui/empty-state";
 import { CalendarX } from "lucide-react";
 
 export default function EventNotFound() {

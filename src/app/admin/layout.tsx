@@ -2,7 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/auth";
 import { SiteHeader } from "@/components/layout/site-header";
 import { Button } from "@/components/ui/button";
-import { AdminTabs } from "@/components/admin/admin-nav";
+import { AdminTabs } from "@/features/admin/components/admin-nav";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   await requireAdmin();

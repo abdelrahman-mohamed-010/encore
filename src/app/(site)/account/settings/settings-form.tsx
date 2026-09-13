@@ -2,15 +2,16 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowUp, Globe, Lock } from "lucide-react";
 import { toast } from "sonner";
+import { updateProfile } from "@/features/account/actions";
 import { createClient } from "@/lib/supabase/client";
 import { useAsyncAction } from "@/hooks";
 import { profileSchema, type ProfileData, type ProfileValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
+import { SettingsRow } from "@/components/ui/settings-row";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Input, Textarea, PrefixInput, Label } from "@/components/ui/input";
 import type { Profile } from "@/lib/types";
@@ -50,18 +51,16 @@ function LinkedinIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 export function SettingsForm({ profile }: { profile: Profile }) {
-  const router = useRouter();
 
-  // Parse first and last names from profile.full_name
-  const initialNameParts = (profile.full_name ?? "").trim().split(" ");
-  const [firstName, setFirstName] = React.useState(initialNameParts[0] ?? "");
-  const [lastName, setLastName] = React.useState(initialNameParts.slice(1).join(" ") ?? "");
   const [resettingPassword, setResettingPassword] = React.useState(false);
+
+  const nameParts = (profile.full_name ?? "").trim().split(" ");
 
   const form = useForm<ProfileValues, unknown, ProfileData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: profile.full_name ?? "",
+      firstName: nameParts[0] ?? "",
+      lastName: nameParts.slice(1).join(" "),
       phone: profile.phone ?? "",
       bio: profile.bio ?? "",
       avatarUrl: profile.avatar_url ?? "",
@@ -76,26 +75,9 @@ export function SettingsForm({ profile }: { profile: Profile }) {
   const avatarUrl = useWatch({ control: form.control, name: "avatarUrl" });
 
   const save = useAsyncAction(async (values: ProfileData) => {
-    const combinedName = `${firstName} ${lastName}`.trim() || values.fullName || null;
-
-    const { error } = await createClient()
-      .from("profiles")
-      .update({
-        full_name: combinedName,
-        phone: values.phone || null,
-        bio: values.bio || null,
-        avatar_url: values.avatarUrl || null,
-        website: values.website || null,
-        instagram: values.instagram || null,
-        twitter: values.twitter || null,
-        youtube: values.youtube || null,
-        linkedin: values.linkedin || null,
-      })
-      .eq("id", profile.id);
-
-    if (error) throw new Error(error.message);
+    const result = await updateProfile(values);
+    if (result?.serverError) throw new Error(result.serverError);
     toast.success("Profile saved");
-    router.refresh();
   });
 
   const handleSendPasswordReset = async () => {
@@ -130,24 +112,12 @@ export function SettingsForm({ profile }: { profile: Profile }) {
             {/* Form Inputs on the left */}
             <div className="space-y-5">
               <div className="grid gap-5 sm:grid-cols-2">
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="first-name">First Name</Label>
-                  <Input
-                    id="first-name"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    placeholder="First name"
-                  />
-                </div>
-                <div className="flex flex-col gap-2">
-                  <Label htmlFor="last-name">Last Name</Label>
-                  <Input
-                    id="last-name"
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    placeholder="Last name"
-                  />
-                </div>
+                <FormField<ProfileValues, "firstName"> name="firstName" label="First Name">
+                  {(field) => <Input {...field} placeholder="First name" />}
+                </FormField>
+                <FormField<ProfileValues, "lastName"> name="lastName" label="Last Name">
+                  {(field) => <Input {...field} placeholder="Last name" />}
+                </FormField>
               </div>
 
               <div className="flex flex-col gap-2">
@@ -253,30 +223,28 @@ export function SettingsForm({ profile }: { profile: Profile }) {
           <p className="mt-1 text-sm text-ink-3">Manage your password and authentication.</p>
         </div>
 
-        <div className="flex flex-col justify-between gap-4 rounded-2xl border border-hairline/70 bg-card/60 p-4.5 sm:flex-row sm:items-center">
-          <div className="flex items-start gap-3.5">
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-sunken text-ink-2">
-              <Lock className="size-5" />
-            </div>
-            <div>
-              <h4 className="text-sm font-semibold text-ink">Account Password</h4>
-              <p className="text-xs text-ink-3">
-                Send a secure reset link to <span className="font-medium text-ink">{profile.email}</span>
-              </p>
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={handleSendPasswordReset}
-            disabled={resettingPassword}
-            className="rounded-xl shrink-0"
-          >
-            {resettingPassword ? "Sending..." : "Reset Password"}
-          </Button>
-        </div>
+        <SettingsRow
+          icon={Lock}
+          title="Account Password"
+          description={
+            <>
+              Send a secure reset link to{" "}
+              <span className="font-medium text-ink">{profile.email}</span>
+            </>
+          }
+          action={
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleSendPasswordReset}
+              disabled={resettingPassword}
+              className="rounded-xl shrink-0"
+            >
+              {resettingPassword ? "Sending..." : "Reset Password"}
+            </Button>
+          }
+        />
       </section>
     </div>
   );

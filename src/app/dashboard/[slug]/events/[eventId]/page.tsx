@@ -1,30 +1,23 @@
 import Link from "next/link";
+import { BackLink } from "@/components/ui/back-link";
+import { EventStatusBadge } from "@/components/ui/status-badge";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { ArrowLeft, ExternalLink, Eye, Ticket, TicketCheck, Wallet } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { ExternalLink, Eye, Ticket, TicketCheck, Wallet } from "lucide-react";
+import { getEventDetail } from "@/features/events/queries";
 import { requireOrganizer } from "@/lib/auth";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/surface";
-import { Meter, StatTile } from "@/components/ui/misc";
-import { TicketTypeEditor } from "@/components/dashboard/ticket-type-editor";
-import { SeatingEditor, type SeatingSection } from "@/components/dashboard/seating-editor";
-import { EventStatusControl } from "@/components/dashboard/event-status-control";
-import { EventFormDrawer } from "@/components/dashboard/event-form-drawer";
+
+import { Meter } from "@/components/ui/meter";
+import { StatTile } from "@/components/ui/stat-tile";
+import { TicketTypeEditor } from "@/features/events/components/ticket-type-editor";
+import { SeatingEditor, type SeatingSection } from "@/features/seating/components/seating-editor";
+import { EventStatusControl } from "@/features/events/components/event-status-control";
+import { EventFormDrawer } from "@/features/events/components/event-form-drawer";
 import { formatDateTime, formatMoney, formatNumber } from "@/lib/format";
-import type { EventStats, EventStatus } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Manage event" };
-
-const STATUS_TONE: Record<EventStatus, "positive" | "caution" | "neutral" | "critical"> = {
-  published: "positive",
-  draft: "neutral",
-  pending_review: "caution",
-  paused: "caution",
-  cancelled: "critical",
-  completed: "neutral",
-};
 
 export default async function ManageEventPage({
   params,
@@ -33,41 +26,12 @@ export default async function ManageEventPage({
 }) {
   const { slug, eventId } = await params;
   const { organizer, role } = await requireOrganizer(slug, "scanner");
-  const supabase = await createClient();
+  const detail = await getEventDetail(eventId, organizer.id);
+  if (!detail) notFound();
 
-  const { data: event } = await supabase
-    .from("events")
-    .select("*, venue:venues(id, name, city), category:categories(name)")
-    .eq("id", eventId)
-    .eq("organizer_id", organizer.id)
-    .maybeSingle();
+  const { event, stats, ticketTypes, venueSections, soldOrHeld } = detail;
 
-  if (!event) notFound();
-
-  const [{ data: statsData }, { data: ticketTypes }, { data: venueSections }, { count: soldOrHeld }] =
-    await Promise.all([
-      supabase.rpc("event_stats", { p_event_id: eventId }),
-      supabase.from("ticket_types").select("*").eq("event_id", eventId).order("sort_order"),
-      // The venue's seat map, if it has one — the editor needs to know whether
-      // it is building a map or reusing one that already exists.
-      event.venue_id
-        ? supabase
-            .from("venue_sections")
-            .select("id, name, color, venue_seats(count)")
-            .eq("venue_id", event.venue_id)
-            .order("sort_order")
-        : Promise.resolve({ data: [] }),
-      supabase
-        .from("event_seats")
-        .select("id", { count: "exact", head: true })
-        .eq("event_id", eventId)
-        .neq("status", "available"),
-    ]);
-
-  const stats = (statsData ?? {}) as unknown as EventStats;
-  const sections: SeatingSection[] = (
-    (venueSections ?? []) as { id: string; name: string; color: string; venue_seats: { count: number }[] }[]
-  ).map((section) => ({
+  const sections: SeatingSection[] = venueSections.map((section) => ({
     id: section.id,
     name: section.name,
     color: section.color,
@@ -78,21 +42,13 @@ export default async function ManageEventPage({
 
   return (
     <div className="space-y-6 px-5 md:px-8">
-      <Link
-        href={`/dashboard/${slug}/events`}
-        className="inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
-      >
-        <ArrowLeft className="size-3.5" />
-        Events
-      </Link>
+      <BackLink href={`/dashboard/${slug}/events`}>Events</BackLink>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="display-3 text-ink">{event.title}</h1>
-            <Badge tone={STATUS_TONE[event.status]} size="xs">
-              {event.status.replace("_", " ")}
-            </Badge>
+            <EventStatusBadge status={event.status} size="xs" />
           </div>
           <p className="mt-2 text-sm text-ink-3">
             {formatDateTime(event.starts_at, event.timezone ?? undefined)}
@@ -116,7 +72,9 @@ export default async function ManageEventPage({
               trigger={<Button variant="outline" size="sm">Edit details</Button>}
             />
           )}
-          {canEdit && <EventStatusControl eventId={eventId} status={event.status} />}
+          {canEdit && (
+            <EventStatusControl eventId={eventId} organizerSlug={slug} status={event.status} />
+          )}
         </div>
       </div>
 
@@ -180,6 +138,7 @@ export default async function ManageEventPage({
       {canEdit && (
         <TicketTypeEditor
           eventId={eventId}
+          organizerSlug={slug}
           ticketTypes={ticketTypes ?? []}
           seatingType={event.seating_type}
           sections={sections}
@@ -189,6 +148,7 @@ export default async function ManageEventPage({
       {canEdit && (
         <SeatingEditor
           eventId={eventId}
+          organizerSlug={slug}
           seatingType={event.seating_type}
           venue={event.venue ? { id: event.venue.id, name: event.venue.name } : null}
           sections={sections}

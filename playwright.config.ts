@@ -33,7 +33,9 @@ export default defineConfig({
   webServer: {
     // NEXT_PUBLIC_* values are inlined during the build, so the build itself has
     // to be pointed at the mock — overriding them at start-up alone is too late.
+    // cross-env because a bare VAR=value prefix is not a command on Windows.
     command:
+      "npx cross-env " +
       "NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321 " +
       "NEXT_PUBLIC_SUPABASE_ANON_KEY=test-anon-key " +
       `NEXT_PUBLIC_SITE_URL=http://127.0.0.1:${PORT} ` +

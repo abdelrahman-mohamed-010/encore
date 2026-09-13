@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { generateSeats, rowLabel, sectionCode, type SectionSpec } from "@/lib/seat-layout";
+import { generateSeats, rowLabel, sectionCode, type SectionSpec } from "@/features/seating/seat-layout";
 
 const spec = (name: string, rows: number, seatsPerRow: number): SectionSpec => ({
   name,

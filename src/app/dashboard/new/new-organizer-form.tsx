@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useForm, useWatch } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { createClient } from "@/lib/supabase/client";
+import { createOrganizer } from "@/features/organizers/actions";
 import { useAsyncAction } from "@/hooks";
 import { organizerSchema, slugify, type OrganizerData, type OrganizerValues } from "@/lib/validation";
 import { Button } from "@/components/ui/button";
@@ -23,33 +23,12 @@ export function NewOrganizerForm() {
   const slug = useWatch({ control: form.control, name: "slug" });
 
   const create = useAsyncAction(async (values: OrganizerData) => {
-    const supabase = createClient();
-    const { data: auth } = await supabase.auth.getUser();
-    if (!auth.user) throw new Error("Your session expired. Sign in again.");
-
-    const { data, error } = await supabase
-      .from("organizers")
-      .insert({
-        owner_id: auth.user.id,
-        name: values.name,
-        slug: values.slug,
-        description: values.description || null,
-        support_email: values.supportEmail || null,
-      })
-      .select("slug")
-      .single();
-
-    if (error) {
-      throw new Error(
-        error.code === "23505"
-          ? "That web address is already taken. Try another."
-          : error.message,
-      );
-    }
+    const result = await createOrganizer(values);
+    if (result?.serverError) throw new Error(result.serverError);
+    if (!result?.data) throw new Error("Check the form and try again.");
 
     toast.success("Organization created");
-    router.push(`/dashboard/${data.slug}`);
-    router.refresh();
+    router.push(`/dashboard/${result.data.slug}`);
   });
 
   return (

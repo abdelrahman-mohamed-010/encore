@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Check } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getPlatformSettings } from "@/features/catalog/queries";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, SectionHeader } from "@/components/ui/surface";
 import { formatMoney } from "@/lib/format";
@@ -21,8 +21,7 @@ const INCLUDED = [
 ];
 
 export default async function PricingPage() {
-  const supabase = await createClient();
-  const { data: settings } = await supabase.from("platform_settings").select("*").maybeSingle();
+  const settings = await getPlatformSettings();
 
   const percent = settings?.platform_fee_percent ?? 5;
   const fixed = settings?.platform_fee_fixed_cents ?? 99;

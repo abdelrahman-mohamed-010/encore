@@ -1,39 +1,20 @@
 import Link from "next/link";
+import { OrderStatusBadge } from "@/components/ui/status-badge";
 import Image from "next/image";
 import type { Metadata } from "next";
 import { CalendarDays, MapPin, Receipt, Ticket } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { listMyOrders } from "@/features/account/queries";
 import { requireUser } from "@/lib/auth";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/misc";
+
+import { EmptyState } from "@/components/ui/empty-state";
 import { formatEventStamp, formatMoney, pluralize } from "@/lib/format";
-import type { OrderStatus } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Orders" };
 
-const TONE: Record<OrderStatus, "positive" | "caution" | "critical" | "neutral"> = {
-  paid: "positive",
-  pending: "caution",
-  failed: "critical",
-  cancelled: "neutral",
-  refunded: "critical",
-  partially_refunded: "caution",
-};
-
 export default async function OrdersPage() {
   const user = await requireUser();
-  const supabase = await createClient();
-
-  const { data: orders } = await supabase
-    .from("orders")
-    .select(
-      `id, order_number, status, total_cents, currency, created_at, refunded_cents,
-       event:events(id, title, slug, cover_image_url, starts_at, ends_at, timezone, is_online, venue:venues(name, city)),
-       tickets:tickets(count)`,
-    )
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  const orders = await listMyOrders(user.id);
 
   if (!orders || orders.length === 0) {
     return (
@@ -85,9 +66,7 @@ export default async function OrdersPage() {
               )}
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
-                <Badge tone={TONE[order.status]} size="xs">
-                  {order.status.replace("_", " ")}
-                </Badge>
+                <OrderStatusBadge status={order.status} size="xs" />
                 {ticketCount > 0 && (
                   <span className="inline-flex items-center gap-1.5 rounded-md bg-sunken px-2 py-1 text-xs font-medium text-ink-2">
                     <Ticket className="size-3 text-ink-3" />

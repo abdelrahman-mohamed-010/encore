@@ -1,16 +1,10 @@
-import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { fail, ok, parseBody } from "@/lib/api";
+import { validatePromoSchema } from "@/lib/validation";
 import type { PromoValidation } from "@/lib/types";
 
-const schema = z.object({
-  eventId: z.string().uuid(),
-  code: z.string().min(1).max(40),
-  subtotalCents: z.number().int().min(0),
-});
-
 export async function POST(request: Request) {
-  const parsed = await parseBody(request, schema);
+  const parsed = await parseBody(request, validatePromoSchema);
   if (parsed.response) return parsed.response;
 
   const supabase = await createClient();

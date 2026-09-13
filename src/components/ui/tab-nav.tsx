@@ -42,7 +42,12 @@ export function TabNav({
 
   return (
     <nav
-      className={cn("-mb-px flex gap-6 overflow-x-auto no-scrollbar", className)}
+      className={cn(
+        // Bleeds to the viewport edge below sm so the last tab scrolls clear of
+        // the gutter instead of being clipped mid-word.
+        "-mb-px flex gap-6 overflow-x-auto no-scrollbar max-sm:-mx-5 max-sm:px-5",
+        className,
+      )}
       aria-label="Sections"
     >
       {items.map((item) => {

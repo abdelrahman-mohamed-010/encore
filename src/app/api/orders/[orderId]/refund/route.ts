@@ -1,13 +1,8 @@
-import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
 import { fail, ok, parseBody } from "@/lib/api";
+import { requireOrgRoleJson, requireUserJson } from "@/lib/api-guards";
 import { providerForOrder } from "@/lib/payments";
 import { recordRefund } from "@/lib/payments/rpc";
-
-const schema = z.object({
-  amountCents: z.number().int().positive(),
-  reason: z.string().trim().max(300).optional(),
-});
+import { refundSchema } from "@/lib/validation";
 
 /**
  * Organizer-initiated refund. The money moves at the provider first; only then
@@ -18,30 +13,26 @@ export async function POST(
   { params }: { params: Promise<{ orderId: string }> },
 ) {
   const { orderId } = await params;
-  const parsed = await parseBody(request, schema);
+  const parsed = await parseBody(request, refundSchema);
   if (parsed.response) return parsed.response;
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return fail("You must be signed in.", 401);
+  const auth = await requireUserJson();
+  if (auth.response) return auth.response;
+  const { supabase, user } = auth.data;
 
   // RLS lets tenant staff read the order; the membership check below then
   // narrows refunds to owners and admins.
   const { data: order } = await supabase.from("orders").select("*").eq("id", orderId).maybeSingle();
   if (!order) return fail("Order not found.", 404);
 
-  const { data: membership } = await supabase
-    .from("organizer_members")
-    .select("role")
-    .eq("organizer_id", order.organizer_id)
-    .eq("user_id", user.id)
-    .maybeSingle();
-
-  if (!membership || !["owner", "admin"].includes(membership.role)) {
-    return fail("Only an owner or admin can issue refunds.", 403);
-  }
+  const allowed = await requireOrgRoleJson(
+    supabase,
+    order.organizer_id,
+    user.id,
+    "admin",
+    "Only an owner or admin can issue refunds.",
+  );
+  if (allowed.response) return allowed.response;
 
   const remaining = order.total_cents - order.refunded_cents;
   if (parsed.data.amountCents > remaining) {

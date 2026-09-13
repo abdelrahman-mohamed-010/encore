@@ -43,22 +43,6 @@ export const optionalUrl = z
 export const optionalText = (max: number) =>
   z.string().trim().max(max, `Keep this under ${max} characters.`).optional().or(z.literal(""));
 
-/** Money typed by a human ("12", "12.50") converted to integer cents. */
-export const moneyToCents = z
-  .string()
-  .trim()
-  .min(1, "Enter an amount.")
-  .refine((value) => /^\d+(\.\d{1,2})?$/.test(value), "Enter an amount like 12.50.")
-  .transform((value) => Math.round(Number(value) * 100));
-
-/** A whole number typed into a text input. */
-export const wholeNumber = (message = "Enter a whole number.") =>
-  z
-    .string()
-    .trim()
-    .refine((value) => /^\d+$/.test(value), message)
-    .transform(Number);
-
 export const slug = z
   .string()
   .trim()

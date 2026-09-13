@@ -1,12 +1,8 @@
-import { z } from "zod";
-import { createClient } from "@/lib/supabase/server";
 import { fail, ok, parseBody, rpcErrorCode } from "@/lib/api";
+import { requireUserJson } from "@/lib/api-guards";
 import { finalizeOrderPayment, failOrderPayment } from "@/lib/payments/rpc";
 import { sandboxDecline } from "@/lib/payments";
-
-const schema = z.object({
-  cardNumber: z.string().trim().min(12).max(24),
-});
+import { sandboxPaySchema } from "@/lib/validation";
 
 /**
  * Sandbox settlement. Used for free orders and for organizers who have not
@@ -18,12 +14,9 @@ export async function POST(
   { params }: { params: Promise<{ orderId: string }> },
 ) {
   const { orderId } = await params;
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return fail("You must be signed in.", 401);
+  const auth = await requireUserJson();
+  if (auth.response) return auth.response;
+  const { supabase, user } = auth.data;
 
   const { data: order } = await supabase
     .from("orders")
@@ -41,7 +34,7 @@ export async function POST(
 
   // Free orders skip the card entirely.
   if (order.total_cents > 0) {
-    const parsed = await parseBody(request, schema);
+    const parsed = await parseBody(request, sandboxPaySchema);
     if (parsed.response) return parsed.response;
 
     const decline = sandboxDecline(parsed.data.cardNumber);

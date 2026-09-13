@@ -13,6 +13,8 @@ console.log(`[stack] mock supabase on :${MOCK_PORT}`);
 
 const next = spawn("npx", ["next", "start", "--port", String(APP_PORT)], {
   stdio: "inherit",
+  // Windows resolves npx only through the shell.
+  shell: process.platform === "win32",
   env: {
     ...process.env,
     NEXT_PUBLIC_SUPABASE_URL: `http://127.0.0.1:${MOCK_PORT}`,

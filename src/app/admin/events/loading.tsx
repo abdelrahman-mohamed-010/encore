@@ -1,4 +1,4 @@
-import { EventReviewShell } from "@/components/admin/event-review-list";
+import { EventReviewShell } from "@/features/admin/components/event-review-list";
 import { TableRowsSkeleton } from "@/components/ui/table";
 
 /** See dashboard/[slug]/events/loading.tsx — exists to make this dynamic route prefetchable. */

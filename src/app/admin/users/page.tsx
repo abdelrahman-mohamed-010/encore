@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SectionHeader } from "@/components/ui/surface";
-import { UserTableShell } from "@/components/admin/user-table";
-import { UserRows } from "@/components/admin/user-table-rows";
+import { UserTableShell } from "@/features/admin/components/user-table";
+import { UserRows } from "@/features/admin/components/user-table-rows";
 
 export const metadata: Metadata = { title: "Users" };
 

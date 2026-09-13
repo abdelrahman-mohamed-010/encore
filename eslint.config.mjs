@@ -13,6 +13,39 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/lib/supabase/client",
+              message:
+                "Database reads belong in features/*/queries.ts and writes in a server action. The browser client is only for Supabase auth, storage uploads and edge functions.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Supabase auth must run in the browser to set the session cookie; storage
+    // uploads and edge-function invokes stream straight from the client.
+    files: [
+      "src/app/auth/**/*.tsx",
+      "src/features/auth/components/**/*.tsx",
+      "src/components/layout/user-menu.tsx",
+      "src/components/ui/image-upload.tsx",
+      "src/app/(site)/account/settings/settings-form.tsx",
+      "src/features/organizers/components/organizer-settings-form.tsx",
+      "src/features/organizers/components/report-download.tsx",
+      "src/lib/supabase/client.ts",
+    ],
+    rules: { "no-restricted-imports": "off" },
+  },
 ]);
 
 export default eslintConfig;

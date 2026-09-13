@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { requireOrganizer } from "@/lib/auth";
-import { OrganizerSettingsForm } from "@/components/dashboard/organizer-settings-form";
+import { OrganizerSettingsForm } from "@/features/organizers/components/organizer-settings-form";
 
 export const metadata: Metadata = { title: "Settings" };
 

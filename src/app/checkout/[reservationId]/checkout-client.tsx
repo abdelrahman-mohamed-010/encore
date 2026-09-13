@@ -1,14 +1,16 @@
 "use client";
+import { BackLink } from "@/components/ui/back-link";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { ArrowLeft, CheckCircle2, CreditCard, Timer } from "lucide-react";
+import { CheckCircle2, CreditCard, Timer } from "lucide-react";
 import { toast } from "sonner";
-import { useAsyncAction, useCountdown, usePromoCode } from "@/hooks";
+import { useAsyncAction } from "@/hooks";
+import { useCountdown } from "@/features/checkout/hooks/use-countdown";
+import { usePromoCode } from "@/features/checkout/hooks/use-promo-code";
 import { buyerSchema, type BuyerData, type BuyerValues } from "@/lib/validation/checkout";
 import { orderTotals, type FeeSettings } from "@/lib/pricing";
 import { formatCountdown, formatEventStamp, formatMoney } from "@/lib/format";
@@ -17,9 +19,10 @@ import { Card, Divider } from "@/components/ui/surface";
 import { Badge } from "@/components/ui/badge";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { SummaryLine } from "@/components/ui/misc";
+
+import { SummaryLine } from "@/components/ui/stat-tile";
 import { cn } from "@/lib/utils";
-import { createClient } from "@/lib/supabase/client";
+import { expireReservations } from "@/features/checkout/actions";
 
 type Line = {
   id: string;
@@ -74,7 +77,7 @@ export function CheckoutClient({
     // instant the buyer lands on the event rather than a sweep later. Failing
     // to is not worth blocking the redirect: the sweep will catch it.
     try {
-      await createClient().rpc("expire_reservations", { p_event_id: event.id });
+      await expireReservations({ eventId: event.id });
     } catch {
       // ignored on purpose
     }
@@ -121,11 +124,7 @@ export function CheckoutClient({
 
     // 2. Settle it on whichever rail the order was created for.
     if (order.provider === "stripe") {
-      const intentResponse = await fetch(`/api/orders/${order.order_id}/intent`, { method: "POST" });
-      const intent = await intentResponse.json();
-      if (!intentResponse.ok) throw new Error(intent.error ?? "Could not start the card payment.");
-
-      router.push(`/checkout/complete?order=${order.order_id}&secret=${intent.clientSecret}`);
+      router.push(`/checkout/complete?order=${order.order_id}`);
       return;
     }
 
@@ -154,13 +153,9 @@ export function CheckoutClient({
 
   return (
     <div className="container-page py-8 md:py-10">
-      <Link
-        href={`/events/${event.slug}`}
-        className="mb-6 inline-flex items-center gap-1.5 text-sm text-ink-3 transition-colors hover:text-ink"
-      >
-        <ArrowLeft className="size-3.5" />
+      <BackLink href={`/events/${event.slug}`} className="mb-6">
         Back to event
-      </Link>
+      </BackLink>
 
       <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:gap-12">
         <Form id="checkout-form" form={form} onSubmit={pay.run} className="min-w-0 space-y-6">
@@ -239,18 +234,6 @@ export function CheckoutClient({
           )}
 
           <FormError message={pay.error} />
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="xl"
-            block
-            loading={form.formState.isSubmitting}
-            disabled={expired}
-            className="lg:hidden"
-          >
-            {submitLabel}
-          </Button>
         </Form>
 
         <aside className="lg:sticky lg:top-6 lg:self-start">
@@ -343,7 +326,7 @@ export function CheckoutClient({
               <SummaryLine label="Total" value={formatMoney(totals.totalCents, currency)} strong />
             </div>
 
-            <div className="hidden border-t border-hairline-soft p-4 lg:block">
+            <div className="border-t border-hairline-soft p-4">
               <Button
                 type="submit"
                 form="checkout-form"

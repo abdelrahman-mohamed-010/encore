@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { AuthCard } from "@/components/auth/auth-card";
-import { AuthDivider, OAuthButtons } from "@/components/auth/oauth-buttons";
+import { AuthCard } from "@/features/auth/components/auth-card";
+import { AuthDivider, OAuthButtons } from "@/features/auth/components/oauth-buttons";
 import { LoginForm } from "./login-form";
 
 export const metadata: Metadata = { title: "Sign in" };
@@ -23,18 +23,18 @@ export default async function LoginPage({
           New to Encore?{" "}
           <Link
             href={`/auth/register${next ? `?next=${encodeURIComponent(next)}` : ""}`}
-            className="font-medium text-ink underline underline-offset-4"
+            className="font-medium text-ink transition-colors hover:text-ink-2"
           >
             Create an account
           </Link>
         </>
       }
     >
-      <OAuthButtons next={next} />
-      <AuthDivider label="or continue with email" />
       <Suspense fallback={<div className="h-56 animate-pulse rounded-lg bg-sunken" />}>
         <LoginForm next={next} />
       </Suspense>
+      <AuthDivider label="or continue with" />
+      <OAuthButtons next={next} />
     </AuthCard>
   );
 }

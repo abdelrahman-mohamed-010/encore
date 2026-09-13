@@ -1,8 +1,8 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
-import { fetchNearbyPins } from "@/lib/events-map";
-import { NEARBY_RADIUS_KM } from "@/lib/geo";
-import { getEdgeLocation } from "@/lib/geo-server";
+import { fetchNearbyPins } from "@/features/map/queries";
+import { NEARBY_RADIUS_KM } from "@/features/map/geo";
+import { getEdgeLocation } from "@/features/map/geo-server";
 
 /**
  * The "near me" list.

@@ -2,22 +2,17 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
-import { fetchEventPins } from "@/lib/events-map";
-import { getEdgeLocation } from "@/lib/geo-server";
-import { MapExplorer } from "@/components/map/map-explorer";
+import { getOrganizerBySlug } from "@/features/organizers/queries";
+import { fetchEventPins } from "@/features/map/queries";
+import { getEdgeLocation } from "@/features/map/geo-server";
+import { MapExplorer } from "@/features/map/components/map-explorer";
 import { Button } from "@/components/ui/button";
 
 type Params = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
-  const supabase = await createClient();
-  const { data } = await supabase
-    .from("organizers")
-    .select("name")
-    .eq("slug", slug)
-    .maybeSingle();
+  const data = await getOrganizerBySlug(slug);
 
   return {
     title: data ? `${data.name} on the map` : "Map",
@@ -27,13 +22,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
 export default async function OrganizerMapPage({ params }: Params) {
   const { slug } = await params;
-  const supabase = await createClient();
-
-  const { data: organizer } = await supabase
-    .from("organizers")
-    .select("id, name, slug")
-    .eq("slug", slug)
-    .maybeSingle();
+  const organizer = await getOrganizerBySlug(slug);
 
   if (!organizer) notFound();
 

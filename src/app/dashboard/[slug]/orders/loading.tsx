@@ -1,6 +1,6 @@
 "use client";
 
-import { DashboardOrdersShell } from "@/components/dashboard/dashboard-orders-table";
+import { DashboardOrdersShell } from "@/features/dashboard/components/dashboard-orders-table";
 import { TableRowsSkeleton } from "@/components/ui/table";
 
 /** See events/loading.tsx — exists to make this dynamic route prefetchable. */

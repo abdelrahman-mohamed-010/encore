@@ -1,7 +1,11 @@
+import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { hasOrgRole } from "@/lib/roles";
 import type { OrgMemberRole, Organizer, Profile } from "@/lib/types";
+
+export { hasOrgRole };
 
 /** The signed-in auth user, or null. Memoised per request. */
 export const getUser = cache(async () => {
@@ -61,17 +65,6 @@ export const getMyOrganizers = cache(async (): Promise<MembershipWithOrganizer[]
     .filter((row): row is typeof row & { organizer: Organizer } => Boolean(row.organizer))
     .map((row) => ({ role: row.role, organizer: row.organizer }));
 });
-
-const ROLE_RANK: Record<OrgMemberRole, number> = {
-  scanner: 0,
-  staff: 1,
-  admin: 2,
-  owner: 3,
-};
-
-export function hasOrgRole(role: OrgMemberRole, minimum: OrgMemberRole) {
-  return ROLE_RANK[role] >= ROLE_RANK[minimum];
-}
 
 /**
  * Resolve the tenant addressed by a dashboard URL and assert the caller has at

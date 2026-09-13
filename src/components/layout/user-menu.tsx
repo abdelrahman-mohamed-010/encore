@@ -8,11 +8,12 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
-import { Avatar } from "@/components/ui/misc";
+
+import { Avatar } from "@/components/ui/avatar";
 import {
   Dropdown, DropdownContent, DropdownItem, DropdownLabel, DropdownSeparator, DropdownTrigger,
 } from "@/components/ui/dropdown";
-import { NewOrganizationModal } from "@/components/dashboard/new-organization-modal";
+import { NewOrganizationModal } from "@/features/organizers/components/new-organization-modal";
 import type { MembershipWithOrganizer } from "@/lib/auth";
 import type { Profile } from "@/lib/types";
 

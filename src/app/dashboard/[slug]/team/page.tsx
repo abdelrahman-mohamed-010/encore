@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { requireOrganizer } from "@/lib/auth";
-import { TeamShell } from "@/components/dashboard/team-manager";
-import { TeamRows } from "@/components/dashboard/team-rows";
+import { TeamShell } from "@/features/team/components/team-manager";
+import { TeamRows } from "@/features/team/components/team-rows";
 
 export const metadata: Metadata = { title: "Team" };
 
@@ -21,9 +21,10 @@ export default async function TeamPage({
   const canManageOwners = role === "owner";
 
   return (
-    <TeamShell organizerId={organizer.id} viewerRole={role}>
+    <TeamShell organizerSlug={organizer.slug} viewerRole={role}>
       <TeamRows
         organizerId={organizer.id}
+        organizerSlug={organizer.slug}
         canManageOwners={canManageOwners}
         query={q}
         roleFilter={roleFilter}

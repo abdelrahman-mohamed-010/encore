@@ -14,7 +14,10 @@ import { SelectField } from "@/components/ui/select";
 import { Combobox } from "@/components/ui/combobox";
 import { DateField, DateTimeField, formatLocalDateTime } from "@/components/ui/date-picker";
 import { ColorPicker } from "@/components/ui/color-picker";
-import { EmptyState, Meter, StatTile } from "@/components/ui/misc";
+
+import { Meter } from "@/components/ui/meter";
+import { EmptyState } from "@/components/ui/empty-state";
+import { StatTile } from "@/components/ui/stat-tile";
 import { Table, TBody, TD, TH, THead, TR, TableWrap } from "@/components/ui/table";
 import { Pagination, Steps } from "@/components/ui/nav";
 import { Kbd } from "@/components/ui/button";
@@ -24,7 +27,7 @@ import {
 import {
   Sheet, SheetBody, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle,
 } from "@/components/ui/sheet";
-import { EventCardSkeleton } from "@/components/events/event-card";
+import { EventCardSkeleton } from "@/features/catalog/components/event-card";
 import { cn } from "@/lib/utils";
 
 /**
@@ -438,10 +441,10 @@ export function DesignGallery() {
                     ["Layla Mostafa", "Bronze", "critical", "Refunded", "$40.00"],
                   ].map(([name, tier, tone, status, paid]) => (
                     <TR key={name}>
-                      <TD className="font-medium">{name}</TD>
-                      <TD>{tier}</TD>
-                      <TD><StatusDot tone={tone as "positive"}>{status}</StatusDot></TD>
-                      <TD numeric>{paid}</TD>
+                      <TD data-cell="primary" className="font-medium">{name}</TD>
+                      <TD data-label="Ticket">{tier}</TD>
+                      <TD data-label="Status"><StatusDot tone={tone as "positive"}>{status}</StatusDot></TD>
+                      <TD data-label="Paid" numeric>{paid}</TD>
                     </TR>
                   ))}
                 </TBody>

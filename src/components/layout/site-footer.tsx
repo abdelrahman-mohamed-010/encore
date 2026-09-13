@@ -24,31 +24,39 @@ export function SiteFooter() {
     <footer className="mt-24">
       <div className="container-page">
         <div className="flex flex-col gap-6 py-8 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+          {/*
+            Below sm the wordmark took the first line and left "Start selling"
+            orphaned on its own; grouping the links keeps them one tidy row
+            under the mark. At sm the group is a single flex item with the same
+            gap, so the row reads exactly as before.
+          */}
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-3 max-sm:flex-col max-sm:items-start max-sm:gap-4">
             <Logo showWordmark />
-            {LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="text-md text-ink-2 transition-colors hover:text-ink"
-              >
-                {link.label}
-              </Link>
-            ))}
+            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
+              {LINKS.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="text-md text-ink-2 transition-colors hover:text-ink"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           </div>
 
           <div className="flex items-center gap-5 text-ink-3">
             <a
               href="mailto:hello@encore.app"
               aria-label="Email us"
-              className="transition-colors hover:text-ink"
+              className="-m-2 p-2 transition-colors hover:text-ink"
             >
               <Mail className="size-[18px]" />
             </a>
-            <Link href="/help" aria-label="Help" className="transition-colors hover:text-ink">
+            <Link href="/help" aria-label="Help" className="-m-2 p-2 transition-colors hover:text-ink">
               <MessageCircle className="size-[18px]" />
             </Link>
-            <Link href="/" aria-label="Encore home" className="transition-colors hover:text-ink">
+            <Link href="/" aria-label="Encore home" className="-m-2 p-2 transition-colors hover:text-ink">
               <AtSign className="size-[18px]" />
             </Link>
           </div>

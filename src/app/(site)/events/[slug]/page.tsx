@@ -5,81 +5,19 @@ import type { Metadata } from "next";
 import {
   Clock, MapPin, ShieldCheck, Tag, Ticket, Users, Video,
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { getEventBySlug, getEventSocialCounts } from "@/features/events/queries";
 import { getUser } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
-import { Avatar } from "@/components/ui/misc";
+
+import { Avatar } from "@/components/ui/avatar";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { Card, Divider } from "@/components/ui/surface";
 import { FieldRow, InfoRow } from "@/components/ui/field-row";
-import { TicketPicker } from "@/components/events/ticket-picker";
-import { SeatMap } from "@/components/events/seat-map";
-import { FavoriteButton } from "@/components/events/favorite-button";
-import { ShareButton } from "@/components/events/share-button";
+import { TicketPicker } from "@/features/events/components/ticket-picker";
+import { SeatMap } from "@/features/events/components/seat-map";
+import { FavoriteButton } from "@/features/account/components/favorite-button";
+import { ShareButton } from "@/features/events/components/share-button";
 import { formatDate, formatTime, pluralize } from "@/lib/format";
-import type { EventSeat, TicketAvailability, VenueSeat, VenueSection } from "@/lib/types";
-
-type SeatWithPlace = EventSeat & {
-  seat: (Pick<VenueSeat, "id" | "row_label" | "seat_number" | "pos_x" | "pos_y"> & {
-    section: Pick<VenueSection, "id" | "name" | "code" | "color"> | null;
-  }) | null;
-};
-
-async function loadEvent(slug: string) {
-  const supabase = await createClient();
-
-  const { data: event } = await supabase
-    .from("events")
-    .select(
-      `*,
-       organizer:organizers(id, name, slug, logo_url, description, verification_status),
-       venue:venues(id, name, slug, address_line1, city, country, timezone, latitude, longitude, image_url),
-       category:categories(id, name, slug, color)`,
-    )
-    .eq("slug", slug)
-    .maybeSingle();
-
-  if (!event) return null;
-
-  // Release any hold whose ten minutes are up before reading the inventory.
-  // A scheduled sweep does this every minute too, but doing it here means the
-  // page a buyer is actually looking at can never show an abandoned checkout's
-  // seats as taken, or count its tickets against what is left.
-  await supabase.rpc("expire_reservations", { p_event_id: event.id });
-
-  const [{ data: availability }, { data: seats }, { data: types }] = await Promise.all([
-    supabase.rpc("event_availability", { p_event_id: event.id }),
-    event.seating_type === "reserved_seating"
-      ? supabase
-          .from("event_seats")
-          .select(
-            `id, status, price_cents, ticket_type_id,
-             seat:venue_seats(id, row_label, seat_number, pos_x, pos_y,
-               section:venue_sections(id, name, code, color))`,
-          )
-          .eq("event_id", event.id)
-      : Promise.resolve({ data: [] as SeatWithPlace[] }),
-    // Which tiers price a seating section, so a seated event can still offer
-    // tiers that have no seats at all.
-    supabase.from("ticket_types").select("id, section_id").eq("event_id", event.id),
-  ]);
-
-  const seatedTypeIds = new Set(
-    ((types ?? []) as { id: string; section_id: string | null }[])
-      .filter((type) => type.section_id)
-      .map((type) => type.id),
-  );
-
-  const all = (availability ?? []) as TicketAvailability[];
-
-  return {
-    event,
-    availability: all,
-    seatedAvailability: all.filter((tier) => seatedTypeIds.has(tier.ticket_type_id)),
-    generalAvailability: all.filter((tier) => !seatedTypeIds.has(tier.ticket_type_id)),
-    seats: (seats ?? []) as unknown as SeatWithPlace[],
-  };
-}
 
 export async function generateMetadata({
   params,
@@ -87,7 +25,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const loaded = await loadEvent(slug);
+  const loaded = await getEventBySlug(slug);
   if (!loaded) return { title: "Event not found" };
 
   const { event } = loaded;
@@ -105,19 +43,12 @@ export async function generateMetadata({
 
 export default async function EventPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const loaded = await loadEvent(slug);
+  const loaded = await getEventBySlug(slug);
   if (!loaded) notFound();
 
   const { event, availability, seatedAvailability, generalAvailability, seats } = loaded;
   const user = await getUser();
-  const supabase = await createClient();
-
-  const [{ data: favorite }, { count: attendeeCount }] = await Promise.all([
-    user
-      ? supabase.from("favorites").select("event_id").eq("event_id", event.id).eq("user_id", user.id).maybeSingle()
-      : Promise.resolve({ data: null }),
-    supabase.from("tickets").select("id", { count: "exact", head: true }).eq("event_id", event.id).in("status", ["valid", "used"]),
-  ]);
+  const { favorited, attendeeCount } = await getEventSocialCounts(event.id, user?.id ?? null);
 
   const tz = event.timezone ?? undefined;
   const isPast = new Date(event.ends_at) < new Date();
@@ -174,10 +105,18 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-14">
+      {/*
+        Below lg the rail is `contents`, so its two blocks become siblings of
+        the main column and `order` can interleave them: poster, then the event
+        itself, then the host/venue/actions. Stacking the rail whole put the
+        title three screens down, under metadata for an event you had not been
+        told the name of yet. At lg the rail is a block again and every `order`
+        resets, so the two-column layout is byte-for-byte what it was.
+      */}
+      <div className="grid gap-10 max-lg:flex max-lg:flex-col lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-14">
         {/* ---- Left rail: poster, organizer, venue ------------------------- */}
-        <div className="lg:sticky lg:top-24 lg:self-start">
-          <div className="relative aspect-square overflow-hidden rounded-2xl bg-sunken shadow-e1">
+        <div className="max-lg:contents lg:sticky lg:top-24 lg:self-start">
+          <div className="relative aspect-square overflow-hidden rounded-2xl bg-sunken shadow-e1 max-lg:order-1">
             {event.cover_image_url ? (
               <Image
                 src={event.cover_image_url}
@@ -192,7 +131,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             )}
           </div>
 
-          <div className="mt-5 space-y-5">
+          <div className="space-y-5 max-lg:order-3 lg:mt-5">
             <div>
               <p className="eyebrow mb-2.5">Hosted by</p>
               <Link
@@ -246,7 +185,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             <div className="flex gap-2">
               <FavoriteButton
                 eventId={event.id}
-                initialFavorited={Boolean(favorite)}
+                initialFavorited={favorited}
                 signedIn={Boolean(user)}
               />
               <ShareButton title={event.title} />
@@ -255,7 +194,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         </div>
 
         {/* ---- Right column: the event itself ------------------------------ */}
-        <div className="min-w-0">
+        <div className="min-w-0 max-lg:order-2">
           <div className="flex flex-wrap items-center gap-2">
             {event.category && (
               <Badge tone="neutral" size="md">
@@ -309,11 +248,11 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
                   : [event.venue?.city, event.venue?.country].filter(Boolean).join(", ") || undefined
               }
             />
-            {(attendeeCount ?? 0) > 0 && (
+            {attendeeCount > 0 && (
               <InfoRow
                 icon={Users}
                 main="Going"
-                sub={pluralize(attendeeCount ?? 0, "person", "people")}
+                sub={pluralize(attendeeCount, "person", "people")}
               />
             )}
           </div>

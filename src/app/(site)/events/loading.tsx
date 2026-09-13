@@ -1,6 +1,6 @@
 import { MapPin } from "lucide-react";
 import Link from "next/link";
-import { EventCardSkeleton } from "@/components/events/event-card";
+import { EventCardSkeleton } from "@/features/catalog/components/event-card";
 import { Button } from "@/components/ui/button";
 import { Shimmer } from "@/components/ui/skeleton";
 

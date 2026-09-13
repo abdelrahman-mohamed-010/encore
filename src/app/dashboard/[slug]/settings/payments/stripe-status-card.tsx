@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle, CardDescription } from "@/components/ui/surface";
 import { FieldRow } from "@/components/ui/field-row";
-import { DisconnectStripeButton } from "@/components/dashboard/disconnect-stripe";
+import { DisconnectStripeButton } from "@/features/organizers/components/disconnect-stripe";
 import { formatDate } from "@/lib/format";
 import type { Tables } from "@/lib/types";
 
@@ -12,10 +12,12 @@ type PaymentAccount = Tables["payment_accounts"]["Row"];
 export async function StripeStatusCard({
   accountPromise,
   organizerId,
+  organizerSlug,
   connectConfigured,
 }: {
   accountPromise: PromiseLike<PaymentAccount | null>;
   organizerId: string;
+  organizerSlug: string;
   connectConfigured: boolean;
 }) {
   const account = await accountPromise;
@@ -78,7 +80,7 @@ export async function StripeStatusCard({
                 Open Stripe <ExternalLink />
               </a>
             </Button>
-            <DisconnectStripeButton organizerId={organizerId} />
+            <DisconnectStripeButton organizerSlug={organizerSlug} />
           </CardBody>
         </>
       ) : (

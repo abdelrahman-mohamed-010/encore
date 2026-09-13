@@ -1,34 +1,25 @@
 import Image from "next/image";
+import { TicketStatusBadge } from "@/components/ui/status-badge";
+import type { TicketStatus } from "@/lib/types";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { CalendarDays, Clock, MapPin, Ticket as TicketIcon } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { listMyTickets } from "@/features/account/queries";
 import { requireUser } from "@/lib/auth";
 import { renderTicketQr } from "@/lib/qr";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { EmptyState } from "@/components/ui/misc";
-import { TicketQrModal } from "@/components/events/ticket-qr-modal";
+
+import { EmptyState } from "@/components/ui/empty-state";
+import { TicketQrModal } from "@/features/account/components/ticket-qr-modal";
 import { formatEventStamp } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = { title: "My tickets" };
-const STATUS_TONE = { valid: "positive", used: "neutral", refunded: "critical", void: "critical" } as const;
+
 
 export default async function TicketsPage() {
   const user = await requireUser();
-  const supabase = await createClient();
-  const { data: tickets } = await supabase
-    .from("tickets")
-    .select(
-      `id, ticket_code, qr_secret, status, seat_label, attendee_name, checked_in_at,
-       ticket_type:ticket_types(name),
-       event:events(id, title, slug, starts_at, ends_at, timezone, cover_image_url, is_online, venue:venues(name, city))`,
-    )
-    .eq("owner_user_id", user.id)
-    .order("issued_at", { ascending: false });
-
-  const rows = tickets ?? [];
+  const rows = await listMyTickets(user.id);
   const now = new Date();
   const upcoming = rows.filter((t) => t.event && new Date(t.event.ends_at) >= now);
   const past = rows.filter((t) => t.event && new Date(t.event.ends_at) < now);
@@ -86,7 +77,7 @@ export default async function TicketsPage() {
 type TicketRow = {
   id: string;
   ticket_code: string;
-  status: keyof typeof STATUS_TONE;
+  status: TicketStatus;
   seat_label: string | null;
   attendee_name: string | null;
   checked_in_at: string | null;
@@ -136,9 +127,7 @@ function TicketCard({ ticket, qr, past = false }: { ticket: TicketRow; qr?: stri
             </span>
           </p>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            <Badge tone={STATUS_TONE[ticket.status]} size="xs">
-              {ticket.status === "used" ? "Checked in" : ticket.status}
-            </Badge>
+            <TicketStatusBadge status={ticket.status} size="xs" />
             <span className="text-xs font-medium text-ink-3">{meta}</span>
           </div>
         </div>

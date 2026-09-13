@@ -5,7 +5,7 @@ import { useParams } from "next/navigation";
 import { Megaphone, QrCode, Share2 } from "lucide-react";
 import { Divider } from "@/components/ui/surface";
 import { Shimmer } from "@/components/ui/skeleton";
-import { QuickAction, SectionBlock } from "@/components/dashboard/tiles";
+import { QuickAction, SectionBlock } from "@/features/dashboard/components/tiles";
 
 /** See dashboard/[slug]/events/loading.tsx — exists to make this dynamic route prefetchable. */
 export default function Loading() {

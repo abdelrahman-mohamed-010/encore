@@ -1,25 +1,18 @@
 import Link from "next/link";
+import { EventStatusBadge } from "@/components/ui/status-badge";
 import {
   CalendarDays, CreditCard, Plus, Receipt, TicketCheck, Wallet,
 } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/surface";
-import { StatTile } from "@/components/ui/misc";
-import { PlainCard } from "@/components/dashboard/tiles";
-import { EventFormDrawer } from "@/components/dashboard/event-form-drawer";
-import { RevenueChart, TicketsChart, type SalesPoint } from "@/components/dashboard/sales-chart";
+
+import { StatTile } from "@/components/ui/stat-tile";
+import { PlainCard } from "@/features/dashboard/components/tiles";
+import { EventFormDrawer } from "@/features/events/components/event-form-drawer";
+import { RevenueChart, TicketsChart } from "@/features/dashboard/components/sales-chart";
+import type { SalesPoint } from "@/features/dashboard/types";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";
 import type { EventStatus, OrganizerStats } from "@/lib/types";
-
-const STATUS_TONE: Record<EventStatus, "positive" | "caution" | "neutral" | "critical"> = {
-  published: "positive",
-  draft: "neutral",
-  pending_review: "caution",
-  paused: "caution",
-  cancelled: "critical",
-  completed: "neutral",
-};
 
 export async function PaymentBanner({
   accountPromise,
@@ -174,9 +167,7 @@ export async function RecentEventsSection({
                 {formatDate(event.starts_at, "medium")}
               </p>
             </div>
-            <Badge tone={STATUS_TONE[event.status]} size="sm">
-              {event.status.replace("_", " ")}
-            </Badge>
+            <EventStatusBadge status={event.status} size="sm" />
           </Link>
         </li>
       ))}

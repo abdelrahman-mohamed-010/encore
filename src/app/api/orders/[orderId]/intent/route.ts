@@ -1,5 +1,5 @@
-import { createClient } from "@/lib/supabase/server";
 import { fail, ok } from "@/lib/api";
+import { requireUserJson } from "@/lib/api-guards";
 import { providerForOrder, isStripeConfigured } from "@/lib/payments";
 
 /** Creates a Stripe PaymentIntent on the organizer's connected account. */
@@ -13,11 +13,9 @@ export async function POST(
     return fail("Stripe is not configured on this deployment.", 501);
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return fail("You must be signed in.", 401);
+  const auth = await requireUserJson();
+  if (auth.response) return auth.response;
+  const { supabase, user } = auth.data;
 
   const { data: order } = await supabase.from("orders").select("*").eq("id", orderId).maybeSingle();
   if (!order) return fail("Order not found.", 404);

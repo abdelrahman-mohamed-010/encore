@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 /**
@@ -13,15 +13,18 @@ export function useDebouncedSearchParam(param = "q", delay = 350) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [value, setValue] = useState(searchParams.get(param) ?? "");
   const [isPending, startTransition] = useTransition();
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // The URL is the source of truth (back/forward, a cleared filter chip) —
-  // keep the input in sync when it changes from outside this hook.
-  useEffect(() => {
-    setValue(searchParams.get(param) ?? "");
-  }, [searchParams, param]);
+  const fromUrl = searchParams.get(param) ?? "";
+  const [value, setValue] = useState(fromUrl);
+  const [lastFromUrl, setLastFromUrl] = useState(fromUrl);
+
+  // The URL is the source of truth (back/forward, a cleared filter chip).
+  if (fromUrl !== lastFromUrl) {
+    setLastFromUrl(fromUrl);
+    setValue(fromUrl);
+  }
 
   function onChange(next: string) {
     setValue(next);

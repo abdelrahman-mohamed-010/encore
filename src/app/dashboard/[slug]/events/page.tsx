@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { requireOrganizer } from "@/lib/auth";
-import { DashboardEventsShell } from "@/components/dashboard/dashboard-events-table";
-import { EventsRows } from "@/components/dashboard/dashboard-events-rows";
+import { DashboardEventsShell } from "@/features/dashboard/components/dashboard-events-table";
+import { EventsRows } from "@/features/dashboard/components/dashboard-events-rows";
 
 export const metadata: Metadata = { title: "Events" };
 

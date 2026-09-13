@@ -1,9 +1,9 @@
 import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { act, renderHook } from "@testing-library/react";
-import { useCountdown } from "@/hooks/use-countdown";
+import { useCountdown } from "@/features/checkout/hooks/use-countdown";
 import { useAsyncAction } from "@/hooks/use-async-action";
-import { useSeatSelection } from "@/hooks/use-seat-selection";
-import { useTicketSelection } from "@/hooks/use-ticket-selection";
+import { useSeatSelection } from "@/features/events/hooks/use-seat-selection";
+import { useTicketSelection } from "@/features/events/hooks/use-ticket-selection";
 import type { TicketAvailability } from "@/lib/types";
 
 const tier = (over: Partial<TicketAvailability> = {}): TicketAvailability => ({

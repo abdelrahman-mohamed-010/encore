@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { createClient } from "@/lib/supabase/server";
+import { listAllCategories } from "@/features/admin/queries";
 import { SectionHeader } from "@/components/ui/surface";
-import { CategoryManager } from "@/components/admin/category-manager";
+import { CategoryManager } from "@/features/admin/components/category-manager";
 
 export const metadata: Metadata = { title: "Categories" };
 
 export default async function AdminCategoriesPage() {
-  const supabase = await createClient();
-  const { data: categories } = await supabase.from("categories").select("*").order("sort_order");
+  const categories = await listAllCategories();
 
   return (
     <div className="max-w-2xl space-y-6">
@@ -16,7 +15,7 @@ export default async function AdminCategoriesPage() {
         title="Categories"
         description="The taxonomy every organizer picks from when creating an event."
       />
-      <CategoryManager categories={categories ?? []} />
+      <CategoryManager categories={categories} />
     </div>
   );
 }

@@ -13,7 +13,8 @@ export type OrganizerValues = z.input<typeof organizerSchema>;
 export type OrganizerData = z.output<typeof organizerSchema>;
 
 export const profileSchema = z.object({
-  fullName: z.string().trim().max(120, "That name is too long.").optional().or(z.literal("")),
+  firstName: z.string().trim().max(60, "That name is too long.").optional().or(z.literal("")),
+  lastName: z.string().trim().max(60, "That name is too long.").optional().or(z.literal("")),
   phone: z.string().trim().max(40, "That phone number is too long.").optional().or(z.literal("")),
   bio: optionalText(600),
   avatarUrl: optionalUrl,
