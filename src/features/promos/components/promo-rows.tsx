@@ -3,7 +3,8 @@ import { Plus, Tag } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/surface";
 
-import { EmptyState } from "@/components/ui/empty-state";import { PaginationRow } from "@/components/ui/table";
+import { EmptyState } from "@/components/ui/empty-state";
+import { PaginationRow } from "@/components/ui/table";
 import { listPromos } from "@/features/promos/queries";
 import { formatMoney, formatNumber } from "@/lib/format";
 import { PromoRowActions } from "@/features/promos/components/promo-row-actions";

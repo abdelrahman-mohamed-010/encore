@@ -55,25 +55,25 @@ export async function OrdersRows({
               key={order.id}
               className="border-b border-hairline-soft last:border-b-0 hover:bg-sunken transition-colors"
             >
-              <td className="px-5 py-3.5">
+              <td data-cell="primary" className="px-5 py-3.5">
                 <span className="font-mono text-xs font-semibold text-ink">{order.order_number}</span>
                 <span className="ml-2 text-xs text-ink-3">
                   {count} {count === 1 ? "ticket" : "tickets"}
                 </span>
               </td>
 
-              <td className="px-5 py-3.5">
+              <td data-label="Buyer" className="px-5 py-3.5">
                 <p className="truncate font-medium text-ink">{order.buyer_name}</p>
                 <p className="truncate text-xs text-ink-3">{order.buyer_email}</p>
               </td>
 
-              <td className="max-w-48 truncate px-5 py-3.5 text-ink-2">{order.event?.title ?? "—"}</td>
+              <td data-label="Event" className="max-w-48 truncate px-5 py-3.5 text-ink-2">{order.event?.title ?? "—"}</td>
 
-              <td className="whitespace-nowrap px-5 py-3.5 text-ink-3">
+              <td data-label="Date" className="whitespace-nowrap px-5 py-3.5 text-ink-3">
                 {formatDateTime(order.created_at)}
               </td>
 
-              <td className="whitespace-nowrap px-5 py-3.5 text-right tabular font-medium text-ink">
+              <td data-label="Total" className="whitespace-nowrap px-5 py-3.5 text-right tabular font-medium text-ink">
                 {formatMoney(order.total_cents, order.currency)}
                 {order.refunded_cents > 0 && (
                   <span className="block text-2xs text-critical">
@@ -82,12 +82,12 @@ export async function OrdersRows({
                 )}
               </td>
 
-              <td className="px-5 py-3.5">
+              <td data-label="Status" className="px-5 py-3.5">
                 <OrderStatusBadge status={order.status} size="xs" />
               </td>
 
               {canRefund && (
-                <td className="px-5 py-3.5 text-right">
+                <td data-cell="actions" className="px-5 py-3.5 text-right">
                   {(order.status === "paid" || order.status === "partially_refunded") && (
                     <RefundButton
                       orderId={order.id}

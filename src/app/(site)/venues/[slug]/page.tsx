@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { DateBlock } from "@/components/ui/field-row";
 
-import { EmptyState } from "@/components/ui/empty-state";import { Breadcrumbs } from "@/components/ui/nav";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Breadcrumbs } from "@/components/ui/nav";
 import { formatDateTime, formatNumber } from "@/lib/format";
 
 export const revalidate = 300;

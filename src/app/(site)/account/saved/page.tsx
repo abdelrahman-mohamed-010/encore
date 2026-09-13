@@ -5,7 +5,8 @@ import { listMySavedEvents } from "@/features/account/queries";
 import { requireUser } from "@/lib/auth";
 import { EventCard } from "@/features/catalog/components/event-card";
 
-import { EmptyState } from "@/components/ui/empty-state";import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
 import type { EventSearchResult } from "@/lib/types";
 
 export const metadata: Metadata = { title: "Saved events" };

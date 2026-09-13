@@ -9,7 +9,8 @@ import { requireUser } from "@/lib/auth";
 import { renderTicketQr } from "@/lib/qr";
 import { Button } from "@/components/ui/button";
 
-import { EmptyState } from "@/components/ui/empty-state";import { TicketQrModal } from "@/features/account/components/ticket-qr-modal";
+import { EmptyState } from "@/components/ui/empty-state";
+import { TicketQrModal } from "@/features/account/components/ticket-qr-modal";
 import { formatEventStamp } from "@/lib/format";
 import { cn } from "@/lib/utils";
 

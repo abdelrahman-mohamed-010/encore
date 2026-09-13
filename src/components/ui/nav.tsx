@@ -27,7 +27,10 @@ export function Pagination({
   );
 
   return (
-    <nav className={cn("flex items-center justify-center gap-1", className)} aria-label="Pagination">
+    <nav
+      className={cn("flex items-center justify-center gap-1 max-sm:flex-wrap", className)}
+      aria-label="Pagination"
+    >
       <Button
         variant="ghost"
         size="icon-sm"
@@ -125,11 +128,11 @@ export function Steps({
   className?: string;
 }) {
   return (
-    <ol className={cn("flex items-center gap-2", className)}>
+    <ol className={cn("flex items-center gap-2 overflow-x-auto no-scrollbar max-sm:-mx-5 max-sm:px-5", className)}>
       {steps.map((step, index) => {
         const state = index < current ? "done" : index === current ? "active" : "todo";
         return (
-          <li key={step} className="flex flex-1 items-center gap-2">
+          <li key={step} className="flex flex-1 shrink-0 items-center gap-2">
             <span
               className={cn(
                 "grid size-6 shrink-0 place-items-center rounded-full text-2xs font-semibold tnum",

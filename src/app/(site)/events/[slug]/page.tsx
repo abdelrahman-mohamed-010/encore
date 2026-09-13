@@ -9,7 +9,8 @@ import { getEventBySlug, getEventSocialCounts } from "@/features/events/queries"
 import { getUser } from "@/lib/auth";
 import { Badge } from "@/components/ui/badge";
 
-import { Avatar } from "@/components/ui/avatar";import { VerifiedBadge } from "@/components/ui/verified-badge";
+import { Avatar } from "@/components/ui/avatar";
+import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { Card, Divider } from "@/components/ui/surface";
 import { FieldRow, InfoRow } from "@/components/ui/field-row";
 import { TicketPicker } from "@/features/events/components/ticket-picker";
@@ -104,10 +105,18 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         // eslint-disable-next-line react/no-danger
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-14">
+      {/*
+        Below lg the rail is `contents`, so its two blocks become siblings of
+        the main column and `order` can interleave them: poster, then the event
+        itself, then the host/venue/actions. Stacking the rail whole put the
+        title three screens down, under metadata for an event you had not been
+        told the name of yet. At lg the rail is a block again and every `order`
+        resets, so the two-column layout is byte-for-byte what it was.
+      */}
+      <div className="grid gap-10 max-lg:flex max-lg:flex-col lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] lg:gap-14">
         {/* ---- Left rail: poster, organizer, venue ------------------------- */}
-        <div className="lg:sticky lg:top-24 lg:self-start">
-          <div className="relative aspect-square overflow-hidden rounded-2xl bg-sunken shadow-e1">
+        <div className="max-lg:contents lg:sticky lg:top-24 lg:self-start">
+          <div className="relative aspect-square overflow-hidden rounded-2xl bg-sunken shadow-e1 max-lg:order-1">
             {event.cover_image_url ? (
               <Image
                 src={event.cover_image_url}
@@ -122,7 +131,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
             )}
           </div>
 
-          <div className="mt-5 space-y-5">
+          <div className="space-y-5 max-lg:order-3 lg:mt-5">
             <div>
               <p className="eyebrow mb-2.5">Hosted by</p>
               <Link
@@ -185,7 +194,7 @@ export default async function EventPage({ params }: { params: Promise<{ slug: st
         </div>
 
         {/* ---- Right column: the event itself ------------------------------ */}
-        <div className="min-w-0">
+        <div className="min-w-0 max-lg:order-2">
           <div className="flex flex-wrap items-center gap-2">
             {event.category && (
               <Badge tone="neutral" size="md">

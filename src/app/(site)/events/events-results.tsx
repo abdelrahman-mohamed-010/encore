@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { SearchX } from "lucide-react";
 
-import { EmptyState } from "@/components/ui/empty-state";import { Button } from "@/components/ui/button";
+import { EmptyState } from "@/components/ui/empty-state";
+import { Button } from "@/components/ui/button";
 import { LoadMoreEvents } from "@/features/catalog/components/load-more-events";
 import { formatNumber } from "@/lib/format";
 import type { EventSearchResult } from "@/lib/types";

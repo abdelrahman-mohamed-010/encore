@@ -299,6 +299,60 @@
   .no-scrollbar { scrollbar-width: none; -ms-overflow-style: none; }
   .no-scrollbar::-webkit-scrollbar { display: none; }
 
+  /*
+     A six-column table on a 390px screen is a 52rem sideways scroll: you read
+     one column at a time and lose the row you were on. Below sm each row
+     becomes a card and each cell a label/value line, taking its label from the
+     cell's `data-label`. Cells without one (row actions) render bare.
+
+     Applies only under the breakpoint, so the real table is untouched above it.
+  */
+  @media (max-width: 639px) {
+    .table-stack,
+    .table-stack tbody,
+    .table-stack tfoot,
+    .table-stack tr,
+    .table-stack td { display: block; width: 100%; }
+
+    .table-stack { min-width: 0; }
+    .table-stack thead { display: none; }
+
+    .table-stack tbody tr {
+      border-bottom: 1px solid var(--color-hairline);
+      padding-block: 0.625rem;
+    }
+    .table-stack tbody tr:last-child { border-bottom: 0; }
+
+    .table-stack tbody td {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 1.25rem;
+      padding: 0.3rem 1.25rem;
+      text-align: left;
+    }
+
+    .table-stack tbody td[data-label]::before {
+      content: attr(data-label);
+      flex: none;
+      font-size: var(--text-2xs);
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-ink-3);
+    }
+
+    /* The row's identity line leads the card at full width. */
+    .table-stack tbody td[data-cell="primary"] {
+      justify-content: flex-start;
+      padding-bottom: 0.5rem;
+    }
+    .table-stack tbody td[data-cell="actions"] {
+      justify-content: flex-end;
+      padding-top: 0.5rem;
+    }
+  }
+
   /* Display type. The serif variant is opt-in per element. */
   .display-1 { font-size: clamp(2.5rem, 1.6rem + 3.6vw, 4rem); line-height: 1.02; letter-spacing: -0.03em; font-weight: 700; text-wrap: balance; }
   .display-2 { font-size: clamp(2rem, 1.4rem + 2.2vw, 2.75rem); line-height: 1.08; letter-spacing: -0.025em; font-weight: 700; text-wrap: balance; }

@@ -66,7 +66,7 @@ export function DashboardOrdersShell({
       </div>
 
       <Card className="overflow-x-auto">
-        <table className="w-full min-w-[52rem] text-left text-sm">
+        <table className="table-stack w-full text-left text-sm sm:min-w-[52rem]">
           <thead>
             <tr className="border-b border-hairline text-2xs uppercase tracking-[0.06em] text-ink-3">
               <th scope="col" className="px-5 py-3.5 font-semibold">Order</th>

@@ -46,14 +46,14 @@ export default async function HomePage() {
           {formatNumber(Number(totalEvents))} events on sale right now
         </p>
         <div className="mt-8">
-          <CategoryRail categories={categories} className="justify-center" />
+          <CategoryRail categories={categories} className="sm:justify-center" />
         </div>
       </section>
 
       {/* ---- Upcoming + rail ----------------------------------------------- */}
       <section className="container-page pb-14 md:pb-16">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_20rem]">
-          <div>
+          <div className="min-w-0">
             <SectionHeader
               title="Happening soon"
               description="The next events to go on stage."
@@ -78,7 +78,7 @@ export default async function HomePage() {
             </Suspense>
           </div>
 
-          <aside className="lg:sticky lg:top-20 lg:self-start">
+          <aside className="min-w-0 lg:sticky lg:top-20 lg:self-start">
             <p className="eyebrow mb-3">Next up</p>
             <div className="space-y-2">
               {soonest.map((event) => (

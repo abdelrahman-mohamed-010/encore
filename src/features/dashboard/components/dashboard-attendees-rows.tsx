@@ -64,23 +64,23 @@ export async function AttendeeRows({
             key={ticket.id}
             className="border-b border-hairline-soft last:border-b-0 hover:bg-sunken transition-colors"
           >
-            <td className="px-5 py-3.5">
+            <td data-cell="primary" className="px-5 py-3.5">
               <p className="truncate font-medium text-ink">{ticket.attendee_name ?? "—"}</p>
               <p className="truncate text-xs text-ink-3">{ticket.attendee_email ?? ""}</p>
             </td>
 
-            <td className="max-w-40 truncate px-5 py-3.5 text-ink-2">{ticket.event?.title ?? "—"}</td>
+            <td data-label="Event" className="max-w-40 truncate px-5 py-3.5 text-ink-2">{ticket.event?.title ?? "—"}</td>
 
-            <td className="px-5 py-3.5 text-ink-2">
+            <td data-label="Ticket" className="px-5 py-3.5 text-ink-2">
               {ticket.ticket_type?.name ?? "General"}
               {ticket.seat_label && (
                 <span className="block text-xs text-ink-3">Seat {ticket.seat_label}</span>
               )}
             </td>
 
-            <td className="px-5 py-3.5 font-mono text-xs text-ink-2 font-medium">{ticket.ticket_code}</td>
+            <td data-label="Code" className="px-5 py-3.5 font-mono text-xs text-ink-2 font-medium">{ticket.ticket_code}</td>
 
-            <td className="px-5 py-3.5">
+            <td data-label="Status" className="px-5 py-3.5">
               {ticket.status === "used" ? (
                 <div>
                   <Badge tone="positive" size="xs">Checked in</Badge>

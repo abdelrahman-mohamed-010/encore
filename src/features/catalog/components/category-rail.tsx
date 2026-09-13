@@ -25,7 +25,14 @@ export function CategoryRail({
   className?: string;
 }) {
   return (
-    <div className={cn("flex gap-2 overflow-x-auto pb-1 no-scrollbar", className)}>
+    <div
+      className={cn(
+        // Below sm the rail bleeds to the viewport edge, so a chip scrolls fully
+        // off instead of being clipped mid-pill by the container gutter.
+        "flex gap-2 overflow-x-auto pb-1 no-scrollbar max-sm:-mx-5 max-sm:px-5",
+        className,
+      )}
+    >
       <CategoryChip href="/events" label="All" active={!activeSlug} iconName="LayoutGrid" />
       {categories.map((category) => (
         <CategoryChip

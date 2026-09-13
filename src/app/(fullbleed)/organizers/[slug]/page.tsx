@@ -5,7 +5,8 @@ import type { Metadata } from "next";
 import { Globe, Mail } from "lucide-react";
 import { getOrganizerBySlug, getOrganizerPublicPage } from "@/features/organizers/queries";
 
-import { Avatar } from "@/components/ui/avatar";import { NearbyEvents } from "@/features/map/components/nearby-events";
+import { Avatar } from "@/components/ui/avatar";
+import { NearbyEvents } from "@/features/map/components/nearby-events";
 import { VerifiedBadge } from "@/components/ui/verified-badge";
 import { EventTimeline } from "@/features/organizers/components/event-timeline";
 

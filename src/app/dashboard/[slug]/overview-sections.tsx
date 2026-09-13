@@ -6,7 +6,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardBody, CardHeader, CardTitle } from "@/components/ui/surface";
 
-import { StatTile } from "@/components/ui/stat-tile";import { PlainCard } from "@/features/dashboard/components/tiles";
+import { StatTile } from "@/components/ui/stat-tile";
+import { PlainCard } from "@/features/dashboard/components/tiles";
 import { EventFormDrawer } from "@/features/events/components/event-form-drawer";
 import { RevenueChart, TicketsChart, type SalesPoint } from "@/features/dashboard/components/sales-chart";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";

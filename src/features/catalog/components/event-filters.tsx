@@ -69,7 +69,11 @@ export function EventFilters({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center gap-2.5">
+      {/*
+        Wrapping four selects and a sort into a 390px column produced three
+        ragged rows. Below sm they become one edge-to-edge scrolling strip.
+      */}
+      <div className="flex flex-wrap items-center gap-2.5 max-sm:-mx-5 max-sm:flex-nowrap max-sm:overflow-x-auto max-sm:px-5 max-sm:pb-1 max-sm:no-scrollbar max-sm:*:shrink-0">
         <span className="mr-1 hidden items-center gap-2 text-sm font-medium text-ink-2 sm:flex">
           <SlidersHorizontal className="size-3.5" />
           Filter
@@ -117,7 +121,7 @@ export function EventFilters({
           Free
         </Button>
 
-        <div className="ml-auto flex items-center gap-2.5">
+        <div className="flex items-center gap-2.5 sm:ml-auto">
           <SelectField
             aria-label="Sort by"
             size="sm"

@@ -17,7 +17,8 @@ import { ColorPicker } from "@/components/ui/color-picker";
 
 import { Meter } from "@/components/ui/meter";
 import { EmptyState } from "@/components/ui/empty-state";
-import { StatTile } from "@/components/ui/stat-tile";import { Table, TBody, TD, TH, THead, TR, TableWrap } from "@/components/ui/table";
+import { StatTile } from "@/components/ui/stat-tile";
+import { Table, TBody, TD, TH, THead, TR, TableWrap } from "@/components/ui/table";
 import { Pagination, Steps } from "@/components/ui/nav";
 import { Kbd } from "@/components/ui/button";
 import {
@@ -440,10 +441,10 @@ export function DesignGallery() {
                     ["Layla Mostafa", "Bronze", "critical", "Refunded", "$40.00"],
                   ].map(([name, tier, tone, status, paid]) => (
                     <TR key={name}>
-                      <TD className="font-medium">{name}</TD>
-                      <TD>{tier}</TD>
-                      <TD><StatusDot tone={tone as "positive"}>{status}</StatusDot></TD>
-                      <TD numeric>{paid}</TD>
+                      <TD data-cell="primary" className="font-medium">{name}</TD>
+                      <TD data-label="Ticket">{tier}</TD>
+                      <TD data-label="Status"><StatusDot tone={tone as "positive"}>{status}</StatusDot></TD>
+                      <TD data-label="Paid" numeric>{paid}</TD>
                     </TR>
                   ))}
                 </TBody>

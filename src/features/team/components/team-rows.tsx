@@ -1,6 +1,7 @@
 import Link from "next/link";
 
-import { Avatar } from "@/components/ui/avatar";import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
+import { Avatar } from "@/components/ui/avatar";
+import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Users, UserPlus } from "lucide-react";
 import { listTeamMembers, type Member } from "@/features/team/queries";
@@ -65,16 +66,16 @@ export async function TeamRows({
             key={member.userId}
             className="border-b border-hairline-soft transition-colors hover:bg-sunken/60 last:border-b-0"
           >
-            <td className="px-5 py-3.5">
+            <td data-cell="primary" className="px-5 py-3.5">
               <div className="flex items-center gap-3">
                 <Avatar src={member.avatarUrl} name={member.fullName ?? member.email} size="md" />
                 <span className="font-medium text-ink">{member.fullName ?? "Team member"}</span>
               </div>
             </td>
 
-            <td className="whitespace-nowrap px-5 py-3.5 text-ink-2">{member.email}</td>
+            <td data-label="Email" className="whitespace-nowrap px-5 py-3.5 text-ink-2">{member.email}</td>
 
-            <td className="px-5 py-3.5">
+            <td data-label="Role" className="px-5 py-3.5">
               <TeamRoleSelect
                 organizerSlug={organizerSlug}
                 userId={member.userId}
@@ -84,7 +85,7 @@ export async function TeamRows({
               />
             </td>
 
-            <td className="px-5 py-3.5 text-right">
+            <td data-cell="actions" className="px-5 py-3.5 text-right">
               {!(member.role === "owner" && !canManageOwners) && (
                 <TeamRemoveButton organizerSlug={organizerSlug} userId={member.userId} email={member.email} />
               )}

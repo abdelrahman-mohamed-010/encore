@@ -17,16 +17,16 @@ export function ClosingCta() {
           memory awaits.
         </h2>
 
-        <div className="mt-12 flex flex-wrap justify-center gap-3.5">
+        <div className="mt-12 flex flex-wrap justify-center gap-3.5 max-sm:flex-col max-sm:items-stretch">
           <Link
             href="/events"
-            className="inline-flex h-12 items-center rounded-full bg-card px-5 text-md font-medium text-ink shadow-e1 transition-colors hover:bg-sunken"
+            className="inline-flex h-12 items-center justify-center rounded-full bg-card px-5 text-md font-medium text-ink shadow-e1 transition-colors hover:bg-sunken"
           >
             Discover events
           </Link>
           <Link
             href="/dashboard/new"
-            className="inline-flex h-12 items-center rounded-full bg-btn px-5 text-md font-medium text-ink-2 transition-colors hover:bg-btn-h hover:text-ink"
+            className="inline-flex h-12 items-center justify-center rounded-full bg-btn px-5 text-md font-medium text-ink-2 transition-colors hover:bg-btn-h hover:text-ink"
           >
             Start selling tickets
           </Link>

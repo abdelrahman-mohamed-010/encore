@@ -50,7 +50,7 @@ export async function EventReviewRows({
       <tbody>
         {events.map((event) => (
           <tr key={event.id} className="border-b border-hairline-soft last:border-b-0 hover:bg-sunken">
-            <td className="px-5 py-3.5">
+            <td data-cell="primary" className="px-5 py-3.5">
               <div className="flex items-center gap-3">
                 <div className="relative size-10 shrink-0 overflow-hidden rounded-lg bg-sunken flex items-center justify-center">
                   {event.coverImageUrl ? (
@@ -71,14 +71,14 @@ export async function EventReviewRows({
                 </div>
               </div>
             </td>
-            <td className="whitespace-nowrap px-5 py-3.5 text-ink-3">
+            <td data-label="Starts" className="whitespace-nowrap px-5 py-3.5 text-ink-3">
               {formatDate(event.startsAt, "medium")}
             </td>
-            <td className="whitespace-nowrap px-5 py-3.5 text-ink-3">{event.organizerName || "—"}</td>
-            <td className="px-5 py-3.5">
+            <td data-label="Organizer" className="whitespace-nowrap px-5 py-3.5 text-ink-3">{event.organizerName || "—"}</td>
+            <td data-label="Status" className="px-5 py-3.5">
               <EventStatusBadge status={event.status} size="xs" />
             </td>
-            <td className="px-5 py-3.5 text-right">
+            <td data-cell="actions" className="px-5 py-3.5 text-right">
               <EventReviewActions
                 id={event.id}
                 title={event.title}

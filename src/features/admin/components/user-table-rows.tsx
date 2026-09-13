@@ -1,6 +1,7 @@
 import { Search } from "lucide-react";
 
-import { Avatar } from "@/components/ui/avatar";import { Badge } from "@/components/ui/badge";
+import { Avatar } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { PaginationRow, TableEmptyRow } from "@/components/ui/table";
 import { listUsers, type UserProfile } from "@/features/admin/queries";
 import { formatDate } from "@/lib/format";
@@ -37,7 +38,7 @@ export async function UserRows({
       <tbody>
         {profiles.map((profile) => (
           <tr key={profile.id} className="border-b border-hairline-soft last:border-b-0 hover:bg-sunken">
-            <td className="px-5 py-3.5">
+            <td data-cell="primary" className="px-5 py-3.5">
               <div className="flex items-center gap-3">
                 <Avatar src={profile.avatar_url} name={profile.full_name ?? profile.email} size="sm" />
                 <div className="min-w-0">
@@ -46,18 +47,18 @@ export async function UserRows({
                 </div>
               </div>
             </td>
-            <td className="whitespace-nowrap px-5 py-3.5 text-ink-3">
+            <td data-label="Joined" className="whitespace-nowrap px-5 py-3.5 text-ink-3">
               {formatDate(profile.created_at, "medium")}
             </td>
-            <td className="px-5 py-3.5">
+            <td data-label="Role" className="px-5 py-3.5">
               <RoleSelect id={profile.id} email={profile.email} role={profile.role} />
             </td>
-            <td className="px-5 py-3.5">
+            <td data-label="Status" className="px-5 py-3.5">
               <Badge tone={profile.is_banned ? "critical" : "positive"} size="xs">
                 {profile.is_banned ? "Banned" : "Active"}
               </Badge>
             </td>
-            <td className="px-5 py-3.5 text-right">
+            <td data-cell="actions" className="px-5 py-3.5 text-right">
               <BanToggleButton id={profile.id} isBanned={profile.is_banned} />
             </td>
           </tr>

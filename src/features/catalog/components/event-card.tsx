@@ -72,14 +72,24 @@ export function EventCard({
           </div>
         </div>
 
-        <div className="mt-auto flex items-end justify-between gap-3 pt-1">
-          <span className="flex min-w-0 items-center gap-1.5 text-sm text-ink-3">
+        {/*
+          Sharing one line with the price left the venue about eleven characters
+          on a 390px screen, so every card read "Cairo International Stad…".
+          Below sm they stack and the venue gets the full width.
+        */}
+        <div className="mt-auto flex items-end justify-between gap-3 pt-1 max-sm:flex-col max-sm:items-start max-sm:gap-1.5">
+          <span className="flex min-w-0 items-center gap-1.5 text-sm text-ink-3 max-sm:w-full">
             {event.is_online ? (
               <Video className="size-4 shrink-0" />
             ) : (
               <MapPin className="size-4 shrink-0" />
             )}
-            <span className="truncate">{placeLabel(event)}</span>
+            {/*
+              Truncation is nowrap, which made the venue the card's min-content
+              width — enough to push a 320px page sideways once the row stacked.
+              Below sm it wraps instead; from sm up it truncates as before.
+            */}
+            <span className="min-w-0 sm:truncate">{placeLabel(event)}</span>
           </span>
           <span className="shrink-0 text-base font-semibold tabular text-ink">
             {priceRange(event.min_price_cents, event.max_price_cents, event.currency)}

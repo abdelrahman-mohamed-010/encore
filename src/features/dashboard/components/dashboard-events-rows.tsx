@@ -4,7 +4,8 @@ import Image from "next/image";
 import { CalendarDays, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-import { Meter } from "@/components/ui/meter";import { Tooltip } from "@/components/ui/tooltip";
+import { Meter } from "@/components/ui/meter";
+import { Tooltip } from "@/components/ui/tooltip";
 import { PaginationRow, RowLink, TableEmptyRow } from "@/components/ui/table";
 import { listOrganizerEvents, type DashboardEventItem } from "@/features/dashboard/queries";
 import { formatDate, formatMoney, formatNumber } from "@/lib/format";
@@ -61,7 +62,7 @@ export async function EventsRows({
 
           return (
             <RowLink key={event.id} href={`/dashboard/${slug}/events/${event.id}`}>
-              <td className="px-5 py-3.5">
+              <td data-cell="primary" className="px-5 py-3.5">
                 <div className="flex items-center gap-3">
                   <div className="relative size-11 shrink-0 overflow-hidden rounded-xl bg-sunken">
                     {event.cover_image_url ? (
@@ -86,15 +87,15 @@ export async function EventsRows({
                 </div>
               </td>
 
-              <td className="whitespace-nowrap px-5 py-3.5 text-ink-3">
+              <td data-label="Date" className="whitespace-nowrap px-5 py-3.5 text-ink-3">
                 {formatDate(event.starts_at, "medium")}
               </td>
 
-              <td className="px-5 py-3.5">
+              <td data-label="Status" className="px-5 py-3.5">
                 <EventStatusBadge status={event.status} size="xs" />
               </td>
 
-              <td className="whitespace-nowrap px-5 py-3.5 text-xs text-ink-2">
+              <td data-label="Tickets" className="whitespace-nowrap px-5 py-3.5 text-xs text-ink-2">
                 {event.seating_type === "reserved_seating" ? (
                   <span className="font-medium text-ink">Reserved</span>
                 ) : (
@@ -102,7 +103,7 @@ export async function EventsRows({
                 )}
               </td>
 
-              <td className="px-5 py-3.5">
+              <td data-label="Sold" className="px-5 py-3.5">
                 <div className="w-36">
                   <div className="flex items-baseline justify-between text-xs">
                     <span className="tabular text-ink font-medium">
@@ -116,11 +117,11 @@ export async function EventsRows({
                 </div>
               </td>
 
-              <td className="whitespace-nowrap px-5 py-3.5 text-right tabular font-medium text-ink">
+              <td data-label="Revenue" className="whitespace-nowrap px-5 py-3.5 text-right tabular font-medium text-ink">
                 {formatMoney(gross, currency)}
               </td>
 
-              <td className="px-5 py-3.5 text-right whitespace-nowrap">
+              <td data-cell="actions" className="px-5 py-3.5 text-right whitespace-nowrap">
                 <Tooltip content="View public page">
                   <Button asChild variant="ghost" size="icon-sm" className="rounded-lg">
                     <Link href={`/events/${event.slug}`} target="_blank">

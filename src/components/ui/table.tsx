@@ -18,7 +18,7 @@ export function TableWrap({ className, ...props }: React.HTMLAttributes<HTMLDivE
 }
 
 export function Table({ className, ...props }: React.TableHTMLAttributes<HTMLTableElement>) {
-  return <table className={cn("w-full min-w-160 caption-bottom text-sm", className)} {...props} />;
+  return <table className={cn("table-stack w-full caption-bottom text-sm sm:min-w-160", className)} {...props} />;
 }
 
 export function THead({ className, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) {

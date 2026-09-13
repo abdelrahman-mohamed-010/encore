@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { requireProfile } from "@/lib/auth";
 
-import { Avatar } from "@/components/ui/avatar";import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import { AccountTabs } from "@/components/ui/tab-nav";
 
 /**

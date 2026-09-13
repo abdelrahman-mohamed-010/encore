@@ -9,7 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardBody } from "@/components/ui/surface";
 
 import { Meter } from "@/components/ui/meter";
-import { StatTile } from "@/components/ui/stat-tile";import { TicketTypeEditor } from "@/features/events/components/ticket-type-editor";
+import { StatTile } from "@/components/ui/stat-tile";
+import { TicketTypeEditor } from "@/features/events/components/ticket-type-editor";
 import { SeatingEditor, type SeatingSection } from "@/features/seating/components/seating-editor";
 import { EventStatusControl } from "@/features/events/components/event-status-control";
 import { EventFormDrawer } from "@/features/events/components/event-form-drawer";

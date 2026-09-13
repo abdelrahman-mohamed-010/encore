@@ -20,7 +20,8 @@ import { Badge } from "@/components/ui/badge";
 import { Form, FormError, FormField } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-import { SummaryLine } from "@/components/ui/stat-tile";import { cn } from "@/lib/utils";
+import { SummaryLine } from "@/components/ui/stat-tile";
+import { cn } from "@/lib/utils";
 import { expireReservations } from "@/features/checkout/actions";
 
 type Line = {
@@ -237,18 +238,6 @@ export function CheckoutClient({
           )}
 
           <FormError message={pay.error} />
-
-          <Button
-            type="submit"
-            variant="primary"
-            size="xl"
-            block
-            loading={form.formState.isSubmitting}
-            disabled={expired}
-            className="lg:hidden"
-          >
-            {submitLabel}
-          </Button>
         </Form>
 
         <aside className="lg:sticky lg:top-6 lg:self-start">
@@ -341,7 +330,7 @@ export function CheckoutClient({
               <SummaryLine label="Total" value={formatMoney(totals.totalCents, currency)} strong />
             </div>
 
-            <div className="hidden border-t border-hairline-soft p-4 lg:block">
+            <div className="border-t border-hairline-soft p-4">
               <Button
                 type="submit"
                 form="checkout-form"

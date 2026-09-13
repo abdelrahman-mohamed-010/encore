@@ -6,7 +6,8 @@ import { OrganizerSwitcher } from "@/features/dashboard/components/organizer-swi
 import { DashboardTabs } from "@/features/dashboard/components/dashboard-nav";
 import { EventFormDrawer } from "@/features/events/components/event-form-drawer";
 
-import { Avatar } from "@/components/ui/avatar";import { Button } from "@/components/ui/button";
+import { Avatar } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 
 export default async function DashboardLayout({
   children,

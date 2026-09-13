@@ -8,7 +8,8 @@ import { Calendar as CalendarIcon, Clock, MapPin, Ticket, X } from "lucide-react
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 
-import { EmptyState } from "@/components/ui/empty-state";import { formatMoney } from "@/lib/format";
+import { EmptyState } from "@/components/ui/empty-state";
+import { formatMoney } from "@/lib/format";
 import type { EventSearchResult } from "@/lib/types";
 
 export function EventTimeline({
