@@ -30,11 +30,11 @@ export default async function RegisterPage({
         </>
       }
     >
-      <OAuthButtons next={next} />
-      <AuthDivider label="or sign up with email" />
       <Suspense fallback={<div className="h-72 animate-pulse rounded-lg bg-sunken" />}>
         <RegisterForm next={next} />
       </Suspense>
+      <AuthDivider label="or sign up with" />
+      <OAuthButtons next={next} />
     </AuthCard>
   );
 }

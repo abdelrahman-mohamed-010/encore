@@ -30,11 +30,11 @@ export default async function LoginPage({
         </>
       }
     >
-      <OAuthButtons next={next} />
-      <AuthDivider label="or continue with email" />
       <Suspense fallback={<div className="h-56 animate-pulse rounded-lg bg-sunken" />}>
         <LoginForm next={next} />
       </Suspense>
+      <AuthDivider label="or continue with" />
+      <OAuthButtons next={next} />
     </AuthCard>
   );
 }
