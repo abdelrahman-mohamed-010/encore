@@ -50,26 +50,59 @@ screenshot admits nobody. Every scan attempt is logged, valid or not.
 
 ## Architecture
 
+Routes live in `app/`, domain code in `features/`, and only genuinely
+cross-cutting things in `components/` and `lib/`.
+
 ```
 src/
   app/
     (site)/            public storefront + attendee account
+    (fullbleed)/       pages that opt out of the site header
     auth/              sign in, sign up, password reset, OAuth callback
     checkout/          hold → order → pay
     dashboard/[slug]/  tenant-scoped organizer console
     admin/             platform console
-    api/               checkout, payments, refunds, webhooks, Stripe Connect
+    api/               webhooks, Stripe Connect, and the money-path routes
+  features/<domain>/   account admin auth catalog checkout dashboard events
+                       home map organizers promos scan seating team
+    queries.ts         reads. "server-only", returning typed DTOs
+    actions.ts         writes. "use server", validated and authorised
+    components/        that domain's UI
+    hooks/             hooks only that domain uses
   components/
     ui/                the design system primitives
-    events/  layout/  dashboard/  admin/
-  lib/
-    supabase/          browser, server and middleware clients + generated types
-    payments/          provider interface, Stripe adapter, sandbox adapter
-    pricing.ts         order arithmetic, mirrored from the SQL
+    layout/            the app shell
+  lib/                 shared by two or more features: supabase clients,
+                       payments, pricing, roles, validation, format, env
 supabase/migrations/   the schema, in order
 tests/unit/            Vitest
 tests/e2e/             Playwright + a PostgREST-shaped mock
 ```
+
+### Where data access lives
+
+Two rules, both enforced rather than documented:
+
+**Every read is a query.** Pages and components do not talk to Postgres; reads
+live in a feature's `queries.ts`, are marked `server-only`, and return an
+explicit DTO rather than a cast. The one exception is the profile lookup that
+follows sign-in, which needs the session the browser has just established.
+
+**Every write is a server action.** Mutations run on the server through
+`next-safe-action`, validated by the *same* zod schema the form uses, and
+authorised by `requireOrgAccess` before touching a row. The browser Supabase
+client is reserved for what genuinely needs it — Supabase auth, storage uploads
+and one edge function — and `npm run lint` errors if anything else imports it.
+
+That means business rules hold on the server, not just in the UI: the ticket
+capacity floor, the refusal to delete a type that has sales, and owner-only
+promotion to owner are all re-checked in the action.
+
+Caching follows from this. Writes call `revalidatePath`, so the ISR pages are
+busted by a change rather than waiting out a timer, and
+`experimental.staleTimes.dynamic` keeps a route you just left in the client
+router cache instead of refetching it — without that, every auth-cookie route
+replayed its skeleton on back-navigation.
 
 ### The money path
 
@@ -92,6 +125,12 @@ npm install
 cp .env.example .env.local     # fill in your Supabase project
 npm run dev
 ```
+
+`NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` are required and
+checked by `src/env.ts` when the build starts. They are inlined into the client
+bundle, so a build without them would deploy green and then fail in every
+visitor's browser — the build stops instead. Set them in your host's
+environment, not just locally.
 
 Apply `supabase/migrations/*.sql` in order to a fresh Supabase project, then set
 the server secret the payment RPCs check:
@@ -123,7 +162,7 @@ Point a Stripe webhook at `/api/webhooks/stripe` for `payment_intent.succeeded`,
 ```bash
 npm run typecheck   # tsc, no emit
 npm run lint        # eslint
-npm test            # vitest — pricing, formatting, QR, payments, API errors
+npm test            # vitest — pricing, roles, validation, QR, seating, format
 npm run test:e2e    # playwright — desktop + mobile
 npm run verify      # all of the above plus a production build
 ```
@@ -131,6 +170,12 @@ npm run verify      # all of the above plus a production build
 `npm run test:e2e` boots a small PostgREST-shaped mock and points a real
 production build at it, so the server components, the middleware and the browser
 all run their real code paths without needing a live database.
+
+Two of the unit suites exist to catch drift rather than bugs. One asserts the
+authorisation ladder in `lib/roles.ts`, which every guard and action now leans
+on. The other checks `lib/pricing.ts` against a transcription of the fee
+arithmetic in `0006_orders_tickets_rpcs.sql`, so the total a buyer is quoted
+cannot quietly diverge from the one the database will charge.
 
 The database itself is tested separately, against a real Postgres, in
 `supabase/tests/` — oversell under contention, hold expiry, promo maths, tenant
@@ -147,3 +192,10 @@ display type. Tokens live in `src/app/globals.css`; primitives in
 
 Chart colours are validated for colour-vision deficiency separation and contrast
 against each surface rather than picked by eye.
+
+**Mobile is a separate design, not a squeeze.** Where the phone layout differs
+it is expressed with `max-sm:` / `max-lg:` variants, so the desktop stylesheet
+is untouched rather than overridden. The event page reorders its columns below
+`lg` so the title follows the poster instead of trailing the venue block, and
+`table-stack` turns each dashboard table row into a labelled card below `sm`
+rather than a 50rem sideways scroll.
